@@ -1,0 +1,384 @@
+ID;Gruppe;Typ;Bezeichnung;Beschreibung
+0;F4SM;bool;F4SMVar;Version of this file: 1.5 04.02.2020
+10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
+20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
+30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
+40;AIRCRAFT;float;gs;Ownship Normal Gs
+50;AIRCRAFT;float;pitch;Ownship Pitch (Radians)
+60;AIRCRAFT;float;roll;Ownship Roll (Radians)
+70;AIRCRAFT;float;turnRate;actual turn rate (no delay or dampening) in degrees/second
+80;AIRCRAFT;float;yaw;Ownship Yaw (Radians)
+90;ALTIMETER;float;aauz;AAU altimeter indicated altitude (new in BMS4)
+100;ALTIMETER;float;cabinAlt;Ownship cabin altitude
+110;ALTIMETER;float;caraAlow;Cara alow setting
+120;ALTIMETER;float;RALT;"Radar altitude (only valid/ reliable if MiscBit ""RALT_Valid"" is set)"
+130;ALTIMETER;string;AltCalReading;Altimeter setting (e.g. 1013/2992)
+150;CMDS/RWR;float;ChaffCount;Number of Chaff left
+160;CMDS/RWR;float;FlareCount;Number of Flare left
+170;CMDS/RWR;byte[];RwrInfo;New RWR Info
+180;CMDS/RWR;int;cmdsMode;Ownship CMDS mode state, see CmdsModes enum for details
+190;AIRCRAFT;float;lefPos;Ownship LEF position
+200;AIRCRAFT;float;speedBrake;Ownship speed brake position 0 = closed, 1 = 60 Degrees open
+210;AIRCRAFT;float;tefPos;Ownship TEF position
+220;AIRCRAFT;float;vtolPos;Ownship VTOL exhaust angle
+230;DED/PFL;string[];DEDLines;All 5 rows with 25 chars each
+231;DED/PFL;string;DEDLine1;Line 1 of the DED display
+232;DED/PFL;string;DEDLine2;Line 2 of the DED display
+233;DED/PFL;string;DEDLine3;Line 3 of the DED display
+234;DED/PFL;string;DEDLine4;Line 4 of the DED display
+235;DED/PFL;string;DEDLine5;Line 5 of the DED display
+240;DED/PFL;string[];Invert;DED display with inverted colors?
+250;ENGINE;float;epuFuel;Ownship EPU fuel (Percent 0-100)
+260;ENGINE;float;ftit;Ownship Forward Turbine Inlet Temp (Degrees C)
+270;ENGINE;float;ftit2;Ownship Forward Turbine Inlet Temp2 (Degrees C)
+280;ENGINE;float;hydPressureA;Ownship Hydraulic Pressure A
+290;ENGINE;float;hydPressureB;Ownship Hydraulic Pressure B
+300;ENGINE;float;nozzlePos;Ownship engine nozzle percent open (0-100)
+310;ENGINE;float;nozzlePos2;Ownship engine nozzle2 percent open (0-100)
+320;ENGINE;float;oilPressure;Ownship Oil Pressure (Percent 0-100)
+330;ENGINE;float;oilPressure2;Ownship Oil Pressure2 (Percent 0-100)
+340;ENGINE;float;rpm;Ownship engine rpm (Percent 0-103)
+350;ENGINE;float;rpm2;Ownship engine rpm2 (Percent 0-103)
+360;ENVIROMENT;float;windOffset;Wind delta to FPM (Radians)
+370;ENVIROMENT;float;bullseyeX;Bullseye X in sim coordinates (same as ownship, i.e. North (Ft))
+380;ENVIROMENT;float;bullseyeY;Bullseye Y in sim coordinates (same as ownship, i.e. East (Ft))
+390;F4SM;int;BMSBuildNumber;E.g. build 20050
+400;F4SM;int;BMSVersionMajor;E.g.  4.
+410;F4SM;int;BMSVersionMinor;E.g. 34.
+420;F4SM;int;BMSVersionMicro;E.g. 1
+430;F4SM;int;VersionNum;Version of Mem area
+440;F4SM;int;VersionNum2;Version of Mem area
+450;F4SM;string;DrawingAreaSize;The overall size of the DrawingData/FalconSharedMemoryAreaDrawing area
+460;F4SM;string;StringAreaSize;The overall size of the StringData/FalconSharedMemoryAreaString shared memory area
+470;F4SM;string;StringAreaTime;Last time the StringData/FalconSharedMemoryAreaString shared memory area has been changed - you only need to re-read the string shared mem if this changes
+480;FUEL;float;aft;Fuel quantity in aft tank in lbs
+490;FUEL;float;bingoFuel;Bingo fuel level
+500;FUEL;float;externalFuel;Ownship external fuel (Lbs)
+510;FUEL;float;fuelFlow;Ownship fuel flow (Lbs/Hour)
+520;FUEL;float;fuelFlow2;Ownship fuel flow2 (Lbs/Hour)
+530;FUEL;float;fwd;Fuel quantity in forward tank in lbs
+540;FUEL;float;internalFuel;Ownship internal fuel (Lbs)
+550;FUEL;float;total;Total fuel in lbs
+560;GEAR;float;bumpIntensity;"Intensity of a ""bump"" while taxiing/rolling, 0..1"
+570;GEAR;float;gearPos;Ownship Gear position 0 = up, 1 = down
+580;GEAR;float;LeftGearPos;Position of the left landinggear
+590;GEAR;float;NoseGearPos;Position of the nose landinggear
+600;GEAR;float;RightGearPos;Position of the right landinggear
+610;HeadPosition;float;headPitch;Head pitch offset from design eye (radians) NB: these do not work when TrackIR device is enabled
+620;HeadPosition;float;headRoll;Head roll offset from design eye (radians) NB: these do not work when TrackIR device is enabled
+630;HeadPosition;float;headYaw;Head yaw offset from design eye (radians) NB: these do not work when TrackIR device is enabled
+640;HeadPosition;float;headX;Head X offset from design eye (feet)
+650;HeadPosition;float;headY;Head Y offset from design eye (feet)
+660;HeadPosition;float;headZ;Head Z offset from design eye (feet)
+670;HSI/ADI/TACAN;float;kias;Ownship Indicated Airspeed (Knots)
+680;HSI/ADI/TACAN;float;mach;Ownship Mach number
+690;HSI/ADI/TACAN;float;vt;Ownship True Airspeed (Ft/Sec)
+700;HSI/ADI/TACAN;byte;navMode;HSI nav mode (new in BMS4)
+710;HSI/ADI/TACAN;float;airbaseX;HSI_VAL_AIRBASE_X
+720;HSI/ADI/TACAN;float;airbaseY;HSI_VAL_AIRBASE_Y
+730;HSI/ADI/TACAN;float;bearingToBeacon;HSI_VAL_BEARING_TO_BEACON
+740;HSI/ADI/TACAN;float;courseDeviation;HSI_VAL_CRS_DEVIATION
+750;HSI/ADI/TACAN;float;currentHeading;HSI_VAL_CURRENT_HEADING
+760;HSI/ADI/TACAN;float;desiredCourse;HSI_VAL_DESIRED_CRS
+770;HSI/ADI/TACAN;float;desiredHeading;HSI_VAL_DESIRED_HEADING
+780;HSI/ADI/TACAN;float;deviationLimit;HSI_VAL_DEV_LIMIT
+790;HSI/ADI/TACAN;float;distanceToBeacon;HSI_VAL_DISTANCE_TO_BEACON
+800;HSI/ADI/TACAN;float;halfDeviationLimit;HSI_VAL_HALF_DEV_LIMIT
+810;HSI/ADI/TACAN;float;localizerCourse;HSI_VAL_LOCALIZER_CRS
+820;HSI/ADI/TACAN;float;totalValues;HSI_VAL_TOTAL_VALUES
+830;HSI/ADI/TACAN;int;courseState;HSI_STA_CRS_STATE
+840;HSI/ADI/TACAN;int;headingState;HSI_STA_HDG_STATE
+850;HSI/ADI/TACAN;int;totalStates;HSI_STA_TOTAL_STATES
+860;UNKNOWN;ushort[];RTT_area;For each area: left/top/right/bottom
+870;UNKNOWN;ushort[];RTT_size;RTT overall width and height
+880;LIGHTS;byte;instrLight;Current instrument backlight brightness setting, see InstrLight enum for details
+890;IFF;string;iffBackupMode;IFF panel backup Mode1 all 4 digits
+891;IFF;byte;iffBackupMode1Digit1;IFF panel backup Mode1 digit 1
+892;IFF;byte;iffBackupMode1Digit2;IFF panel backup Mode1 digit 2
+893;IFF;byte;iffBackupMode3ADigit1;IFF panel backup Mode3A digit 1
+894;IFF;byte;iffBackupMode3ADigit2;IFF panel backup Mode3A digit 2
+900;HSI/ADI/TACAN;float;adiIlsVerPos;Position of vertical ILS bar
+910;HSI/ADI/TACAN;float;adiIlsHorPos;Position of horizontal ILS bar
+920;SYSTEMS;uint;miscBits;See MiscBits enum for details
+921;SYSTEMS;bool;ralt_Valid;Indicates whether the RALT reading is valid/reliable
+980;MULTIPLAYER;byte;pilotsOnline;Number of pilots in an MP session
+990;MULTIPLAYER;byte[];pilotsStatus;Status of the MP pilots, see enum FlyStates
+1000;MULTIPLAYER;string[];pilotsCallsign;List of pilots callsign connected to an MP session
+1010;MULTIPLAYER;int;vehicleACD;Ownship ACD index number, i.e. which aircraft type are we flying.
+1020;NAVIGATION;float;x;Ownship North (Ft)
+1030;NAVIGATION;float;y;Ownship East (Ft)
+1040;NAVIGATION;float;z;Ownship Down (Ft)
+1050;NAVIGATION;float;xDot;Ownship North Rate (ft/sec)
+1060;NAVIGATION;float;yDot;Ownship East Rate (ft/sec)
+1070;NAVIGATION;float; zDot;Ownship Down Rate (ft/sec)
+1080;NAVIGATION;float;latitude;Ownship latitude in degrees (as known by avionics)
+1090;NAVIGATION;float;longitude;Ownship longitude in degrees (as known by avionics)
+1100;DED/PFL;string[];PFLLines;25 usable chars
+1110;DED/PFL;string[];PFLInvert;25 usable chars
+1120;RADIO;string;bupUhfFreq;BUP UHF channel frequency
+1130;RADIO;string;bupUhfPreset;BUP UHF channel preset
+1140;IVC;RadioClientControl;ivc_RadioClientControlData;???
+1150;IVC;RadioClientStatus;ivc_RadioClientStatus;???
+1151;IVC;bool;ivc_AllClear ;No status indications present
+1152;IVC;bool;ivc_ClientActive;Voice client program running
+1153;IVC;bool;ivc_Connected;Connection established with voice server
+1154;IVC;bool;ivc_ConnectionFail;Client failed to connect to voice server
+1155;IVC;bool;ivc_HostUnknown;Bad ip address supplied for voice server
+1156;IVC;bool;ivc_BadPassword;Password rejected by voice server
+1157;IVC;bool;ivc_NoMicrophone;No input device detected by voice client
+1158;IVC;bool;ivc_NoSpeakers;No output device detected by voice client
+1160;CMDS/RWR;float[];bearing;???
+1170;CMDS/RWR;float[];lethality;???
+1180;CMDS/RWR;int;rwrObjectCount;???
+1190;CMDS/RWR;int[];rwrSymbol;???
+1200;CMDS/RWR;uint[];missileActivity;???
+1210;CMDS/RWR;uint[];missileLaunch;???
+1220;CMDS/RWR;uint[];newDetection;???
+1230;CMDS/RWR;uint[];selected;???
+1240;SYSTEMS;uint;powerBits;Ownship power bus / generator states, see PowerBits enum for details
+1241;SYSTEMS;bool;busPowerBattery;True if at least the battery bus is powered
+1242;SYSTEMS;bool;busPowerEmergency;True if at least the emergency bus is powered
+1243;SYSTEMS;bool;busPowerEssential;True if at least the essential bus is powered
+1244;SYSTEMS;bool;busPowerNonEssential;True if at least the non-essential bus is powered
+1245;SYSTEMS;bool;mainGenerator;True if the main generator is online
+1246;SYSTEMS;bool;standbyGenerator;True if the standby generator is online
+1247;SYSTEMS;bool;jetFuelStarter;True if JFS is running, can be used for magswitch
+1250;SYSTEMS;int;currentTime;Current time in seconds (max 60 * 60 * 24)
+1260;SYSTEMS;int;mainPower;???
+1270;CAUTION;uint;bettyBits;See BettyBits enum for details
+1271;CAUTION;bool;betty_Allwords;Betty is bitching
+1272;CAUTION;bool;betty_Pullup ;Betty is bitching
+1273;CAUTION;bool;betty_Altitude;Betty is bitching
+1274;CAUTION;bool;betty_Warning;Betty is bitching
+1275;CAUTION;bool;betty_Jammer;Betty is bitching
+1276;CAUTION;bool;betty_Counter;Betty is bitching
+1277;CAUTION;bool;betty_ChaffFlare;Betty is bitching
+1278;CAUTION;bool;betty_ChaffFlare_Low;Betty is bitching
+1279;CAUTION;bool;betty_ChaffFlare_Out;Betty is bitching
+1280;CAUTION;bool;betty_Lock;Betty is bitching
+1281;CAUTION;bool;betty_Caution;Betty is bitching
+1282;CAUTION;bool;betty_Bingo;Betty is bitching
+1283;CAUTION;bool;betty_Data;Betty is bitching
+1284;CAUTION;bool;betty_IFF;Betty is bitching
+1285;CAUTION;bool;betty_Lowspeed;Betty is bitching
+1286;CAUTION;bool;betty_Beeps;Betty is bitching
+1287;CAUTION;bool;betty_AOA;Betty is bitching
+1288;CAUTION;bool;betty_MaxG;Betty is bitching
+1290;TACAN;bool;auxTacanIsAA;True if TACAN is set to AA
+1300;TACAN;bool;auxTacanIsX;True if TaCAN is set to X
+1310;TACAN;bool;ufcTacanIsAA;True if TACAN is set to AA
+1320;TACAN;bool;ufcTacanIsX;True if TACAN is set to X
+1330;TACAN;byte[];tacanInfo;TACAN info (new in BMS4)
+1340;TACAN;int;auxTChan;Backup TACAN Channel
+1350;TACAN;int;ufcTChan;UFC Tacan Channel
+1360;TRIM;float;trimPitch;Value of trim in pitch axis, -0.5 to +0.5
+1370;TRIM;float;trimRoll;Value of trim in roll axis, -0.5 to +0.5
+1380;TRIM;float;trimYaw;Value of trim in yaw axis, -0.5 to +0.5
+1450;ALTIMETER;uint;altBits;Various altimeter bits, see AltBits enum for details
+1451;ALTIMETER;bool;calType;True if calibration in inches of Mercury (Hg), false if in hectoPascal (hPa)
+1452;ALTIMETER;bool;pneuFlag;True if PNEU flag is visible
+1460;HSI/ADI/TACAN;uint;hsiBits;HSI flags
+1461;HSI/ADI/TACAN;bool;toTrue;HSI_FLAG_TO_TRUE
+1462;HSI/ADI/TACAN;bool;ilsWarning  ;HSI_FLAG_ILS_WARN
+1463;HSI/ADI/TACAN;bool;courseWarning;HSI_FLAG_CRS_WARN
+1464;HSI/ADI/TACAN;bool;init ;HSI_FLAG_INIT
+1465;HSI/ADI/TACAN;bool;totalFlags ;"HSI_FLAG_TOTAL_FLAGS; never set"
+1466;HSI/ADI/TACAN;bool;adi_OFF ;ADI OFF Flag
+1467;HSI/ADI/TACAN;bool;adi_AUX ;ADI AUX Flag
+1468;HSI/ADI/TACAN;bool;adi_GS ;ADI GS FLAG
+1469;HSI/ADI/TACAN;bool;adi_LOC ;ADI LOC FLAG
+1470;HSI/ADI/TACAN;bool;hsi_OFF ;HSI OFF Flag
+1471;HSI/ADI/TACAN;bool;bup_adi_OFF ;Backup ADI Off Flag
+1472;HSI/ADI/TACAN;bool;vvi;VVI OFF Flag
+1473;HSI/ADI/TACAN;bool;aoa;AOA OFF Flag
+1474;HSI/ADI/TACAN;bool;avtr;AVTR Light
+1475;HSI/ADI/TACAN;bool;outerMarker ;MARKER beacon light for outer marker
+1476;HSI/ADI/TACAN;bool;middleMarker ;MARKER beacon light for middle marker
+1477;HSI/ADI/TACAN;bool;fromTrue ;HSI_FLAG_TO_TRUE
+1478;HSI/ADI/TACAN;bool;flying ;True if player is attached to an aircraft (i.e. not in UI state). 
+1480;LIGHTS;uint;blinkBits;Cockpit indicator lights blink status, see BlinkBits enum for details. Value is 1 if lamp is blinking
+1481;HSI/ADI/TACAN;bool;blink_OuterMarker;Slow flashing for outer marker. Value is 1 if lamp is blinking
+1482;HSI/ADI/TACAN;bool;blink_MiddleMarker;Fast flashing for middle marker. Value is 1 if lamp is blinking
+1483;SYSTEMS;bool;blink_PROBEHEAT ;Probeheat system is tested. Value is 1 if lamp is blinking
+1484;CMDS/RWR;bool;blink_AuxSrch ;Search function in NOT activated and a search radar is painting ownship. Value is 1 if lamp is blinking
+1485;CMDS/RWR;bool;blink_Launch ;Missile is fired at ownship. Value is 1 if lamp is blinking
+1486;CMDS/RWR;bool;blink_PriMode ;priority mode is enabled but more than 5 threat emitters are detected. Value is 1 if lamp is blinking
+1487;CMDS/RWR;bool;blink_Unk ;Unknown is not active but EWS detects unknown radar. Value is 1 if lamp is blinking
+1488;SYSTEMS;bool;blink_Elec_Fault ;non-resetting fault.  Value is 1 if lamp is blinking
+1489;CAUTION;bool;blink_OXY_BROW ;monitor fault during Obogs.  Value is 1 if lamp is blinking
+1490;ENGINE;bool;blink_EPUOn ;abnormal EPU operation.  Value is 1 if lamp is blinking
+1491;ENGINE;bool;blink_JFSOn_Slow ;Non-critical failure.  Value is 1 if lamp is blinking slow
+1492;ENGINE;bool;blink_JFSOn_Fast ;Critical failure.  Value is 1 if lamp is blinking fast
+1500;LIGHTS;uint;lightBits;Cockpit Indicator Lights, one bit per bulb. See enum
+1501;CAUTION;bool;masterCaution ;Left eyebrow
+1502;CAUTION;bool;tf;Left eyebrow
+1503;CAUTION;bool;oxy_BROW ;Repurposed for eyebrow OXY LOW (was OBS, unused)
+1504;CAUTION;bool;equip_HOT ;"Caution light; repurposed for cooling fault (was: not used)"
+1505;LIGHTS;bool;onGround ;True if on ground: this is not a lamp bit!
+1506;CAUTION;bool;eng_FIRE ;"Right eyebrow; upper half of split face lamp"
+1507;CAUTION;bool;config;Stores config, caution panel
+1508;CAUTION;bool;hyd;"Right eyebrow; see also OIL (this lamp is not split face)"
+1509;TEST;bool;flcs_ABCD ;"TEST panel FLCS channel lamps; repurposed, was OIL (see HYD; that lamp is not split face)"
+1510;CAUTION;bool;flcs;"Right eyebrow; was called DUAL which matches block 25, 30/32 and older 40/42"
+1511;CAUTION;bool;can;Right eyebrow
+1512;CAUTION;bool;t_l_CFG ;Right eyebrow
+1513;INDEXER;bool;aoaAbove ;AOA Indexer top
+1514;INDEXER;bool;aoaOn ;AOA Indexer center
+1515;INDEXER;bool;aoaBelow ;AOA Indexer bottom
+1516;INDEXER;bool;refuelRDY ;Refuel/NWS top
+1517;INDEXER;bool;refuelAR ;Refuel/NWS center
+1518;INDEXER;bool;refuelDSC ;Refuel/NWS bottom
+1519;CAUTION;bool;fltControlSys ;Caution lights
+1520;CAUTION;bool;leFlaps ;Caution lights
+1521;CAUTION;bool;engineFault ;Caution lights
+1522;CAUTION;bool;overheat ;Caution lights
+1523;CAUTION;bool;fuelLow ;Caution lights
+1524;CAUTION;bool;avionics ;Caution lights
+1525;CAUTION;bool;radarAlt ;Caution lights
+1526;CAUTION;bool;iff;Caution lights
+1527;CAUTION;bool;ecm;Caution lights
+1528;CAUTION;bool;hook ;Caution lights
+1529;CAUTION;bool;nwsFail ;Caution lights
+1530;CAUTION;bool;cabinPress ;Caution lights
+1531;SYSTEMS;bool;autoPilotOn ;TRUE if is AP on.  NB: This is not a lamp bit!
+1532;SYSTEMS;bool;tfr_STBY ;"MISC panel; lower half of split face TFR lamp"
+1540;LIGHTS;uint;lightBits2;Cockpit Indicator Lights, one bit per bulb. See enum
+1541;CMDS/RWR;bool;handOff ;Threat Warning Prime
+1542;CMDS/RWR;bool;launch ;Threat Warning Prime
+1543;CMDS/RWR;bool;priMode ;Threat Warning Prime
+1544;CMDS/RWR;bool;naval ;Threat Warning Prime
+1545;CMDS/RWR;bool;unk ;Threat Warning Prime
+1546;CMDS/RWR;bool;tgtSep ;Threat Warning Prime
+1547;CMDS/RWR;bool;go ;EWS on and operating normally
+1548;CMDS/RWR;bool;noGo ;EWS on but malfunction present
+1549;CMDS/RWR;bool;degr ;EWS Status message: AUTO DEGR
+1550;CMDS/RWR;bool;rdy ;EWS Status message: DISPENSE RDY
+1551;CMDS/RWR;bool;chaffLo ;EWS Bingo chaff quantity reached
+1552;CMDS/RWR;bool;flareLo ;EWS Bingo flare quantity reached
+1553;CMDS/RWR;bool;auxSrch ;Aux Threat Warning
+1554;CMDS/RWR;bool;auxAct ;Aux Threat Warning
+1555;CMDS/RWR;bool;auxLow ;Aux Threat Warning
+1556;CMDS/RWR;bool;auxPwr ;Aux Threat Warning
+1557;CMDS/RWR;bool;ecmPwr ;ECM
+1558;CMDS/RWR;bool;ecmFail ;ECM
+1559;CAUTION;bool;fwdFuelLow ;Caution lights
+1560;CAUTION;bool;aftFuelLow ;Caution lights
+1561;ENGINE;bool;epuOn ;"EPU panel; run light"
+1562;ENGINE;bool;jfsOn ;"Eng Jet Start panel; run light"
+1563;CAUTION;bool;sec ;Caution panel
+1564;CAUTION;bool;oxy_Low;Caution panel
+1565;CAUTION;bool;probeHeat;Caution panel
+1566;CAUTION;bool;seat_Arm;Caution panel
+1567;CAUTION;bool;buc;Caution panel
+1568;CAUTION;bool;fuel_Oil_Hot ;Caution panel
+1569;CAUTION;bool;anti_Skid;Caution panel
+1570;CAUTION;bool;tfr_Engaged;"MISC panel; upper half of split face TFR lamp"
+1571;GEAR;bool;gearHandle ;Lamp in gear handle lights on fault or gear in motion
+1572;CAUTION;bool;engine;Lower half of right eyebrow ENG FIRE/ENGINE lamp
+1580;LIGHTS;uint;lightBits3;Cockpit Indicator Lights, one bit per bulb. See enum
+1581;ELECTRICS;bool;flcsPmg ;Elec Panel
+1582;ELECTRICS;bool;mainGen ;Elec Panel
+1583;ELECTRICS;bool;stbyGen ;Elec Panel
+1584;ELECTRICS;bool;epuGen ;Elec Panel
+1585;ELECTRICS;bool;epuPmg ;Elec Panel
+1586;ELECTRICS;bool;toFlcs ;Elec Panel
+1587;ELECTRICS;bool;flcsRly ;Elec Panel
+1588;ELECTRICS;bool;batFail ;Elec Panel
+1589;ENGINE;bool;hydrazine ;EPU Panel 
+1590;ENGINE;bool;air ;EPU Panel 
+1591;CAUTION;bool;elec_Fault ;Caution panel
+1592;CAUTION;bool;lef_Fault ;Caution panel
+1593;GEAR;bool;onGround ;Weight-on-wheels
+1594;TEST;bool;flcsBitRun ;FLT CONTROL panel RUN light (used to be Multi-engine fire light)
+1595;TEST;bool;flcsBitFail ;"FLT CONTROL panel FAIL light (used to be Lock light Cue; non-F-16)"
+1596;CAUTION;bool;dbuWarn ;"Right eyebrow DBU ON cell; was Shoot light cue; non-F16"
+1597;GEAR;bool;noseGearDown ;"Landing gear panel; on means down and locked"
+1598;GEAR;bool;leftGearDown ;"Landing gear panel; on means down and locked"
+1599;GEAR;bool;rightGearDown ;"Landing gear panel; on means down and locked"
+1600;GEAR;bool;parkBrakeOn ;"Parking brake engaged; NOTE: not a lamp bit"
+1601;ELECTRICS;bool;power_Off ;Set if there is no electrical power.  NB: not a lamp bit
+1602;CAUTION;bool;cadc ;Caution panel
+1603;AIRCRAFT;bool;sSpeedBrake ;True if speed brake is in anything other than stowed position
+1604;TEST;bool;sysTest ;Threat Warning Prime - additional bits
+1605;CAUTION;bool;mcAnnounced ;"Master Caution WILL come up in 3sec; turns off when MC light is on"
+1606;AIRCRAFT;bool;mlgWow ;MLGWOW is only for AFM , it means WOW switches on MLG are triggered 
+1607;AIRCRAFT;bool;nlgWow ;NLGWOW is only for AFM , it means WOW switches on MLG are triggered 
+1608;AIRCRAFT;bool;atf_Not_Engaged;???
+1610;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio
+1611;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1
+1612;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2
+1613;RADIO;string;bupUhfFreqCh3;Manuel UHF Freqs for BUP Radio Channel3
+1614;RADIO;string;bupUhfFreqCh4;Manuel UHF Freqs for BUP Radio Channel4
+1615;RADIO;string;bupUhfFreqCh5;Manuel UHF Freqs for BUP Radio Channel5
+1616;RADIO;string;bupUhfFreqCh6;Manuel UHF Freqs for BUP Radio Channel6
+1617;RADIO;string;bupUhfFreqCh7;Manuel UHF Freqs for BUP Radio Channel7
+1618;RADIO;string;bupUhfFreqCh8;Manuel UHF Freqs for BUP Radio Channel8
+1619;RADIO;string;bupUhfFreqCh9;Manuel UHF Freqs for BUP Radio Channel9
+1620;RADIO;string;bupUhfFreqCh10;Manuel UHF Freqs for BUP Radio Channel10
+1621;RADIO;string;bupUhfFreqCh11;Manuel UHF Freqs for BUP Radio Channel11
+1622;RADIO;string;bupUhfFreqCh12;Manuel UHF Freqs for BUP Radio Channel12
+1623;RADIO;string;bupUhfFreqCh13;Manuel UHF Freqs for BUP Radio Channel13
+1624;RADIO;string;bupUhfFreqCh14;Manuel UHF Freqs for BUP Radio Channel14
+1625;RADIO;string;bupUhfFreqCh15;Manuel UHF Freqs for BUP Radio Channel15
+1626;RADIO;string;bupUhfFreqCh16;Manuel UHF Freqs for BUP Radio Channel16
+1627;RADIO;string;bupUhfFreqCh17;Manuel UHF Freqs for BUP Radio Channel17
+1628;RADIO;string;bupUhfFreqCh18;Manuel UHF Freqs for BUP Radio Channel18
+1629;RADIO;string;bupUhfFreqCh19;Manuel UHF Freqs for BUP Radio Channel19
+1630;RADIO;string;bupUhfFreqCh20;Manuel UHF Freqs for BUP Radio Channel20
+1641;AIRCRAFT;byte;aaMissileFired;How many AA missiles fired.
+1642;AIRCRAFT;byte;agMissileFired;How many maverick/rockets fired
+1643;AIRCRAFT;byte;bombDropped;How many bombs dropped
+1644;AIRCRAFT;byte;flareDropped;How many flares dropped
+1645;AIRCRAFT;byte;chaffDropped;How many chaff dropped
+1646;AIRCRAFT;byte;bulletsFired;How many bullets shot
+1647;AIRCRAFT;int;collisionCounter;Collisions
+1648;AIRCRAFT;bool;isFiringGun;True if gun is firing
+1649;AIRCRAFT;bool;isEndFlight;True if player is ending the flight from 3D
+1650;AIRCRAFT;bool;isEjecting;True if player has ejected
+1651;AIRCRAFT;bool;in3D;True if player is in3D
+1652;AIRCRAFT;bool;isPaused;True if Sim is paused
+1653;AIRCRAFT;bool;isFrozen;True if Sim is frozen
+1654;AIRCRAFT;bool;isOverG;True if G limits are being exceeded
+1655;AIRCRAFT;bool;isOnGround;True if player a/c is on the ground
+1656;AIRCRAFT;bool;isExitGame;True if player exits the game (2D)
+1657;AIRCRAFT;float ;gForce;Current G force
+1658;AIRCRAFT;float ;eyex;Where the eye is in relationship to the plane
+1659;AIRCRAFT;float ;eyey;Where the eye is in relationship to the plane
+1660;AIRCRAFT;float ;eyez;Where the eye is in relationship to the plane
+1661;AIRCRAFT;int ;lastdamage;1 to 8 depending on quadrant. 
+1662;AIRCRAFT;float ;damageforce;How big the hit was.
+1663;AIRCRAFT;int;whendamage;???
+1670;F4SM;string[];StringData;various strings, see stringdata for details
+1671;F4SM;string;BMS.exe;path to BMS.exe
+1672;F4SM;string;KeyFile;path top keyfile in use
+1673;F4SM;string;BMSBasedir;reference to BMS directory
+1674;F4SM;string;BMSBinDirectory;reference to BMS directory
+1675;F4SM;string;BMSDataDirectory;reference to BMS directory
+1676;F4SM;string;BMSUIArtDirectory;reference to BMS directory
+1677;F4SM;string;BMSUserDirectory;reference to BMS directory
+1678;F4SM;string;BMSAcmiDirectory;reference to BMS directory
+1679;F4SM;string;BMSBriefingsDirectory;reference to BMS directory
+1680;F4SM;string;BMSConfigDirectory;reference to BMS directory
+1681;F4SM;string;BMSLogsDirectory;reference to BMS directory
+1682;F4SM;string;BMSPatchDirectory;reference to BMS directory
+1683;F4SM;string;BMSPictureDirectory;reference to BMS directory
+1684;F4SM;string;ThrName;reference to BMS directory
+1685;F4SM;string;ThrCampaigndir;reference to BMS directory
+1686;F4SM;string;ThrTerraindir;reference to BMS directory
+1687;F4SM;string;ThrArtdir;reference to BMS directory
+1688;F4SM;string;ThrMoviedir;reference to BMS directory
+1689;F4SM;string;ThrUisounddir;reference to BMS directory
+1690;F4SM;string;ThrObjectdir;reference to BMS directory
+1691;F4SM;string;Thr3ddatadir;reference to BMS directory
+1692;F4SM;string;ThrMisctexdir;reference to BMS directory
+1693;F4SM;string;ThrSounddir;reference to BMS directory
+1694;F4SM;string;ThrTacrefdir;reference to BMS directory
+1695;F4SM;string;ThrSplashdir;reference to BMS directory
+1696;F4SM;string;ThrCockpitdir;reference to BMS directory
+1697;F4SM;string;ThrSimdatadir;reference to BMS directory
+1698;F4SM;string;ThrSubtitlesdir;reference to BMS directory
+1699;F4SM;string;ThrTacrefpicsdir;reference to BMS directory
+1700;F4SM;string;AcName;aircraft name
+1701;F4SM;string;AcNCTR;aircraft type
+1702;F4SM;string;ButtonsFile;path to 3dbuttons.dat file
+1703;F4SM;string;CockpitFile;path to 3dckpt.dat file
