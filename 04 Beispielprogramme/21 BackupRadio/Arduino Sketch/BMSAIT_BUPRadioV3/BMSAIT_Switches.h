@@ -130,7 +130,7 @@ void SetupSwitches()
     else
     {
     //setup for analog reading of PIN x
-    pinMode(schalter[index].pIN, INPUT_PULLUP);
+    pinMode(schalter[index].pIN, INPUT);
     schalter[index].lastPINState=analogRead(schalter[index].pIN);  
     }
   }  
@@ -148,10 +148,6 @@ void CheckSwitches()
       { 
         delay(5);        
         schalter[index].lastPINState= currentPINState;
-        
-        //modification for BUPRadio - call function from F4SME_BUPRadio.h to set internal commands
-         CheckSwitchesBUPRadio(index);
-        //modification for BUPRadio - set internal commands
         
         if (currentPINState==0)
         {
@@ -184,11 +180,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].kommando ,3);
-            //debug
-            //char buf[5];
-            //itoa(currentPINState,buf,10);
-            //SendMessage(buf,1);
-            //debug
+            //if (testmode)
+            //  {
+            //  char buf[5];
+            //  itoa(currentPINState,buf,10);
+            //  SendMessage(buf,1);
+            //  }
           }
         }
       } 
