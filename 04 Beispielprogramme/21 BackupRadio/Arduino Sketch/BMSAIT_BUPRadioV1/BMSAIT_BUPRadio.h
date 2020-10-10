@@ -64,6 +64,8 @@ void SetupBUPRadio()
  if (!gefunden[0] || !gefunden[1] || !gefunden[2]) SendMessage("Fehler in Funktion SetupBUPRadio",1);
 }
 
+
+///check if a display is supposed to be illuminated
 bool checkPowerOn(byte disp)
 {
   if (datenfeld[mainPwr].wert[0]=='0') return false; //turn off both displays if a/c power is off
@@ -72,13 +74,12 @@ bool checkPowerOn(byte disp)
     lastchannel[0]= datenfeld[presetID].wert[0];
     lastchannel[1]= datenfeld[presetID].wert[1];
     lastchannel[2]= datenfeld[presetID].wert[2];
-    //debug_readback(presetID);
     channel_got_changed=millis();
   }
   
   if (!UHFMain) return false;                       //turn off both displays if UHF Power is off
   
-  if (disp==presetID)  //PresetChannel display check
+  if (disp==presetID) //PresetChannel display check
   {
     if (UHFMode==1) return true; //turn on channel display if Mode switch is in PRE 
     if (UHFStatusMode || UHFTestMode) return true; //turn on channel display if status or test button is being pressed
@@ -87,16 +88,18 @@ bool checkPowerOn(byte disp)
     return false;  //otherwise, turn off display
   }
     
-  //Status COM Volume prüfen
-    //offen
+  //Check COM Volume status
+    //not implemented yet
 
   return true;
 }
 
 
-//adds functions to the 7-Segement update to simulate the BUPRadio more accurately
+///adds functions to the 7-Segement update to simulate the BUPRadio more accurately
 void BUPRadioUpdate(byte p)
 {
+  CheckSwitchesBUPRadio(); //check switch positions to determine display behaviour
+  
   bool power=checkPowerOn(p);  //check if internal commands require a powerdown of the current display
 
   if (!power)  // no power is applied to the UHF panel. Display remains blank
@@ -106,7 +109,7 @@ void BUPRadioUpdate(byte p)
     Wert[DATENLAENGE-1]='\0';
     return; 
   }
-
+       
   if (UHFTestMode)  
   {
     //if testbutton is pressed, all displays show '8'  
@@ -131,28 +134,30 @@ void BUPRadioUpdate(byte p)
     return;
   }
 
-  //no execptions found, no modifications applied
+  //no execptions found, no modifications applied (display data as set in UserConfig)
 }
 
 
-//switches will be checked for internal commands. Internal commands will affect the 7-Segment-Displays 
-void CheckSwitchesBUPRadio(byte index)
+///switches will be checked for internal commands. Internal commands will affect the 7-Segment-Displays 
+void CheckSwitchesBUPRadio()
 {
   //set default settings
   UHFMode=1;            //set a mark that UHF Mode switch is in PRE position (unless it is in PRE or GRD)  
   UHFStatusMode=false;  //disable status mode on bupradio (unless the button is being pressed)  
   UHFTestMode=false;    //disable test mode on bupradio (unless the button is being pressed) 
- 
- //check for commands
-  if (schalter[index].lastPINState==0)
-  {
-    if (schalter[index].intCommand==1) {UHFMain=false;}  //set a mark that UHF Main switch is in off position
-    if (schalter[index].intCommand==2) {UHFMain=true;}   //set a mark that UHF Main switch is in main or both position
-    if (schalter[index].intCommand==3) {UHFMode=0;}      //set a mark that UHF Mode switch is in MNL position  
-    if (schalter[index].intCommand==5) {UHFMode=2;}      //set a mark that UHF Mode switch is in GRD position
-    if (schalter[index].intCommand==6) {UHFStatusMode=true;} //activate status mode on bupradio
-    if (schalter[index].intCommand==7) {UHFTestMode=true;}   //activate test mode on bupradio
-  }
+ for (byte index=0;index<anzSchalter;index++)
+ {
+  //check for commands
+  if (schalter[index].lastPINState==0) //button is currently pressed or switch is set
+    {
+      if (schalter[index].intCommand==1) {UHFMain=false;}  //set a mark that UHF Main switch is in off position
+      if (schalter[index].intCommand==2) {UHFMain=true;}   //set a mark that UHF Main switch is in main or both position
+      if (schalter[index].intCommand==3) {UHFMode=0;}      //set a mark that UHF Mode switch is in MNL position  
+      if (schalter[index].intCommand==5) {UHFMode=2;}      //set a mark that UHF Mode switch is in GRD position
+      if (schalter[index].intCommand==6) {UHFStatusMode=true;} //activate status mode on bupradio
+      if (schalter[index].intCommand==7) {UHFTestMode=true;}   //activate test mode on bupradio
+    }
+ }  
 }
 
 

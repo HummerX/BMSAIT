@@ -29,7 +29,7 @@
   void ResetMotors();
   //mod
   void debug_readbackBUP(byte posID);
-  void CheckSwitchesBUPRadio(byte index);
+  void CheckSwitchesBUPRadio();
   //mod
   
 //Struct definitions
