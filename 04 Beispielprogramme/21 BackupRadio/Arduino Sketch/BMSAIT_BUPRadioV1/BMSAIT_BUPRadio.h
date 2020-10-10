@@ -135,6 +135,25 @@ void BUPRadioUpdate(byte p)
 }
 
 
+//switches will be checked for internal commands. Internal commands will affect the 7-Segment-Displays 
+void CheckSwitchesBUPRadio(byte index)
+{
+  //set default settings
+  UHFMode=1;            //set a mark that UHF Mode switch is in PRE position (unless it is in PRE or GRD)  
+  UHFStatusMode=false;  //disable status mode on bupradio (unless the button is being pressed)  
+  UHFTestMode=false;    //disable test mode on bupradio (unless the button is being pressed) 
+ 
+ //check for commands
+  if (schalter[index].lastPINState==0)
+  {
+    if (schalter[index].intCommand==1) {UHFMain=false;}  //set a mark that UHF Main switch is in off position
+    if (schalter[index].intCommand==2) {UHFMain=true;}   //set a mark that UHF Main switch is in main or both position
+    if (schalter[index].intCommand==3) {UHFMode=0;}      //set a mark that UHF Mode switch is in MNL position  
+    if (schalter[index].intCommand==5) {UHFMode=2;}      //set a mark that UHF Mode switch is in GRD position
+    if (schalter[index].intCommand==6) {UHFStatusMode=true;} //activate status mode on bupradio
+    if (schalter[index].intCommand==7) {UHFTestMode=true;}   //activate test mode on bupradio
+  }
+}
 
 
 
