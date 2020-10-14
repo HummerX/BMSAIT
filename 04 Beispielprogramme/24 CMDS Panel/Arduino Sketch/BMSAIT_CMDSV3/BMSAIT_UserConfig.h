@@ -50,12 +50,12 @@ Datenfeld datenfeld[]=
    //Description  ID     DT    OT  PIN  C   SP  DP  IV
    {  "CHAFF",  "0150", 'f',  30,   0,  2,  6,  99, "12"}    //Variable 0 - Chaff Count
   ,{  "FLARE",  "0160", 'f',  30,   0,  2,  2,  99, "89"}    //Variable 1 - Flare Count
-  ,{  "GO",     "1547", 'b',  10,  10,  0,  0,   0, "F"}     //Variable 2 - GO Status
-  ,{  "NOGO",   "1548", 'b',  10,  11,  0,  0,   0, "F"}     //Variable 3 - NOGO Status
-  ,{  "DEGR",   "1549", 'b',  10,  12,  0,  0,   0, "F"}     //Variable 4 - DEGRADE Status
-  ,{  "RDY",    "1549", 'b',  10,  13,  0,  0,   0, "F"}     //Variable 5 - DISPENSER RDY Status
-  ,{  "POWER",  "1260", 'i',   0,   0,  0,  0,   0, "1"}     //Variable 6 - Status of electrical system of the A/C
-  ,{  "CHLOW",  "1551", 'b',  30,   0,  2,  4,  99, "T"}     //Variable 7 - Chaff Lo warning
-  ,{  "FLLOW",  "1552", 'b',  30,   0,  2,  0,  99, "T"}     //Variable 8 - Flare Lo warning
+  ,{  "GO",     "1547", 'b',  10,  A4,  0,  0,   0, "F"}     //Variable 2 - GO Status
+  ,{  "NOGO",   "1548", 'b',  10,  A5,  0,  0,   0, "F"}     //Variable 3 - NOGO Status
+  ,{  "DEGR",   "1549", 'b',  10,  A3,  0,  0,   0, "F"}     //Variable 4 - DEGRADE Status
+  ,{  "RDY",    "1549", 'b',  10,  A2,  0,  0,   0, "F"}     //Variable 5 - DISPENSER RDY Status
+  ,{  "POWER",  "1260", 'i',   0,   0,  0,  0,   0, "T"}     //Variable 6 - Status of electrical system of the A/C
+  ,{  "CHLOW",  "1551", 'b',  30,   0,  2,  4,  99, "F"}     //Variable 7 - Chaff Lo warning
+  ,{  "FLLOW",  "1552", 'b',  30,   0,  2,  0,  99, "F"}     //Variable 8 - Flare Lo warning
   };  
 const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

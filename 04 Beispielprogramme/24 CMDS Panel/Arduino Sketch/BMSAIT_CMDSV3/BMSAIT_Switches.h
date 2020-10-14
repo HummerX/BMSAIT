@@ -28,14 +28,16 @@ Schalter schalter[]=
 {
 //Switch definition. If you add a switch, add a line to the following list 
 //,{<PIN>,<description>,<type>,<rotarySwitchID>,0,<commandID when pressed>,<commandID when released>,<internal command>}
-  {   2,    "M-OFF"  ,    2,          0,        0,        "01",                   "00",                   0}    //MODE Rotary
- ,{   3,    "M-STB"  ,    2,          0,        0,        "02",                   "00",                   1}    //MODE Rotary
- ,{   4,    "M-MAN"  ,    2,          0,        0,        "03",                   "00",                   1}    //MODE Rotary
- ,{   5,    "M-SEM"  ,    2,          0,        0,        "04",                   "00",                   1}    //MODE Rotary
- ,{   6,    "M_AUT"  ,    2,          0,        0,        "05",                   "00",                   1}    //MODE Rotary
- ,{   7,    "M_BYP"  ,    2,          0,        0,        "06",                   "00",                   1}    //MODE Rotary 
- ,{   8,    "FLARE"  ,    2,          0,        0,        "07",                   "08",                   2}    //CHAFF ON/OFF 
- ,{   9,    "CHAFF"  ,    2,          0,        0,        "09",                   "10",                   3}    //FLARE ON/OFF
+  {   A0,   "MODE"  ,     3,          0,        0,        "00",                   "00",                   1}    //MODE Rotary
+ ,{   A1,   "PGRM"  ,     3,          1,        0,        "00",                   "00",                   0}    //PGRM Rotary
+ ,{   6,    "JETT"  ,     2,          0,        0,        "01",                   "02",                   0}    //Jettison ON/OFF Switch
+ ,{   7,    "FLARE" ,     2,          0,        0,        "03",                   "04",                   2}    //Flare ON/OFF Switch
+ ,{   8,    "CHAFF" ,     2,          0,        0,        "05",                   "06",                   3}    //Chaff ON/OFF Switch
+ ,{   9,    "02"    ,     2,          0,        0,        "07",                   "08",                   0}    //02  ON/OFF Switch
+ ,{  10,    "01"    ,     2,          0,        0,        "09",                   "10",                   0}    //01  ON/OFF Switch
+ ,{  11,    "MWS"   ,     2,          0,        0,        "11",                   "12",                   0}    //MWS ON/OFF Switch
+ ,{  12,    "JMR"   ,     2,          0,        0,        "13",                   "14",                   0}    //JMR ON/OFF Switch
+ ,{  13,    "RWR"   ,     2,          0,        0,        "15",                   "16",                   0}    //RWR ON/OFF Switch
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
     
@@ -78,15 +80,15 @@ void SetupSwitches()
   {
     if ((schalter[index].typ==1) || (schalter[index].typ==2))
     {
-      //setup for digital reading of PIN x
-      pinMode(schalter[index].pIN, INPUT_PULLUP);
-      schalter[index].lastPINState=digitalRead(schalter[index].pIN);
+    //setup for digital reading of PIN x
+    pinMode(schalter[index].pIN, INPUT_PULLUP);
+    schalter[index].lastPINState=digitalRead(schalter[index].pIN);
     }
     else
     {
-      //setup for analog reading of PIN x
-      pinMode(schalter[index].pIN, INPUT);
-      schalter[index].lastPINState=analogRead(schalter[index].pIN);  
+    //setup for analog reading of PIN x
+    pinMode(schalter[index].pIN, INPUT);
+    schalter[index].lastPINState=analogRead(schalter[index].pIN);  
     }
   }  
 }

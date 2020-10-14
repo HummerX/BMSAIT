@@ -46,25 +46,12 @@ Drehschalter analogSchalter[][STATES]=
 {
  {
   //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {      "17",         true,               0,               102}    //MODE OFF
-  ,{      "18",         true,             103,               307}    //MODE STDBY
-  ,{      "19",         true,             308,               512}    //MODE MAN
-  ,{      "20",         true,             513,               717}    //MODE SEMI
-  ,{      "21",         true,             718,               922}    //MODE AUTO
-  ,{      "22",         true,             923,              1024}    //MODE BYP
-  ,{      "00",         false,              0,                 0}    
-  ,{      "00",         false,              0,                 0}   
-  ,{      "00",         false,              0,                 0}    
-  ,{      "00",         false,              0,                 0}    
- },
- {
-  //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {      "23",         true,               0,               128}    //PRGM BIT
-  ,{      "24",         true,             129,               384}    //PRGM 1
-  ,{      "25",         true,             385,               640}    //PRGM 2
-  ,{      "26",         true,             641,               896}    //PRGM 3
-  ,{      "27",         true,             897,              1024}    //PRGM 4
-  ,{      "00",         false,              0,                 0}    
+   {      "17",         true,               0,               102}    
+  ,{      "18",         true,             103,               307}    
+  ,{      "19",         true,             308,               512}    
+  ,{      "20",         true,             513,               717}    
+  ,{      "21",         true,             718,               922}    
+  ,{      "22",         true,             923,              1024}    
   ,{      "00",         false,              0,                 0}    
   ,{      "00",         false,              0,                 0}   
   ,{      "00",         false,              0,                 0}    
@@ -78,15 +65,15 @@ void SetupSwitches()
   {
     if ((schalter[index].typ==1) || (schalter[index].typ==2))
     {
-      //setup for digital reading of PIN x
-      pinMode(schalter[index].pIN, INPUT_PULLUP);
-      schalter[index].lastPINState=digitalRead(schalter[index].pIN);
+    //setup for digital reading of PIN x
+    pinMode(schalter[index].pIN, INPUT_PULLUP);
+    schalter[index].lastPINState=digitalRead(schalter[index].pIN);
     }
     else
     {
-      //setup for analog reading of PIN x
-      pinMode(schalter[index].pIN, INPUT);
-      schalter[index].lastPINState=analogRead(schalter[index].pIN);  
+    //setup for analog reading of PIN x
+    pinMode(schalter[index].pIN, INPUT);
+    schalter[index].lastPINState=analogRead(schalter[index].pIN);  
     }
   }  
 }

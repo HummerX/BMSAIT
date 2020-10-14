@@ -3,16 +3,16 @@
 #include <LedControl.h>
 LedControl Max7219_display=LedControl(0,0,0, 1); //empty call of the LEDControl class
 
-#define MAX_CLK A1   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
-#define MAX_CS  A2   //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
-#define MAX_DIN A3   //PIN "Data In" for the SPI connection of the 7-Segment Tube 
+#define MAX_CLK 2   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
+#define MAX_CS  3   //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
+#define MAX_DIN 4   //PIN "Data In" for the SPI connection of the 7-Segment Tube 
 
   
 void SetupMax7219()
 {
   Max7219_display=LedControl(MAX_DIN, MAX_CLK, MAX_CS, 1);  //actual call of the LEDControl class with the correct PINs 
   Max7219_display.shutdown(0,false);
-  Max7219_display.setIntensity(0,10);
+  Max7219_display.setIntensity(0,5);
   Max7219_display.setDigit(0,0,1,false);
   Max7219_display.setDigit(0,1,2,false);
   Max7219_display.setDigit(0,2,3,false);

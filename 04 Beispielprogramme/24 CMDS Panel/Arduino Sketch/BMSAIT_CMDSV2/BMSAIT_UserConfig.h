@@ -3,8 +3,8 @@
 // Version: 1.0    3.10.20
 
 #define LED               //drive LEDs
-//#define LCD               //drive LCD display
-#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
+#define LCD               //drive LCD display
+//#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
 //#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
 //#define ServoMotor        //drive servo motors directly connected to the arduino
 //#define ServoPWM          //drive multiple servo motors via pwm shield
@@ -48,14 +48,16 @@
 Datenfeld datenfeld[]=
   {
    //Description  ID     DT    OT  PIN  C   SP  DP  IV
-   {  "CHAFF",  "0150", 'f',  30,   0,  2,  6,  99, "12"}    //Variable 0 - Chaff Count
-  ,{  "FLARE",  "0160", 'f',  30,   0,  2,  2,  99, "89"}    //Variable 1 - Flare Count
+   {  "CHAFF",  "0150", 'f',  20,   0,  2,  6,  99, "12"}    //Variable 0 - Chaff Count
+  ,{  "FLARE",  "0160", 'f',  20,   1,  2,  2,  99, "89"}    //Variable 1 - Flare Count
   ,{  "GO",     "1547", 'b',  10,  10,  0,  0,   0, "F"}     //Variable 2 - GO Status
   ,{  "NOGO",   "1548", 'b',  10,  11,  0,  0,   0, "F"}     //Variable 3 - NOGO Status
   ,{  "DEGR",   "1549", 'b',  10,  12,  0,  0,   0, "F"}     //Variable 4 - DEGRADE Status
   ,{  "RDY",    "1549", 'b',  10,  13,  0,  0,   0, "F"}     //Variable 5 - DISPENSER RDY Status
   ,{  "POWER",  "1260", 'i',   0,   0,  0,  0,   0, "1"}     //Variable 6 - Status of electrical system of the A/C
-  ,{  "CHLOW",  "1551", 'b',  30,   0,  2,  4,  99, "T"}     //Variable 7 - Chaff Lo warning
-  ,{  "FLLOW",  "1552", 'b',  30,   0,  2,  0,  99, "T"}     //Variable 8 - Flare Lo warning
+  ,{  "CHLOW",  "1551", 'b',  20,   0,  2,  4,  99, "F"}     //Variable 7 - Chaff Lo warning
+  ,{  "FLLOW",  "1552", 'b',  20,   1,  2,  0,  99, "F"}     //Variable 8 - Flare Lo warning
+  ,{  "Chtxt",  "9999", 's',  20,   0,  6,  0,  99, "Chaff:"}     //Variable 9 - dummy variable for text to be displayed on LCD
+  ,{  "Fltxt",  "9999", 's',  20,   1,  6,  0,  99, "Flare:"}     //Variable10 - dummy variable for text to be displayed on LCD
   };  
 const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

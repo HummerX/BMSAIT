@@ -1,5 +1,4 @@
-//modifications for CMDS Panel
-
+//modification for CMDS Panel
 byte mainPwr = 99;               //stores the status of the main power of the a/c
 byte ChaffID = 99;               //memorizes the line in the data container that contains the chaff count
 byte FlareID = 99;               //memorizes the line in the data container that contains the flare count
@@ -23,22 +22,22 @@ void SetupCMDS()
       mainPwr = lauf;
       gefunden[0]=true;
     }
-    if (strcmp(datenfeld[lauf].ID, "0150")==0)  //memorize the position of the chaff quantity variable
+    if (strcmp(datenfeld[lauf].ID, "0150")==0)  //memorize the position of the preset channel variable
     {
       ChaffID = lauf;
       gefunden[1]=true;
     }                      
-    if (strcmp(datenfeld[lauf].ID, "0160")==0)  //memorize the position of the flare quantity variable
+    if (strcmp(datenfeld[lauf].ID, "0160")==0)  //memorize the position of the BUP freq variable
     {
       FlareID = lauf;
       gefunden[2]=true;
     }  
-    if (strcmp(datenfeld[lauf].ID, "1551")==0)  //memorize the position of the chaff low warning  variable
+    if (strcmp(datenfeld[lauf].ID, "1551")==0)  //memorize the position of the BUP freq variable
     {
       ChLoID = lauf;
       gefunden[3]=true;
     }  
-    if (strcmp(datenfeld[lauf].ID, "1552")==0)  //memorize the position of the flare low warning variable
+    if (strcmp(datenfeld[lauf].ID, "1552")==0)  //memorize the position of the BUP freq variable
     {
       FlLoID = lauf;
       gefunden[4]=true;
@@ -84,22 +83,22 @@ void CheckSwitchesCMDS()
       else
         {ChaffON=false;} 
     } 
-  } 
+  }
 }
 
 
 ///check if a display is supposed to be illuminated
 bool checkPowerOn(byte disp)
 {
-  if (datenfeld[mainPwr].wert[0]=='0'){return false;} //turn off displays if a/c power is off
+  if (datenfeld[mainPwr].wert[0]=='0') return false; //turn off displays if a/c power is off
   
-  if (!CMDSMain){return false;}                       //turn off both displays if CMDS Power is off
-
+  if (!CMDSMain) return false;                       //turn off both displays if CMDS Power is off
+  
   if ((disp==FlareID)&&(FlareON==false)){return false;}  //turn off flare qty if flare switch is off
   if ((disp==FlLoID)&&(FlareON==false)){return false;}   //turn off flare Lo warning if flare switch is off
   if ((disp==ChaffID)&&(ChaffON==false)){return false;}  //turn off chaff qty if chaff switch is off
   if ((disp==ChLoID)&&(ChaffON==false)){return false;}   //turn off chaff Lo warning if chaff switch is off  
-
+  
   return true;
 }
 
@@ -109,8 +108,7 @@ void CMDSUpdate(byte p)
 {
   CheckSwitchesCMDS(); //check switch positions to determine display behaviour
   
-  bool power=checkPowerOn(p);
-  if (!power)  // if no power is applied the display remains blank
+  if (!checkPowerOn(p))  // if no power is applied the display remains blank
   {
     for (int lauf=0;lauf<DATENLAENGE-1;lauf++)
       {Wert[lauf]=' ';}
