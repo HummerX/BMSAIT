@@ -2,10 +2,10 @@
 
 
 byte rows[] = {2,3,4,5,6,7,8,9};
-const int rowCount = sizeof(rows)/sizeof(rows[0]);
+const byte rowCount = sizeof(rows)/sizeof(rows[0]);
  
 byte cols[] = {10,11,12,14,15};
-const int colCount = sizeof(cols)/sizeof(cols[0]);
+const byte colCount = sizeof(cols)/sizeof(cols[0]);
 
 byte keys[colCount][rowCount];
 
@@ -23,11 +23,11 @@ byte keysignal[colCount][rowCount]=
 
 void SetupButtonMatrix() 
 {
-    for(int rowIndex=0; rowIndex<rowCount; rowIndex++)
+    for(byte rowIndex=0; rowIndex<rowCount; rowIndex++)
     {
         pinMode(rows[rowIndex], INPUT);
     }
-    for (int colIndex=0; colIndex<colCount; colIndex++) 
+    for (byte colIndex=0; colIndex<colCount; colIndex++) 
     {
         pinMode(cols[colIndex], INPUT_PULLUP);
     }    
@@ -35,7 +35,7 @@ void SetupButtonMatrix()
  
 void ButtonmatrixRead() 
 {
-    for (int colIndex=0; colIndex < colCount; colIndex++) 
+    for (byte colIndex=0; colIndex < colCount; colIndex++) 
     {
         // interate through the columns
         byte curCol = cols[colIndex];
@@ -43,7 +43,7 @@ void ButtonmatrixRead()
         digitalWrite(curCol, LOW);
  
         // interate through the rows
-        for (int rowIndex=0; rowIndex < rowCount; rowIndex++) 
+        for (byte rowIndex=0; rowIndex < rowCount; rowIndex++) 
         {
             byte rowCol = rows[rowIndex];
             pinMode(rowCol, INPUT_PULLUP);

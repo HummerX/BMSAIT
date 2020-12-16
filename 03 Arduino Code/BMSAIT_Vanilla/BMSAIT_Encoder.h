@@ -20,57 +20,48 @@ RotEnc rotEnc = { 2,   3,       4,     "01",  "02",  "03",  "04" };
 
 
 volatile unsigned int encoderPos = 0;  // a counter for the dial
-unsigned int lastReportedPos = 1;   // change management
-static boolean rotating = false;      // debounce management
+unsigned int lastReportedPos = 1;      // change management
+static boolean rotating = false;       // debounce management
 
 // interrupt service routine vars
 boolean A_set = false;
 boolean B_set = false;
 
 
-void SetupEncoder() {
-
-    pinMode(rotEnc.pin1, INPUT_PULLUP);
-    pinMode(rotEnc.pin2, INPUT_PULLUP);
-    if (rotEnc.pinShift != 0) { pinMode(rotEnc.pinShift, INPUT_PULLUP); }
-    attachInterrupt(digitalPinToInterrupt(rotEnc.pin1), doEncoderA, CHANGE); // encoder pin on interrupt 0 (pin 2)
-    attachInterrupt(digitalPinToInterrupt(rotEnc.pin2), doEncoderB, CHANGE); // encoder pin on interrupt 1 (pin 3)
-
+void SetupEncoder()
+{
+  pinMode(rotEnc.pin1, INPUT_PULLUP);
+  pinMode(rotEnc.pin2, INPUT_PULLUP);
+  if (rotEnc.pinShift != 0) { pinMode(rotEnc.pinShift, INPUT_PULLUP); }
+  attachInterrupt(digitalPinToInterrupt(rotEnc.pin1), doEncoderA, CHANGE); // encoder pin on interrupt 0 (pin 2)
+  attachInterrupt(digitalPinToInterrupt(rotEnc.pin2), doEncoderB, CHANGE); // encoder pin on interrupt 1 (pin 3)
 }
 
 void CheckEncoder()
 {
-    rotating = true;  // reset the debouncer
+  rotating = true;  // reset the debouncer
 
-    if (lastReportedPos != encoderPos)
-    {
-        bool shft = true;
-        if ((rotEnc.pinShift != 0) && (digitalRead(rotEnc.pinShift) == LOW)) { shft = false; }
+  if (lastReportedPos != encoderPos)
+  {
+      bool shft = true;
+      if ((rotEnc.pinShift != 0) && (digitalRead(rotEnc.pinShift) == LOW)) { shft = false; }
 
-        if (lastReportedPos < encoderPos)
-        {
-            if (shft)
-            {
-                SendMessage(rotEnc.commandL, 3);
-            }
-            else
-            {
-                SendMessage(rotEnc.commandLS, 3);
-            }
-        }
+      if (lastReportedPos < encoderPos)
+      {
+        if (shft)
+        {SendMessage(rotEnc.commandL, 3);}
         else
-        {
-            if (shft)
-            {
-                SendMessage(rotEnc.commandR, 3);
-            }
-            else
-            {
-                SendMessage(rotEnc.commandRS, 3);
-            }
-        }
-        lastReportedPos = encoderPos;
-    }
+        {SendMessage(rotEnc.commandLS, 3);}
+      }
+      else
+      {
+        if (shft)
+        {SendMessage(rotEnc.commandR, 3);}
+        else
+        {SendMessage(rotEnc.commandRS, 3);}
+      }
+      lastReportedPos = encoderPos;
+  }
 }
 
 // Interrupt on A changing state

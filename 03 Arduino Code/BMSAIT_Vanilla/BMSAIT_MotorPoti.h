@@ -1,12 +1,17 @@
 // settings and functions to drive a motor driven potentiometer
+//target= reference link to the line of the motorpoti table of this module
+//ref2= not used
+//ref3= not used
+//ref4= not used
+//ref5= not used
+
 
 #define DIR_DELAY 50 // brief delay for abrupt motor changes
 #define BUFFER 10     // threshold that needs to be crossed to consider a change on the analog value as a movement
 
 typedef struct 
 {
-  byte pIN1;         //Pin1 of the Motor (movement order)
-  byte pIN2;         //Pin2 of the Motor (movement direction)
+  byte pIN[2];       //Motor (PIN1: movement order; PIN2: movement direction) 
   byte pWM;          //Motor Speed (0 to 255)
   bool dir;          //Direction - synchronize motor movement and poti readout
   byte poti;         //Analog pin for position readout
@@ -18,27 +23,28 @@ typedef struct
 
 Struc_MotorPoti motorPoti[]=
 {
-	  	//PIN1	PIN2	 pWM	  dir	   poti 	intP	 extP   command
-		 {  10,    11,	 200,	  true,	  A0,  	500,	 500,    1}
-    //,{   0,     0,   200,   true,   A1,   500,   500,    2}
-    //,{   0,     0,   200,   true,   A2,   500,   500,    3}
+	  	 //PIN1	  PIN2	  pWM	   dir	  poti 	intP	 extP   command
+		  { { 10,    11},	  200,   true,   A0,   500,	  500,    1}
+   //,{ {  0,     0},   200,   true,   A1,   500,   500,    2}
+   //,{ {  0,     0},   200,   true,   A2,   500,   500,    3}
 };
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
 
 bool error=false;
-long time_status=0; //time for new status message
-long time_pause=0; //pause when poti was moved
+bool reSet =false;
+unsigned long time_status=0; //time for new status message
+unsigned long time_pause=0; //pause when poti was moved
 
 void SetupMotorPoti() 
 {
   for (byte x=0;x<motorPotiAnz;x++)
   {
     byte mp=x;
-    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
-    pinMode( motorPoti[mp].pIN1, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN1, LOW );
-    pinMode( motorPoti[mp].pIN2, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN2, LOW );
+    if ((motorPoti[mp].pIN[0]==0) || (motorPoti[mp].pIN[1]==0)) continue;  //skip loop if no Pins were assigned
+    pinMode( motorPoti[mp].pIN[0], OUTPUT );
+    digitalWrite( motorPoti[mp].pIN[0], LOW );
+    pinMode( motorPoti[mp].pIN[1], OUTPUT );
+    digitalWrite( motorPoti[mp].pIN[1], LOW );
   }
   time_status=0;
   time_pause=0;
@@ -47,30 +53,30 @@ void SetupMotorPoti()
 void MotorMoveCW(byte mp)
 {
   // always stop motors briefly before abrupt changes
-  digitalWrite( motorPoti[mp].pIN1, LOW );
-  digitalWrite( motorPoti[mp].pIN2, LOW );
+  digitalWrite( motorPoti[mp].pIN[0], LOW );
+  digitalWrite( motorPoti[mp].pIN[1], LOW );
   delay( DIR_DELAY );
   // set the motor speed and direction
-  digitalWrite( motorPoti[mp].pIN1, LOW ); 
-  analogWrite( motorPoti[mp].pIN2, 255-motorPoti[mp].pWM );
+  digitalWrite( motorPoti[mp].pIN[0], LOW ); 
+  analogWrite( motorPoti[mp].pIN[1], 255-motorPoti[mp].pWM );
 }
 
 void MotorMoveCCW(byte mp)
 {
   
   // always stop motors briefly before abrupt changes
-  digitalWrite( motorPoti[mp].pIN1, LOW );
-  digitalWrite( motorPoti[mp].pIN2, LOW );
+  digitalWrite( motorPoti[mp].pIN[0], LOW );
+  digitalWrite( motorPoti[mp].pIN[1], LOW );
   delay( DIR_DELAY );
   // set the motor speed and direction
-  analogWrite( motorPoti[mp].pIN1, motorPoti[mp].pWM ); 
-  digitalWrite( motorPoti[mp].pIN2, LOW ); 
+  analogWrite( motorPoti[mp].pIN[0], motorPoti[mp].pWM ); 
+  digitalWrite( motorPoti[mp].pIN[1], LOW ); 
 }
 
 void MotorStop(byte mp)
 {
-  digitalWrite( motorPoti[mp].pIN1, LOW );
-  digitalWrite( motorPoti[mp].pIN2, LOW );
+  digitalWrite( motorPoti[mp].pIN[0], LOW );
+  digitalWrite( motorPoti[mp].pIN[1], LOW );
   delay(10);
 }
 
@@ -80,7 +86,7 @@ void MotorPoti_Zeroize()
   for (byte x=0;x<motorPotiAnz;x++)
   {
     byte mp=x;
-    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
+    if ((motorPoti[mp].pIN[0]==0) || (motorPoti[mp].pIN[1]==0)) continue;  //skip loop if no Pins were assigned
   
     int oldPos=analogRead(motorPoti[mp].poti);
     int tmp=0;
@@ -154,7 +160,7 @@ void SignalSenden(byte mp)
   sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
   SendMessage(buf,4);
   delay(10);
-  SendMessage(buf,1);
+  if (testmode){SendMessage(buf,1);}
 }
 
 void CheckBMS(byte pos, byte mp)
@@ -205,29 +211,21 @@ void CheckInternalMovement(byte mp)
 
 void UpdateMotorPoti(byte pos) 
 {
-  long curr_time=millis();
-  if (time_status<(curr_time-10000))
+  unsigned long now=millis();
+  if (time_status<(now-10000))
   {
-    time_status=curr_time;
+    time_status=now;
     if (error)
       {SendMessage("Motorpotis deaktiviert",1);}
-    else if (testmode)
-    {
-      char buf[9]="        ";
-      sprintf (buf, "%03u,%04u", motorPoti[datenfeld[pos].ziel].command, motorPoti[datenfeld[pos].ziel].trimPos_int);
-      SendMessage(buf,1);
-    }
-    else
-    {}
   }
   
   if (!error) //only continue if no error occured
   {  
     //check external movement
-    if ((curr_time>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
-      {CheckBMS(pos,datenfeld[pos].ziel);} 
+    if ((now>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
+      {CheckBMS(pos,datenfeld[pos].target);} 
 
     //check internal movement
-    CheckInternalMovement(datenfeld[pos].ziel);
+    CheckInternalMovement(datenfeld[pos].target);
   }
 }
