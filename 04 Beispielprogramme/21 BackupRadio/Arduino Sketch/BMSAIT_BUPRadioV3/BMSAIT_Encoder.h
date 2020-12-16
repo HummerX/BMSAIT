@@ -16,7 +16,7 @@ typedef struct //data field structure to define commands for rotary switches wit
 } RotEnc;
 
 //             PIN1, PIN2, PIN Shift, CMD1,  CMD2,  CMD3,  CMD4
-RotEnc rotEnc = { 2,   3,       0,     "43",  "44",  "00",  "00" };
+RotEnc rotEnc = { 2,   3,       0,     "45",  "46",  "00",  "00" };
 
 
 volatile unsigned int encoderPos = 0;  // a counter for the dial

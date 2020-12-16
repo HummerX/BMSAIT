@@ -8,6 +8,7 @@
 
 TM1637Display TM1637_display=TM1637Display(TM1637_CLK, TM1637_DIO);
 
+
   
 void SetupTM1637()
 {
@@ -36,19 +37,21 @@ void UpdateTM1637(int p)
 {
   byte anzeige[4] = {0x00,0x00,0x00,0x00};
     memcpy(Wert, datenfeld[p].wert, sizeof(datenfeld[p].wert));
+    
     //modifier for BUPRadio
     BUPRadioUpdate(p); //look for modifiers
-      for (int lauf=0;lauf<datenfeld[p].stellen;lauf++)
-      {
-      if (Wert[lauf]!=' ') anzeige[lauf+datenfeld[p].start]=TM1637_display.encodeDigit(Wert[lauf]);
-      }
+        
+    for (int lauf=0;lauf<datenfeld[p].ref3;lauf++)
+    {
+    if (Wert[lauf]!=' ') anzeige[lauf+datenfeld[p].ref4]=TM1637_display.encodeDigit(Wert[lauf]);
+    }
     //modifier for BUPRadio
-
   
   uint8_t dots;
-  if (datenfeld[p].dp==0) dots=0b10000000;
-  if (datenfeld[p].dp==1) dots=0b01000000;
-  if (datenfeld[p].dp==2) dots=0b00100000;
-  if (datenfeld[p].dp==3) dots=0b00010000;
+  if (datenfeld[p].ref5==0) dots=0b10000000;
+  if (datenfeld[p].ref5==1) dots=0b01000000;
+  if (datenfeld[p].ref5==2) dots=0b00100000;
+  if (datenfeld[p].ref5==3) dots=0b00010000;
   TM1637_display.setSegments(anzeige);
+  
 }

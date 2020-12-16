@@ -41,6 +41,7 @@ Schalter schalter[]=
  ,{  A2,     "MNL3"   ,     3,      2,            0,      "00",         "00",       0}        //Man Freq Selector3
  ,{  A3,     "MNL4"   ,     3,      3,            0,      "00",         "00",       0}        //Man Freq Selector4
  ,{  A4,     "MNL5"   ,     3,      4,            0,      "00",         "00",       0}        //Man Freq Selector5
+ ,{  A5,     "COM1V" ,      2,      0,            0,      "07",         "08",       8}        //COM1 Volume switch ON/OFF
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
     
@@ -50,10 +51,10 @@ const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);
 #define STATES 10  //number of positions of the rotary switch(es)
 Drehschalter analogSchalter[][STATES]=
 {
- {//RotSwitch0: 3-position rotary switch X__.___(2,3)
+ {//RotSwitch0: 2-position rotary switch X__.___(2,3)
   //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {    "07",         true,               0,             512}     //send command 06 if analog read is between 0 and 511 (of 1024)
-  ,{    "08",         true,             511,            1024}     //send command 07 if analog read is between 512 and 668 (of 1024)
+   {    "09",         true,               0,             512}     //send command 06 if analog read is between 0 and 511 (of 1024)
+  ,{    "10",         true,             511,            1024}     //send command 07 if analog read is between 512 and 668 (of 1024)
   ,{    "00",        false,               0,               0}     
   ,{    "00",        false,               0,               0}
   ,{    "00",        false,               0,               0}
@@ -65,49 +66,49 @@ Drehschalter analogSchalter[][STATES]=
  },
  {//RotSwitch1: 10-position rotary switch _X_.___
   //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {"09",true,  0, 64}       
-  ,{"10",true, 65,177}   
-  ,{"11",true,178,291}    
-  ,{"12",true,292,405}  
-  ,{"13",true,406,518}    
-  ,{"14",true,519,632}   
-  ,{"15",true,633,746}    
-  ,{"16",true,747,859}    
-  ,{"17",true,860,973}    
-  ,{"18",true,974,1024}   
+   {"11",true,  0, 64}       
+  ,{"12",true, 65,177}   
+  ,{"13",true,178,291}    
+  ,{"14",true,292,405}  
+  ,{"15",true,406,518}    
+  ,{"16",true,519,632}   
+  ,{"17",true,633,746}    
+  ,{"18",true,747,859}    
+  ,{"19",true,860,973}    
+  ,{"20",true,974,1024}   
  },
  {//RotSwitch2: 10-position rotary switch __X.___
   //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {"19",true,  0, 64}     
-  ,{"20",true, 65,177}     
-  ,{"21",true,178,291}   
-  ,{"22",true,292,405}    
-  ,{"23",true,406,518} 
-  ,{"24",true,519,632}  
-  ,{"25",true,633,746}
-  ,{"26",true,747,859}
-  ,{"27",true,860,973}
-  ,{"28",true,974,1024}
+   {"21",true,  0, 64}     
+  ,{"22",true, 65,177}     
+  ,{"23",true,178,291}   
+  ,{"24",true,292,405}    
+  ,{"25",true,406,518} 
+  ,{"26",true,519,632}  
+  ,{"27",true,633,746}
+  ,{"28",true,747,859}
+  ,{"29",true,860,973}
+  ,{"30",true,974,1024}
  },
  {//RotSwitch3: 10-position rotary switch ___.X_
   //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {"29",true,  0, 64} 
-  ,{"30",true, 65,177}
-  ,{"31",true,178,291}
-  ,{"32",true,292,405}
-  ,{"33",true,406,518}
-  ,{"34",true,519,632} 
-  ,{"35",true,633,746}
-  ,{"36",true,747,859}
-  ,{"37",true,860,973} 
-  ,{"38",true,974,1024}
+   {"31",true,  0, 64} 
+  ,{"32",true, 65,177}
+  ,{"33",true,178,291}
+  ,{"34",true,292,405}
+  ,{"35",true,406,518}
+  ,{"36",true,519,632} 
+  ,{"37",true,633,746}
+  ,{"38",true,747,859}
+  ,{"39",true,860,973} 
+  ,{"40",true,974,1024}
  },
   {//RotSwitch4: 4-position rotary switch ___._XX
    //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {"39",true,   0,  255} 
-  ,{"40",true, 256,  511}
-  ,{"41",true, 512,  767}     
-  ,{"42",true, 768, 1024}
+   {"41",true,   0,  255} 
+  ,{"42",true, 256,  511}
+  ,{"43",true, 512,  767}     
+  ,{"44",true, 768, 1024}
   ,{"00",false,  0,    0}
   ,{"00",false,  0,    0}
   ,{"00",false,  0,    0}

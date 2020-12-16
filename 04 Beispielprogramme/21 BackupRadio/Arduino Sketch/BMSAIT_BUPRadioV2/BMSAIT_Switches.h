@@ -1,4 +1,4 @@
-// This module provides functions to read switches and send commands to the BMSAIT windows application
+// This module provides functions to read switches and send commands to the F4SME windows application
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
 
 
@@ -25,18 +25,19 @@ typedef struct //data field structure to define commands for rotary switches wit
 
 
 //Switch definition. If you add a switch, add a line to the following list 
-
+//,{<PIN>,<description>,<type>,<rotarySwitchID>,0,<commandID when pressed>,<commandID when released>,<internal command>}
+    
 
 Schalter schalter[]=
 {
-//,{<PIN>,<description>,<type>,<rotarySwitchID>,0,<commandID when pressed>,<commandID when released>,<internal command>}
-  {   6,    "STATU" ,     1,          0,        0,        "00",                   "00",                   6}    //STATUS button
- ,{   7,    "TEST"  ,     1,          0,        0,        "00",                   "00",                   7}    //TEST button
- ,{   3,    "UHFOF" ,     2,          0,        0,        "01",                   "00",                   1}    //UHF Main Switch - OFF
- ,{   4,    "UHFMA" ,     2,          0,        0,        "02",                   "00",                   2}    //UHF Main Switch - MAIN
- ,{   5,    "UHFBO" ,     2,          0,        0,        "03",                   "00",                   2}    //UHF Main Switch - BOTH
- ,{   8,    "MNL"   ,     2,          0,        0,        "04",                   "05",                   3}    //UHF Mode Switch MAN
- ,{   9,    "GRD"   ,     2,          0,        0,        "06",                   "05",                   5}    //UHF Mode Switch GRD
+  {6, "STATU" ,1, 0, 0, "00", "00", 6}    //STATUS button
+ ,{7, "TEST"  ,1, 0, 0, "00", "00", 7}    //TEST button
+ ,{3, "UHFOF" ,2, 0, 0, "01", "00", 1}    //UHF Main Switch - OFF
+ ,{4, "UHFMA" ,2, 0, 0, "02", "00", 2}    //UHF Main Switch - MAIN
+ ,{5, "UHFBO" ,2, 0, 0, "03", "00", 2}    //UHF Main Switch - BOTH
+ ,{8, "MNL"   ,2, 0, 0, "04", "05", 3}    //UHF Mode Switch Manual
+ ,{9, "GRD"   ,2, 0, 0, "06", "05", 5}    //UHF Mode Switch PRE
+ ,{10,"COM1V" ,2, 0, 0, "07", "08", 8}    //COM1 Volume switch ON/OFF
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
     
@@ -47,17 +48,16 @@ const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);
 Drehschalter analogSchalter[][STATES]=
 {
  {
-  //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {      "07",         true,               0,               64}       //send command 14 if analog read is between 0 and 64 (of 1024)
-  ,{      "08",         true,              65,              177}     //send command 05 if analog read is between 65 and 177 (of 1024)
-  ,{      "09",         true,             178,              291}    //send command 06 if analog read is between 178 and 291 (of 1024)
-  ,{      "10",         true,             292,              405}    //send command 07 if analog read is between 292 and 405 (of 1024)
-  ,{      "11",         true,             406,              518}    //send command 08 if analog read is between 406 and 518 (of 1024)
-  ,{      "12",         true,             519,              632}    //send command 09 if analog read is between 519 and 632 (of 1024)
-  ,{      "13",         true,             633,              746}    //send command 10 if analog read is between 633 and 746 (of 1024)
-  ,{      "14",         true,             747,              859}    //send command 11 if analog read is between 747 and 859 (of 1024)
-  ,{      "15",         true,             860,              973}    //send command 12 if analog read is between 860 and 973 (of 1024)
-  ,{      "16",         true,             974,              1024}   //send command 13 if analog read is between 974 and 1024 (of 1024)
+  {"04",true,0,64}       //send command 04 if analog read is between 0 and 64 (of 1024)
+  ,{"05",true,65,177}     //send command 05 if analog read is between 65 and 177 (of 1024)
+  ,{"06",true,178,291}    //send command 06 if analog read is between 178 and 291 (of 1024)
+  ,{"07",true,292,405}    //send command 07 if analog read is between 292 and 405 (of 1024)
+  ,{"08",true,406,518}    //send command 08 if analog read is between 406 and 518 (of 1024)
+  ,{"09",true,519,632}    //send command 09 if analog read is between 519 and 632 (of 1024)
+  ,{"10",true,633,746}    //send command 10 if analog read is between 633 and 746 (of 1024)
+  ,{"11",true,747,859}    //send command 11 if analog read is between 747 and 859 (of 1024)
+  ,{"12",true,860,973}    //send command 12 if analog read is between 860 and 973 (of 1024)
+  ,{"13",true,974,1024}   //send command 13 if analog read is between 974 and 1024 (of 1024)
  }
   /*
   //activate this to add an additional rotary switch
@@ -109,7 +109,6 @@ void CheckSwitches()
       { 
         delay(5);        
         schalter[index].lastPINState= currentPINState;
-
         
         if (currentPINState==0)
         {
@@ -142,11 +141,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].kommando ,3);
-            //debug
-            //char buf[5];
-            //itoa(currentPINState,buf,10);
-            //SendMessage(buf,1);
-            //debug
+            //if (testmode)
+            //  {
+            //  char buf[5];
+            //  itoa(currentPINState,buf,10);
+            //  SendMessage(buf,1);
+            //  }
           }
         }
       } 

@@ -1,6 +1,7 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.0    3.10.2020
+// Version: 1.2   29.10.2020
 // Robin "Hummer" Bruns
+
 
 
 //basic settings
@@ -19,13 +20,16 @@
   #define VAR_ENDE '>'        // char to mark the end of the actual data
   #define TYP_ANFANG '{'      // char to mark the begin of the type definition in a message string
   #define TYP_ENDE '}'        // char to mark the begin of the type definition in a message string
-  
+
 //Function headers
-  void PullRequest();
+  void ReadData();
+  void UpdateInput();
+  void UpdateOutput();
+  void PullRequest(byte v);
   void ReadResponse();     
-  void debug_readback(byte posID);
-  void SendSysCommand(char text[]); 
-  void SendMessage(char message[], byte option);
+  void DebugReadback(byte posID);
+  void SendSysCommand(const char text[]); 
+  void SendMessage(const char message[], byte option);
   void ResetMotors();
   //mod
   void debug_readbackBUP(byte posID);
@@ -36,13 +40,14 @@
   typedef struct //data field structure for storage of data variables
   {
     char bezeichnung[6];            //short description (max. 5 characters)
-    char ID[5];                     //only required for PULL-operation. The ID for this data from "BMSAIT-Variablen.csv". this will tell the windows app which data you are requesting
+    char ID[5];                     //only required for PULL-operation. The ID for this data from "BMSAIT-Variablen.csv". this will tell the windows app what kind of data you are requesting
     char format;                    //only required for PULL-operation. Data type according to  "BMSAIT-Variablen.csv" (y=byte, i=integer, f=float, s=string, b=bool, 1=Byte Array, 2=Int Array, 3=string Array, 4=float Array) 
-    byte typ;                        //indicates the type of device that will be used to output his data (10: LED, 20: LCD, 30: 7-Segment MAX7219, 40: Servomotor)
-    byte ziel;                       //target information. This will be used to set the PIN for LED output, the adress for motors on a pwm shield or the line on LCD displays
-    byte stellen;                    //sets the length of this data. This is used to set the position of this data on LCD or 7-segment displays
-    byte start;                      //sets the position of this data on LCD / 7Segment displays. if set, the data will be offset by this number of characters
-    byte dp;                         //marks the character that will display the decimal point on 7Segment displays
+    byte typ;                       //indicates the type of device that will be used to output his data (10: LED, 20: LCD, 30: 7-Segment MAX7219, 40: Servomotor)
+    byte target;                    //this byte links the variable to a specific device (i.e. PIN for LED output, the adress for motors on a pwm shield or to differentiate between multiple devices within one module)
+    byte ref2;                      //the use of reference byte depends on the output type. Ref2 can set the line on LCD displays
+    byte ref3;                      //the use of reference byte depends on the output type. Ref3 can set the length if a data value to display on LCD or 7-segment displays
+    byte ref4;                      //the use of reference byte depends on the output type. Ref4 can set the position of data on LCD / 7Segment displays. if set, the data will be offset by this number of characters
+    byte ref5;                      //the use of reference byte depends on the output type. Ref5 can mark the position of the decimal point on 7-Segment displays
     char wert[DATENLAENGE];         //contains the current value
   } Datenfeld;
 
@@ -64,6 +69,14 @@
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
   bool testmode=false;        //Testmode on/off
 
+
+  #ifdef DUE
+    #define SERIALCOM SerialUSB   //enable communication over the native port of the DUE
+  #else
+    #define SERIALCOM Serial      //standard serial connection
+  #endif
+
+  
 //settings for PULL logic
   bool pull= false;           //flag that defines wether to use push or pull logic (true=pull ; false=push). Can be switched by commands of the F4SMExporter App
   long lastPoll=0;            //timestamp of the last data request during pull logic
@@ -83,9 +96,29 @@
 #endif 
 //mod  
 
+//button matrix settings
+#ifdef ButtonMatrix               
+  #include "BMSAIT_Buttonmatrix.h"
+#endif  
+
+//rotary encoders
+#ifdef RotEncoder               
+  #include "BMSAIT_Encoder.h"
+#endif  
+
+//analog axis settings
+#ifdef AnalogAxis 
+  #include "BMSAIT_Analogachse.h"
+#endif 
+
 //LED settings
 #ifdef LED                             
   #include "BMSAIT_LED.h"
+#endif
+
+//LED matrix settings
+#ifdef LEDMatrix                             
+  #include "BMSAIT_LEDMatrix.h"
 #endif
 
 //LCD settings
@@ -133,39 +166,38 @@
   #include "BMSAIT_MotorPoti.h"
 #endif 
 
- 
+#ifdef DED_PFL                             
+  #include "BMSAIT_DED_PFL.h"
+#endif
 
-//button matrix settings
-#ifdef ButtonMatrix               
-  #include "BMSAIT_Buttonmatrix.h"
-#endif  
+#ifdef SpeedBrake                             
+  #include "BMSAIT_SBI.h"
+#endif
 
-//rotary encoders
-#ifdef RotEncoder               
-  #include "BMSAIT_Encoder.h"
-#endif  
-
-//analog axis settings
-#ifdef AnalogAxis 
-  #include "BMSAIT_Analogachse.h"
-#endif 
-  
 //example how to add your own project to this sketch. 
 #ifdef NewDevice                
   #include "BMSAIT_Placeholder.h"
-#endif  
+#endif 
   
  
+//********************
+//Main Program
+//********************
 
+///Setup of BMSAIT
 void setup()
 {
-  Serial.begin(BAUDRATE);
-  pinMode(LED_BUILTIN, OUTPUT);
+  SERIALCOM.begin(BAUDRATE);
+                                      
                                       
   #ifdef LED                            //LEDs setup begin
     SetupLED();
   #endif                                //LEDs setup end
   
+  #ifdef LEDMatrix                      //LEDMatrix setup begin
+    SetupLEDMatrix();
+  #endif                                //LEDMatrix setup end
+ 
   #ifdef LCD                            //LCD setup begin
    SetupLCD();
   #endif                                //LCD setup end
@@ -174,7 +206,7 @@ void setup()
    SetupMax7219();
   #endif                                //7-segment-display MAX7219 setup end
 
-  #ifdef SSegTM1637                    //7-segment-display TM1637 setup begin
+  #ifdef SSegTM1637                     //7-segment-display TM1637 setup begin
    SetupTM1637();
   #endif                                //7-segment-display TM1637 setup end
                              
@@ -187,7 +219,7 @@ void setup()
   #endif                                //servo PWM shield setup end
     
   #ifdef StepperBYJ                     //stepper setup begin
-   SetupStepperBYJ();
+   //SetupStepperBYJ();
   #endif                                //stepper setup end
 
   #ifdef StepperX27                     //stepper setup begin
@@ -201,6 +233,15 @@ void setup()
   #ifdef MotorPoti                      //MotorPoti setup begin
     SetupMotorPoti();
   #endif                                //MotorPoti setup end
+ 
+  #ifdef DED_PFL                        //DED setup begin
+    SetupDED();
+  #endif                                //DED setup end
+
+  #ifdef SpeedBrake                     //SBI setup begin
+    SetupSBI();
+  #endif                                //SBI setup end
+
   #ifdef Switches                       //Input controller setup begin
    SetupSwitches();
   #endif                                //Input controller setup end
@@ -222,7 +263,7 @@ void setup()
   #endif                                //Example end
 
   //modification for BUPRadio
-  #ifdef BUPRadio  
+  #ifdef BUPRadio
     SetupBUPRadio();
   #endif
   //modification for BUPRadio
@@ -234,28 +275,85 @@ void setup()
 void loop()              
 {
   delay(1);
-  
-  if (pull){PullRequest(); }   //send data requests if PULL mode is active
-  
-  ReadResponse();              //check for new data from the windows app
+  ReadData();  //get new data from PC
 
-  #ifdef Switches              
-   CheckSwitches();            //check switch positions and initiate commands if switches were moved
+  UpdateInput(); //check input devices (switches, buttons)
+  
+  UpdateOutput(); //update outputs (LEDs, motors, displays)
+}
+
+
+//********************
+//Functions
+//********************
+
+/// reset motor positions to default values
+void ResetMotors()
+{
+  #ifdef ServoMotor                       
+    Servo_Zeroize();            
+  #endif                            
+  
+  #ifdef ServoPWM                       
+    ServoPWM_Zeroize();              
+  #endif  
+  
+  #ifdef StepperVID
+    StepperVID_Zeroize();   
   #endif
-                                 
-  #ifdef ButtonMatrix         
-   ButtonmatrixRead();         //check button matrix for changes and initiate commands if switches were moved 
+   
+  #ifdef StepperX27
+    StepperX27_Zeroize();  
+  #endif
+   
+  #ifdef Stepper28BYJ48
+    Stepper28BYJ48_Zeroize();  
+  #endif
+   
+  #ifdef MotorPoti
+    MotorPoti_Zeroize(); 
+  #endif
+}
+
+
+///check for fresh sharedMem data 
+void ReadData()
+{
+  if (pull)  //send data requests if PULL mode is active
+  {
+    for (byte v=0;v<VARIABLENANZAHL;v++)
+    {
+      PullRequest(v);
+      delay(5);
+      //modification BUP Radio
+      PullRequestBUP();  //adds another request to update the BUPFreq container
+      //modification BUP Radio
+    }
+  }   
+  else  
+  {
+    while(SERIALCOM.available())
+    { 
+      #ifdef PRIORITIZE_OUTPUT
+      UpdateOutput();   //throw in another update if outputs are priorized 
+      #endif
+      #ifdef PRIORITIZE_INPUT
+      UpdateInput();   //throw in another update if inputs are priorized 
+      #endif
+      ReadResponse();   //check for new data from the windows app
+    }        
+  }
+}
+
+
+///loop through all data variables and update output devices
+void UpdateOutput()
+{
+  #ifdef DED_PFL  
+    UpdateDED();  
   #endif
   
-  #ifdef RotEncoder              
-   CheckEncoder();            //check encoders and initiate commands if they were moved
-  #endif
-  
-  #ifdef AnalogAxis      
-   ReadAnalogAxis();           //check analog axis for changes and initiate commands if switches were moved
-  #endif
-  
-  for (byte x=0;x<VARIABLENANZAHL;x++)     //loop through the data container. For each entry, the respective output will be updated
+ for (byte x=0;x<VARIABLENANZAHL;x++)     //loop through the data container. For each entry, the respective output will be updated
   {
     switch (datenfeld[x].typ)
     {
@@ -266,7 +364,13 @@ void loop()
         case 11: //LED (PIN is wired to Vcc)
           UpdateLED_PINLOW(x); 
           break;
-      #endif       
+      #endif 
+            
+      #ifdef LEDMatrix
+        case 12: //LEDMatrix
+          UpdateLEDMatrix(x); 
+          break;
+      #endif    
       
       #ifdef LCD
         case 20: //LCD
@@ -321,6 +425,12 @@ void loop()
           UpdateMotorPoti(x);
           break;      
       #endif
+
+      #ifdef SpeedBrake
+        case 71: //Speedbrake OLED
+          UpdateSBI(x);
+          break;      
+      #endif
       
       #ifdef NewDevice  //define this flag in the top of BMSAIT_UserConfig.h to activate this block ("#define newDevice")
         case 69: //assign this type to a variable in the data container to call a new method
@@ -328,96 +438,87 @@ void loop()
         break;
       #endif
 
-     
       default:
         //not implemented
         break;
     }
-  }
+  }  
 }
 
+void UpdateInput()
+{
+  #ifdef Switches              
+   CheckSwitches();            //check switch positions and initiate commands if switches were moved
+  #endif
+                                 
+  #ifdef ButtonMatrix         
+   ButtonmatrixRead();         //check button matrix for changes and initiate commands if switches were moved 
+  #endif
+  
+  #ifdef RotEncoder              
+   CheckEncoder();            //check encoders and initiate commands if they were moved
+  #endif
+  
+  #ifdef AnalogAxis      
+   ReadAnalogAxis();           //check analog axis for changes and initiate commands if switches were moved
+  #endif
+}
 
 ///Loop through the data container and send a message to the BMSAIT App to request data update for each entry
-void PullRequest()
+void PullRequest(byte var)
 {
-  if (lastPoll+POLLTIME<millis())  //wait for a specified time (POLLTIME) before requesting another update
-  {
-    lastPoll=millis();
-    while (Serial.available())  //flush input buffer to prevent wrong data to be read into the current variable
-    {Serial.read();}      
-    
-    //in every loop run, only one data entry update will be requested. This avoids data congestion and flickering of attached displays
-    if (last_request>=VARIABLENANZAHL-1)
-      {last_request=0;}
-    else
-      {last_request++;}
-    
-    //build message string <pos>,<vartype>,<varID>
-    char nachricht[11]="";
-    char pos[2]="";
-  if (strcmp(datenfeld[last_request].ID,"9999")==0) return;  //don't update dummy variables                                            
-    itoa(last_request,pos,10);  //write data container position as character
-    if (last_request<10) 
-      {
-        nachricht[0]='0'; 
-        nachricht[1]=pos[0];
-      }
-      else 
-      {
-        nachricht[0]=pos[0]; 
-        nachricht[1]=pos[1];
-      }
+  //build message string <pos>,<vartype>,<varID>
+  char nachricht[11]={0};
+  char pos[2]={0,0};
+  if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
+    itoa(var,pos,10);  //write data container position as character
+    if (var<10) 
+    {
+      nachricht[0]='0'; 
+      nachricht[1]=pos[0];
+    }
+    else 
+    {
+      nachricht[0]=pos[0]; 
+      nachricht[1]=pos[1];
+    }
     nachricht[2]=',';
-    nachricht[3]=datenfeld[last_request].format;  //add the variable type
+    nachricht[3]=datenfeld[var].format;  //add the variable type
     nachricht[4]=',';
     for (byte lauf=0;lauf<5;lauf++)
-    {nachricht[5+lauf]=datenfeld[last_request].ID[lauf];} //add the variable ID
+      {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
     nachricht[10]='\0';
     SendMessage(nachricht,2);
-  //modification BUP Radio
-    //delay(10);
-    delay(5);
-    PullRequestBUP();  //adds another request to update the BUPFreq container
-  //modification BUP Radio
-  }
+    byte x=0;
+    while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
+    {
+      #ifdef PRIORITIZE_OUTPUT
+        UpdateOutput(); //throw in another update if outputs are priorized
+        x+=15;
+      #endif
+      #ifdef PRIORITIZE_INPUT
+        UpdateInput();   //throw in another update if inputs are priorized
+        x+=15;
+      #endif
+      #if !defined PRIORITIZE_OUTPUT && !defined PRIORITIZE_INPUT
+        delay(1);
+        x++;  
+      #endif
+    }
+    while(SERIALCOM.available()>1)  //read incoming data
+      {ReadResponse();}
 }
 
-/// reset stepper motor positions to default values
-void ResetMotors()
-{
-#ifdef ServoMotor                       
-  Servo_Zeroize();            
-#endif                            
 
-#ifdef ServoPWM                       
-  ServoPWM_Zeroize();              
-#endif  
-
-#ifdef StepperVID
-  StepperVID_Zeroize();   
-#endif
- 
-#ifdef StepperX27
-  StepperX27_Zeroize();  
-#endif
- 
-#ifdef Stepper28BYJ48
-  Stepper28BYJ48_Zeroize();  
-#endif
- 
-#ifdef MotorPoti
-  MotorPoti_Zeroize(); 
-#endif
-}
 
 /// Check incoming serial data for data. Expects structured messages --> CommandBit VariableID {VariableType}<Data>
 void ReadResponse()       
 {
-  if (Serial.available()>1)
+  if (SERIALCOM.available()>1)
   {
      if (state==0)
      {
-       inputByte_0=Serial.read();
+       inputByte_0=SERIALCOM.read();
        if (inputByte_0 == MESSAGEBEGIN ) //Check for start of Message - byte (255)
        {
          state=1;
@@ -426,42 +527,38 @@ void ReadResponse()
      
      if (state==1)
      {
-       inputByte_1=Serial.read();
+       inputByte_1=SERIALCOM.read();
        if (inputByte_1 == HANDSHAKE)
        {
-         Serial.flush();
+         SERIALCOM.flush();
          SendSysCommand(ID); //Send ID to idendify this board
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          state=0;
        }
        else if (inputByte_1 == STARTPULL)
        {
          //confirm start of PULL requests
          pull=true;
-         Serial.flush();
+         SERIALCOM.flush();
          SendSysCommand("on");
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          state=0;
        }  
        else if (inputByte_1 == ENDPULL)
        {
          //confirm termination of PULL requests
          pull=false;
-         Serial.flush();
+         SERIALCOM.flush();
          SendSysCommand("off");
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          state=0;
        } 
        else if (inputByte_1 == CALIBRATE)
        {
          //reset motor position to zero
-         Serial.flush();
-         SendSysCommand("cal");
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         SERIALCOM.flush();
+         SendSysCommand("ok");
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          ResetMotors();
          state=0;
        }       
@@ -469,81 +566,82 @@ void ReadResponse()
        {
          //confirm testmode
          testmode=true;
-         Serial.flush();
+         SERIALCOM.flush();
          SendSysCommand("on");
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          state=0;
        }  
        else if (inputByte_1 == TESTOFF)
        {
          //confirm end of testmode
          testmode=false;
-         Serial.flush();
+         SERIALCOM.flush();
          SendSysCommand("off");
-         delay(1000);
-         while (Serial.available()){Serial.read();} //clear buffer
+         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
          state=0;
        }
-             
        else if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
        {
          neuer_wert.varNr=(int)inputByte_1;
          state=2;
+         delay(1);
        }
        else 
        { 
-         state=0;    //unexpected value. discard data and start over  
+         state=0;    //unexpected value. discard data and start over.  
          if (testmode){SendMessage("Fehler State 1",1);}
        }
      }
 
-     if ((state==2) && (Serial.available()>2))
-      {
-        if (Serial.read()==TYP_ANFANG) //if the message is in the correct format, the defined char TYP_ANFANG can be found here
-        {
-          neuer_wert.typ=Serial.read();  //reads the VariableType ('i'=integer, 'f'=float, 's'=string ...)
-          Serial.read();  //Dump the char '}'
-          state=3;
-        }
-        else
-        {
-          state=0;  //unexpected value. discard data and start over
-          if (testmode){SendMessage("Fehler State 2",1);}
-        }  
-      }
+     if ((state==2) && (SERIALCOM.available()>2))
+     {
+       if (SERIALCOM.read()==TYP_ANFANG) //if the message is in the correct format, the defined char TYP_ANFANG can be found here
+       {
+         neuer_wert.typ=SERIALCOM.read();  //reads the VariableType ('i'=integer, 'f'=float, 's'=string ...)
+         SERIALCOM.read();  //Dump the char '}'
+         state=3;
+       }
+       else
+       {
+         state=0;  //unexpected value. discard data and start over.
+         if (testmode){SendMessage("Fehler State 2",1);}
+       }  
+     }
       
-      if ((state==3) && (Serial.available()>1))
-      {
-        if (Serial.read()==VAR_BEGIN) //if the message is in the correct format, the defined char VAR_ANFANG can be found here
-        {
-          state=4;
-        }
-        else
-        {
-          state=0;  //unexpected value. discard data and start over
-          if (testmode){SendMessage("Fehler State 3",1);}
-        }  
-      }
+     if ((state==3) && (SERIALCOM.available()))
+     {
+       if (SERIALCOM.read()==VAR_BEGIN) //if the message is in the correct format, the defined char VAR_BEGIN can be found here
+       {
+         Uebertragung_pos=0;
+         neuer_wert.wert[0]='\0';
+         state=4;
+       }
+       else
+       {
+         state=0;  //unexpected value. discard data and start over.
+         if (testmode){SendMessage("Fehler State 3",1);}
+       }  
+     }
       
-    while ((state==4) && (Serial.available()))
-    {
-      char c = Serial.read();
-      if ((c==VAR_ENDE) || (Uebertragung_pos>DATENLAENGE-1))  //continue to read the incoming data until the termination character is read or the maximum lengh of the data variable is reached
-      {
-        // end of data found. Validate the buffer before writing the new data into the data container
-        state=0;
-        int laenge=sizeof(neuer_wert.wert);            
-        if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
-        {
-          if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
-          {
-             for (int lauf=DATENLAENGE;lauf>=laenge;lauf--)
+     while ((state==4)&&(SERIALCOM.available()))
+     {
+       byte c = SERIALCOM.read();
+
+       if (c==VAR_ENDE)  //the termination character arrived. Save the data.
+       {
+         // end of data found. Validate the buffer before writing the new data into the data container
+         
+         int laenge=sizeof(neuer_wert.wert);            
+         if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
+         {
+           if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
+           {
+             for (int lauf=DATENLAENGE-1;lauf>laenge;lauf--)
                {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
              memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
-             if (testmode){debug_readback(neuer_wert.varNr);}
-          }
-        }
+           }
+           if (testmode){DebugReadback(neuer_wert.varNr);}
+         }
         //modification for BUP Radio (varNr is between 101 and 121)
         else 
         {
@@ -551,36 +649,42 @@ void ReadResponse()
             {BUPRadioFreq[neuer_wert.varNr-100].wert[lauf]='\0';}
             
           memcpy(BUPRadioFreq[neuer_wert.varNr-100].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
-          //debug 
-            if (neuer_wert.varNr==120)
+          if (testmode && (neuer_wert.varNr==120))
+          {
             for (byte x=101;x<121;x++)
             {
-              debug_readbackBUP(x-100); //send current data back to F4SME App for debug purposes
-              delay(10);
+              debug_readbackBUP(x-100); //send current data back to BMSAIT App for debug purposes
+              delay(5);
             }
-          //debug  
+          }
         }
-        //modification for BUP Radio
-        
-        //clean variables
-        Uebertragung_pos=0;
-        neuer_wert.wert[0]="\0";
-        neuer_wert.varNr=-1;
-        neuer_wert.typ='\0';
-      }
-      else                
-      {
-        //end of data not yet found. Add the current character to the buffer.
-        neuer_wert.wert[Uebertragung_pos]=c;
-        neuer_wert.wert[Uebertragung_pos + 1]='\0';
-        Uebertragung_pos++;
-      }
+         //modification for BUP Radio  
+         state=0;
+       }
+       else if (Uebertragung_pos>DATENLAENGE)  //end of variable missed. discard and start over.
+       { 
+         if (testmode){SendMessage("Fehler State 4.1",1);}       
+         state=0;
+       }
+       else if (c==MESSAGEBEGIN)    //end of variable missed. discard and start over.
+       {
+         if (testmode){SendMessage("Fehler State 4.2",1);}
+         state=1;
+       }
+       else                
+       {
+         //end of data not yet found. Add the current character to the buffer.
+         neuer_wert.wert[Uebertragung_pos]=c;
+         neuer_wert.wert[Uebertragung_pos + 1]='\0';
+         Uebertragung_pos++;
+       }
     }
   }
 }
 
+
 //readback of recieved data for verification
-void debug_readback(byte posID)
+void DebugReadback(byte posID)
 {
   byte laenge=sizeof(datenfeld[posID].wert);
   char antwort[laenge+2]="";
@@ -629,7 +733,7 @@ void debug_readbackBUP(byte posID)
 }
 
 ///send a system command to the BMSAIT App 
-void SendSysCommand(char text[])  
+void SendSysCommand(const char text[])  
 { 
   delay(50);
   Serial.println(text);
@@ -637,7 +741,7 @@ void SendSysCommand(char text[])
 }
 
 ///Send a message to the BMSAIT App
-void SendMessage(char message[], byte option)
+void SendMessage(const char message[], byte option)
 {
   Serial.print(VAR_BEGIN);
   if (option==1)      //send a text message
