@@ -13,9 +13,7 @@ U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI SBI_display(U8G2_R1, 2/*clock*/, 3/*data*
                           //decrease this to move CLOSED graphic     left      up       right    down  
 #define CLOSED_OFFSETY -2 //increase this to move CLOSED graphic     down     right     up       left
                           //decrease this to move CLOSED graphic      up      left      down     right 
-
                           
-
 #define OFF_OFFSETX 3     //increase this to move OFF graphic        right    down      left      up
                           //decrease this to move OFF graphic        left      up       right    down
 #define OFF_OFFSETY 23    //increase this to move OFF graphic        down     right     up       left
@@ -23,8 +21,6 @@ U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI SBI_display(U8G2_R1, 2/*clock*/, 3/*data*
 #define OFF_STRIPES 64    //increase OFF graphic size
 #define OFF_THICKNESS 10  //increase stripe thickness  
 
-                                                        //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
-                                                        //           (0°)    (90°CW)  (180°)   (270°CW) 
 #define OPEN_OFFSETX -5   //increase this to move OPEN graphic       right     down      left       up
                           //decrease this to move OPEN graphic       left       up       right     down
 #define OPEN_OFFSETY 23   //increase this to move OPEN graphic       down      right      up       left
@@ -32,33 +28,6 @@ U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI SBI_display(U8G2_R1, 2/*clock*/, 3/*data*
 #define OPEN_DIAMETER 7   // bubble size
 #define OPEN_DISTANCE 20  // bubble distance
 
-
-//Giovannis settings
-/*
-U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R3, 4, 9);
-#define SBIFONT u8g2_font_bauhaus2015_tr
-#define CLOSED_SBIFONT_H 11
-                                                        //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
-                                                        //           (0°)    (90°CW)  (180°)   (270°CW) 
-#define CLOSED_OFFSETX 4  //increase this to move CLOSED graphic     right     down     left      up
-                          //decrease this to move CLOSED graphic     left      up       right    down  
-#define CLOSED_OFFSETY -2 //increase this to move CLOSED graphic     down     right     up       left
-                          //decrease this to move CLOSED graphic      up      left      down     right 
-
-#define OFF_OFFSETX 3     //increase this to move OFF graphic        right    down      left      up
-                          //decrease this to move OFF graphic        left      up       right    down
-#define OFF_OFFSETY 38    //increase this to move OFF graphic        down     right     up       left
-                          //decrease this to move OFF graphic         up      left      down     right     
-#define OFF_STRIPES 50    //increase OFF graphic size
-#define OFF_THICKNESS 9   //increase stripe thickness                        
-
-#define OPEN_OFFSETX -5   //increase this to move OFF graphic       right     down      left       up
-                          //decrease this to move OFF graphic       left       up       right     down
-#define OPEN_OFFSETY 29   //increase this to move OFF graphic       down      right      up       left
-                          //decrease this to move OFF graphic        up       left      down      right  
-#define OPEN_DIAMETER 5   // bubble size
-#define OPEN_DISTANCE 16  // bubble distance
-*/
 
 #define SBIDELAY 250
 byte power=99;
