@@ -1,108 +1,183 @@
-
-
-//target= reference link to the line of the motorpoti table of this module
-//ref2= not used
-//ref3= not used
-//ref4= not used
-//ref5= not used
-
 #include <U8g2lib.h>
-#define SBIDELAY 250
-#define THICKNESS 10
 
-//my settings
-  #define SBIFONT u8g2_font_crox4hb_tf
-  #define SBIFONT_H 14
-  #define BORDER  32
-  #define DIAMETER 7
-  #define DISTANCE 20
-  
-  #define SBI_PIN_ROTATION U8G2_R1
-  #define SBI_PIN_CLOCK 2
-  #define SBI_PIN_DATA 3
-  #define SBI_PIN_CS 6
-  #define SBI_PIN_DC 5
-  #define SBI_PIN_RESET 4
-  U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI u8g2(SBI_PIN_ROTATION, SBI_PIN_CLOCK, SBI_PIN_DATA, SBI_PIN_CS, SBI_PIN_DC, SBI_PIN_RESET);
+//U8G2 constructor
+U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI SBI_display(U8G2_R1, 2/*clock*/, 3/*data*/, 6/*cs*/,5/*dc*/, 4/*reset*/);
+
+#define JITTER_ON
+
+#define SBIFONT u8g2_font_crox4hb_tf
+#define CLOSED_SBIFONT_H 14
+                                                        //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
+                                                        //           (0°)    (90°CW)  (180°)   (270°CW) 
+#define CLOSED_OFFSETX 0  //increase this to move CLOSED graphic     right     down     left      up
+                          //decrease this to move CLOSED graphic     left      up       right    down  
+#define CLOSED_OFFSETY -2 //increase this to move CLOSED graphic     down     right     up       left
+                          //decrease this to move CLOSED graphic      up      left      down     right 
+
+                          
+
+#define OFF_OFFSETX 3     //increase this to move OFF graphic        right    down      left      up
+                          //decrease this to move OFF graphic        left      up       right    down
+#define OFF_OFFSETY 23    //increase this to move OFF graphic        down     right     up       left
+                          //decrease this to move OFF graphic         up      left      down     right    
+#define OFF_STRIPES 64    //increase OFF graphic size
+#define OFF_THICKNESS 10  //increase stripe thickness  
+
+                                                        //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
+                                                        //           (0°)    (90°CW)  (180°)   (270°CW) 
+#define OPEN_OFFSETX -5   //increase this to move OPEN graphic       right     down      left       up
+                          //decrease this to move OPEN graphic       left       up       right     down
+#define OPEN_OFFSETY 23   //increase this to move OPEN graphic       down      right      up       left
+                          //decrease this to move OPEN graphic        up       left      down      right  
+#define OPEN_DIAMETER 7   // bubble size
+#define OPEN_DISTANCE 20  // bubble distance
+
 
 //Giovannis settings
-  //#define SBIFONT u8g2_font_fub11_tf
-  //#define SBIFONT_H 11
-  //#define BORDER  32
-  //#define DIAMETER 6
-  //#define DISTANCE 18
-  
-  //#define SBI_PIN_ROTATION U8G2_R3
-  //#define SBI_PIN_CLOCK 4
-  //#define SBI_PIN_DATA 9
-  //U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(SBI_PIN_ROTATION, SBI_PIN_CLOCK, SBI_PIN_DATA);
+/*
+U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R3, 4, 9);
+#define SBIFONT u8g2_font_bauhaus2015_tr
+#define CLOSED_SBIFONT_H 11
+                                                        //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
+                                                        //           (0°)    (90°CW)  (180°)   (270°CW) 
+#define CLOSED_OFFSETX 4  //increase this to move CLOSED graphic     right     down     left      up
+                          //decrease this to move CLOSED graphic     left      up       right    down  
+#define CLOSED_OFFSETY -2 //increase this to move CLOSED graphic     down     right     up       left
+                          //decrease this to move CLOSED graphic      up      left      down     right 
 
+#define OFF_OFFSETX 3     //increase this to move OFF graphic        right    down      left      up
+                          //decrease this to move OFF graphic        left      up       right    down
+#define OFF_OFFSETY 38    //increase this to move OFF graphic        down     right     up       left
+                          //decrease this to move OFF graphic         up      left      down     right     
+#define OFF_STRIPES 50    //increase OFF graphic size
+#define OFF_THICKNESS 9   //increase stripe thickness                        
 
+#define OPEN_OFFSETX -5   //increase this to move OFF graphic       right     down      left       up
+                          //decrease this to move OFF graphic       left       up       right     down
+#define OPEN_OFFSETY 29   //increase this to move OFF graphic       down      right      up       left
+                          //decrease this to move OFF graphic        up       left      down      right  
+#define OPEN_DIAMETER 5   // bubble size
+#define OPEN_DISTANCE 16  // bubble distance
+*/
+
+#define SBIDELAY 250
+byte power=99;
 short oldPos=0;
-unsigned long transitOn=0;
 bool SBopen=false;
 bool OfforTransit=false;
   
 void Closed()
 {
-  u8g2.drawStr(0, (u8g2.getDisplayHeight()-SBIFONT_H)/2, "CLOSE");
+  SBI_display.drawStr(CLOSED_OFFSETX, ((SBI_display.getDisplayHeight()-CLOSED_SBIFONT_H)/2)+CLOSED_OFFSETY, "CLOSE");
 }
 
-void Off()
+void Off(byte jitter_offset)
 {
   bool color=true;
-  for (byte x=1;x<65;x++)
+  for (byte x=1;x<OFF_STRIPES;x++)
   {
     if (color) 
-      {u8g2.drawLine(64-x,BORDER,0,BORDER+64-x);}
+      {SBI_display.drawLine(OFF_OFFSETX+OFF_STRIPES-x,jitter_offset+OFF_OFFSETY,OFF_OFFSETX,jitter_offset+OFF_OFFSETY+OFF_STRIPES-x);}
     else
-      {u8g2.drawLine(64,BORDER+x,x,BORDER+64); }
+      {SBI_display.drawLine(OFF_OFFSETX+OFF_STRIPES,jitter_offset+OFF_OFFSETY+x,OFF_OFFSETX+x,jitter_offset+OFF_OFFSETY+OFF_STRIPES); }
       
-    if (x % THICKNESS==0){color=!color;}
+    if (x % OFF_THICKNESS==0){color=!color;}
   }
 }
 
-void Open()
+void Open(byte jitter_offset)
 {
   for(byte x=1;x<4;x++)
   {
     for (byte y=1;y<4;y++)  
     {
-      u8g2.drawFilledEllipse(DISTANCE*x-8,BORDER-8+DISTANCE*y,DIAMETER,DIAMETER,U8G2_DRAW_ALL);
+      SBI_display.drawFilledEllipse(OPEN_OFFSETX+OPEN_DISTANCE*x,jitter_offset+OPEN_OFFSETY+OPEN_DISTANCE*y,OPEN_DIAMETER,OPEN_DIAMETER,U8G2_DRAW_ALL);
     }
   }
 }
 
 void SBIPrep()
 {
-  u8g2.setFont(SBIFONT);
-  u8g2.setFontRefHeightExtendedText();
-  u8g2.setDrawColor(1);
-  u8g2.setFontPosTop();
-  u8g2.setFontDirection(0);
+  SBI_display.setFont(SBIFONT);
+  SBI_display.setFontRefHeightExtendedText();
+  SBI_display.setDrawColor(1);
+  SBI_display.setFontPosTop();
+  SBI_display.setFontDirection(0);
 }
   
 void SetupSBI() 
 {
-  // put your setup code here, to run once:
-  u8g2.begin();
+  SBI_display.begin();
   SBIPrep();
+  for (int lauf=0;lauf<VARIABLENANZAHL;lauf++)
+  {
+    if (strcmp(datenfeld[lauf].ID, "1242")==0)  //memorize the position of the MainPower variable
+    {power = lauf;}   
+  }
+}
+
+
+//animated off-flag jitter
+void jitter()
+{
+  const byte d=25; //jitter speed
+  for (byte jinks=0;jinks<4;jinks++)
+  {
+    SBI_display.firstPage();
+    do
+    {
+      Off(10);
+    } while( SBI_display.nextPage() );
+    delay(d);
+    SBI_display.firstPage();
+    do
+    {
+      Off(0);
+    } while( SBI_display.nextPage() );
+    delay(d);
+    SBI_display.firstPage();
+    do
+    {
+      Off(-10);
+    } while( SBI_display.nextPage() );
+    delay(d);
+    SBI_display.firstPage();
+    do
+    {
+      Off(0);
+    } while( SBI_display.nextPage() );
+  }
 }
 
 
 void UpdateSBI(byte pos) 
 {
   short SBPos=(short)(100*atof(datenfeld[pos].wert));
-  if (SBPos!=oldPos)
-    {
-      transitOn=millis()+SBIDELAY;
-      oldPos=SBPos;
-    }
-   
-    if (datenfeld[1].wert[0]=='0')
+  bool snap=false;
+  
+  #ifdef JITTER_ON   //displays stutters when transitioning from open to closed and vice versa
+    if (SBPos!=oldPos)
+      {
+        if ((oldPos<=1)&&(SBPos>1)) 
+          {
+           jitter();
+           Open(0);
+           oldPos=SBPos;
+           return;
+          }
+        if ((oldPos>1)&&(SBPos<=1))
+          {
+           jitter();
+           Closed();
+           oldPos=SBPos;
+           return;
+          }
+        else
+        { oldPos=SBPos;}
+      }
+   #endif
+    if (datenfeld[power].wert[0]=='F')
       {OfforTransit=true;}
-    //else if (transitOn>millis())
-    //  {OfforTransit=true;}
     else
       {OfforTransit=false;}
     
@@ -111,16 +186,17 @@ void UpdateSBI(byte pos)
     else
       {SBopen=false;}
 
-  u8g2.firstPage();  
-  do 
-  {  
-    if (OfforTransit) 
-      Off();
-    else if (SBopen) 
-      Open();
-    else 
-      Closed();
-    
-  } while( u8g2.nextPage() );
-  
+    SBI_display.firstPage();  
+    {
+      do 
+      {  
+        if (OfforTransit) 
+          Off(0);
+        else if (SBopen) 
+          Open(0);
+        else 
+          Closed();
+      } while( SBI_display.nextPage() );
+    }
+
 }
