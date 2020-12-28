@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.5 04.02.2020
+0;F4SM;bool;F4SMVar;Version of this file: 1.8   28.12.2020 (BMS 4.35)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -26,8 +26,17 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 232;DED/PFL;string;DEDLine2;Line 2 of the DED display
 233;DED/PFL;string;DEDLine3;Line 3 of the DED display
 234;DED/PFL;string;DEDLine4;Line 4 of the DED display
-235;DED/PFL;string;DEDLine5;Line 5 of the DED display
-240;DED/PFL;string[];Invert;DED display with inverted colors?
+235;DED/PFL;string;DEDLine1f;First half of the Line 1 of the DED display
+236;DED/PFL;string;DEDLine2f;First half of the Line 2 of the DED display
+237;DED/PFL;string;DEDLine3f;First half of the Line 3 of the DED display
+238;DED/PFL;string;DEDLine4f;First half of the Line 4 of the DED display
+239;DED/PFL;string;DEDLine5f;First half of the Line 5 of the DED display
+240;DED/PFL;string;DEDLine1s;Second half of the Line 1 of the DED display
+241;DED/PFL;string;DEDLine2s;Second half of the Line 2 of the DED display
+242;DED/PFL;string;DEDLine3s;Second half of the Line 3 of the DED display
+243;DED/PFL;string;DEDLine4s;Second half of the Line 4 of the DED display
+244;DED/PFL;string;DEDLine5s;Second half of the Line 5 of the DED display
+245;DED/PFL;string[];Invert;Marks inverted parts of the DED display
 250;ENGINE;float;epuFuel;Ownship EPU fuel (Percent 0-100)
 260;ENGINE;float;ftit;Ownship Forward Turbine Inlet Temp (Degrees C)
 270;ENGINE;float;ftit2;Ownship Forward Turbine Inlet Temp2 (Degrees C)
@@ -101,6 +110,11 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 910;HSI/ADI/TACAN;float;adiIlsHorPos;Position of horizontal ILS bar
 920;SYSTEMS;uint;miscBits;See MiscBits enum for details
 921;SYSTEMS;bool;ralt_Valid;Indicates whether the RALT reading is valid/reliable
+922;TEST/FLCS;bool;Flcs_Flcc_A;FLCS A LED
+923;TEST/FLCS;bool;Flcs_Flcc_B;FLCS B LED
+924;TEST/FLCS;bool;Flcs_Flcc_C;FLCS C LED
+925;TEST/FLCS;bool;Flcs_Flcc_D;FLCS D LED
+926;SYSTEMS;bool;SolenoidStatus;0 not powered or failed or WOW  , 1 is working OK
 980;MULTIPLAYER;byte;pilotsOnline;Number of pilots in an MP session
 990;MULTIPLAYER;byte[];pilotsStatus;Status of the MP pilots, see enum FlyStates
 1000;MULTIPLAYER;string[];pilotsCallsign;List of pilots callsign connected to an MP session
@@ -218,7 +232,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1506;CAUTION;bool;eng_FIRE ;"Right eyebrow; upper half of split face lamp"
 1507;CAUTION;bool;config;Stores config, caution panel
 1508;CAUTION;bool;hyd;"Right eyebrow; see also OIL (this lamp is not split face)"
-1509;TEST;bool;flcs_ABCD ;"TEST panel FLCS channel lamps; repurposed, was OIL (see HYD; that lamp is not split face)"
+1509;TEST/FLCS;bool;flcs_ABCD ;"TEST panel FLCS channel lamps; repurposed, was OIL (see HYD; that lamp is not split face)"
 1510;CAUTION;bool;flcs;"Right eyebrow; was called DUAL which matches block 25, 30/32 and older 40/42"
 1511;CAUTION;bool;can;Right eyebrow
 1512;CAUTION;bool;t_l_CFG ;Right eyebrow
@@ -289,8 +303,8 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1591;CAUTION;bool;elec_Fault ;Caution panel
 1592;CAUTION;bool;lef_Fault ;Caution panel
 1593;GEAR;bool;onGround ;Weight-on-wheels
-1594;TEST;bool;flcsBitRun ;FLT CONTROL panel RUN light (used to be Multi-engine fire light)
-1595;TEST;bool;flcsBitFail ;"FLT CONTROL panel FAIL light (used to be Lock light Cue; non-F-16)"
+1594;TEST/FLCS;bool;flcsBitRun ;FLT CONTROL panel RUN light (used to be Multi-engine fire light)
+1595;TEST/FLCS;bool;flcsBitFail ;"FLT CONTROL panel FAIL light (used to be Lock light Cue; non-F-16)"
 1596;CAUTION;bool;dbuWarn ;"Right eyebrow DBU ON cell; was Shoot light cue; non-F16"
 1597;GEAR;bool;noseGearDown ;"Landing gear panel; on means down and locked"
 1598;GEAR;bool;leftGearDown ;"Landing gear panel; on means down and locked"
@@ -299,11 +313,12 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1601;ELECTRICS;bool;power_Off ;Set if there is no electrical power.  NB: not a lamp bit
 1602;CAUTION;bool;cadc ;Caution panel
 1603;AIRCRAFT;bool;sSpeedBrake ;True if speed brake is in anything other than stowed position
-1604;TEST;bool;sysTest ;Threat Warning Prime - additional bits
+1604;TEST/FLCS;bool;sysTest ;Threat Warning Prime - additional bits
 1605;CAUTION;bool;mcAnnounced ;"Master Caution WILL come up in 3sec; turns off when MC light is on"
 1606;AIRCRAFT;bool;mlgWow ;MLGWOW is only for AFM , it means WOW switches on MLG are triggered 
 1607;AIRCRAFT;bool;nlgWow ;NLGWOW is only for AFM , it means WOW switches on MLG are triggered 
-1608;AIRCRAFT;bool;atf_Not_Engaged;???
+1608;AIRCRAFT;bool;atf_Not_Engaged;Autopilot status TFR
+1609;CAUTION;bool;Inlet_Icing;Caution Panel 
 1610;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio
 1611;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1
 1612;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2
@@ -382,3 +397,10 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1701;F4SM;string;AcNCTR;aircraft type
 1702;F4SM;string;ButtonsFile;path to 3dbuttons.dat file
 1703;F4SM;string;CockpitFile;path to 3dckpt.dat file
+1710;F4SM;int;VersionNum;Version of the DrawingData shared memory area
+1720;HUD/HMCS;int;HUD_length;"The length of the string in ""HUD_commands"" (1730)"
+1730;HUD/HMCS;string;HUD_commands;2D drawing commands für HUD
+1740;HUD/HMCS;int;HMS_length;"The length of the string in ""HMS_commands"" (1750)"
+1750;HUD/HMCS;string;HMS_commands;2D drawing commands für HMCS
+1760;CMDS/RWR;int;RWR_length;"The length of the string in ""RWR_commands"" (1770)"
+1770;CMDS/RWR;string;RWR_commands;2D drawing commands für RWR
