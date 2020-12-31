@@ -9,8 +9,8 @@ joystick commands that will be send to Falcon BMS.</p>
 In order to establish a data transfer via BMSAIT a specific arduino sketch needs to be customized and loaded on an arduino compatible board. A windows app will 
 orchestrate the communication between then arduino boards and the flight simulation.</p>
 
-The folder "01 Dokumentation" contains a documentation of the softeare suite (so far only available in german language)</n>
-The folder "02 Windows App" contains the needed files to run the windows application of BMSAIT</n>
-The folder "03 Arduino Code" contains a basic, unedited set of arduino code to be used for individual customizations</n>
-The folder "04 Beispielprogramme" contains pre-edited arduino sketches, matching configurations for the windows app and a documation how to run the examples.</n>
+The folder "01 Dokumentation" contains a documentation of the softeare suite (so far only available in german language)</p>
+The folder "02 Windows App" contains the needed files to run the windows application of BMSAIT</p>
+The folder "03 Arduino Code" contains a basic, unedited set of arduino code to be used for individual customizations</p>
+The folder "04 Beispielprogramme" contains pre-edited arduino sketches, matching configurations for the windows app and a documation how to run the examples.</p>
 
