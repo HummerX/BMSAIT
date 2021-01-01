@@ -1,6 +1,6 @@
 //modifications for CMDS Panel
 
-byte mainPwr = 99;               //stores the status of the main power of the a/c
+byte mainPwr = 99;               //memorizes the line in the data container that contains the a/c power status
 byte ChaffID = 99;               //memorizes the line in the data container that contains the chaff count
 byte FlareID = 99;               //memorizes the line in the data container that contains the flare count
 byte ChLoID = 99;               //memorizes the line in the data container that contains the chaff LOW warning
@@ -18,7 +18,7 @@ void SetupCMDS()
   
   for (int lauf=0;lauf<VARIABLENANZAHL;lauf++)
   {
-    if (strcmp(datenfeld[lauf].ID, "1260")==0)  //memorize the position of the MainPower variable
+    if (strcmp(datenfeld[lauf].ID, "1242")==0)  //memorize the position of the MainPower variable
     {
       mainPwr = lauf;
       gefunden[0]=true;
@@ -91,7 +91,7 @@ void CheckSwitchesCMDS()
 ///check if a display is supposed to be illuminated
 bool checkPowerOn(byte disp)
 {
-  if (datenfeld[mainPwr].wert[0]=='0'){return false;} //turn off displays if a/c power is off
+  if (datenfeld[mainPwr].wert[0]!='T'){return false;} //turn off displays if a/c power is off
   
   if (!CMDSMain){return false;}                       //turn off both displays if CMDS Power is off
 
