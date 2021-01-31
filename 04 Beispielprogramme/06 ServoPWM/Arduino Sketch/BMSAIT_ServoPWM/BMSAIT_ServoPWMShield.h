@@ -1,17 +1,22 @@
 // settings and functions to drive servo motors (via pwm motor shield)
+//target= reference link to the line of the servodataPWM table of this module
+//ref2= not used
+//ref3= not used
+//ref4= not used
+//ref5= not used
 
 #include <Adafruit_PWMServoDriver.h>
 
 typedef struct
 {
-byte port;      //channel of the pwm shield the motor is connected to
-int minPulse;   //min pulse for the motor 
-int maxPulse;   //max pulse for the motor 
-int a_ug;       //min absolut value that might be displayed (i.e.   0 for a speed indicator)
-int a_og;       //max absolut value that might be displayed (i.e. 600 for a speed indicator)
-int last;       //previous value
-long lu;        //last update
-}ServodataPWM;
+byte port;          //channel of the pwm shield the motor is connected to
+int minPulse;       //min pulse for the motor 
+int maxPulse;       //max pulse for the motor 
+int a_ug;           //min absolut value that might be displayed (i.e.   0 for a speed indicator)
+int a_og;           //max absolut value that might be displayed (i.e. 600 for a speed indicator)
+int last;           //previous value
+unsigned long lu;   //last update
+} ServodataPWM;
 
 //IMPORTANT:  You need to calibrate each servo to prevent damage.
 //during calibration, each servo will be moved to the min/max value and stay there for 1 second. If the servo is vibrating in a min or max position, the position is out of bounds. 
@@ -20,9 +25,9 @@ long lu;        //last update
 ServodataPWM servodataPWM[] =
 {
 // Channel  minPulse   maxPulse   a_ug   a_og   last  lu
-    {  0,     165,       605,      0,    103,   0,    0}  // example RPM: {Servo on Channel 0, min pulse length (around 150)=165, max pulse length (around 600)=605, lowest possible value=0, highest value=103, past value=0, last update=0}
+    {0,       160,       605,      0,    600,     0,   0}  // example RPM: {Servo on Channel 0, min pulse length (around 150)=160, max pulse length (around 600)=605, lowest possible value=0, highest value=103, past value=0, last update=0}
 };
-const int SERVOZAHLPWM = sizeof(servodataPWM)/sizeof(servodataPWM[0]);
+const int servozahlPWM = sizeof(servodataPWM)/sizeof(servodataPWM[0]);
 
 
 #define SERVODELAYPWM 500
@@ -34,41 +39,42 @@ void SetupServoPWM()
 {  
   pwm.begin();
   pwm.setPWMFreq(60);
-  for (byte x=0;x<=SERVOZAHLPWM;x++) //move all servos to center position
+  for (byte x=0;x<servozahlPWM;x++) //move all servos to center position
   {  
     int pulselength = map(90, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
     pwm.setPWM(x, 0, pulselength);
-    delay(200);
+    delay(10);
   }
+  delay(1000);
 }
 
 void ServoPWM_Zeroize(void)
 {
-  for (byte x=0;x<=SERVOZAHLPWM;x++) //move all servos to min position
+  for (byte x=0;x<servozahlPWM;x++) //move all servos to min position
   {  
     int pulselength = map(0, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
     pwm.setPWM(x, 0, pulselength);
-    delay(200);
+    delay(10);
   }
   delay(1000);
-  for (byte x=0;x<=SERVOZAHLPWM;x++) //move all servos to max position
+  for (byte x=0;x<servozahlPWM;x++) //move all servos to max position
   {  
     int pulselength = map(180, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
     pwm.setPWM(x, 0, pulselength);
-    delay(200);
+    delay(10);
   }
   delay(1000);
-  for (byte x=0;x<=SERVOZAHLPWM;x++) //move all servos to center position
+  for (byte x=0;x<servozahlPWM;x++) //move all servos to center position
   {  
     int pulselength = map(90, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
     pwm.setPWM(x, 0, pulselength);
-    delay(200);
+    delay(10);
   }
 }
 
 void UpdateServoPWM(int d)
 {
-  byte servoID=datenfeld[d].ziel;
+  byte servoID=datenfeld[d].target;
   
   if (servodataPWM[servoID].lu+5000<millis())
   {
