@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.8   28.12.2020 (BMS 4.35)
+0;F4SM;bool;F4SMVar;Version of this file: 1.8.3   25.01.2021 (BMS 4.35)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -19,6 +19,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 180;CMDS/RWR;int;cmdsMode;Ownship CMDS mode state, see CmdsModes enum for details
 190;AIRCRAFT;float;lefPos;Ownship LEF position
 200;AIRCRAFT;float;speedBrake;Ownship speed brake position 0 = closed, 1 = 60 Degrees open
+201;AIRCRAFT;int;speedBrake(g);Ownship speed brake position 0 = closed, 65535= 60 Degrees open
 210;AIRCRAFT;float;tefPos;Ownship TEF position
 220;AIRCRAFT;float;vtolPos;Ownship VTOL exhaust angle
 230;DED/PFL;string[];DEDLines;All 5 rows with 25 chars each
@@ -26,28 +27,40 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 232;DED/PFL;string;DEDLine2;Line 2 of the DED display
 233;DED/PFL;string;DEDLine3;Line 3 of the DED display
 234;DED/PFL;string;DEDLine4;Line 4 of the DED display
-235;DED/PFL;string;DEDLine1f;First half of the Line 1 of the DED display
-236;DED/PFL;string;DEDLine2f;First half of the Line 2 of the DED display
-237;DED/PFL;string;DEDLine3f;First half of the Line 3 of the DED display
-238;DED/PFL;string;DEDLine4f;First half of the Line 4 of the DED display
-239;DED/PFL;string;DEDLine5f;First half of the Line 5 of the DED display
-240;DED/PFL;string;DEDLine1s;Second half of the Line 1 of the DED display
-241;DED/PFL;string;DEDLine2s;Second half of the Line 2 of the DED display
-242;DED/PFL;string;DEDLine3s;Second half of the Line 3 of the DED display
-243;DED/PFL;string;DEDLine4s;Second half of the Line 4 of the DED display
-244;DED/PFL;string;DEDLine5s;Second half of the Line 5 of the DED display
-245;DED/PFL;string[];Invert;Marks inverted parts of the DED display
+235;DED/PFL;string;DEDLine5;Line 5 of the DED display
+236;DED/PFL;string;DEDLine1f;First half of the Line 1 of the DED display
+237;DED/PFL;string;DEDLine2f;First half of the Line 2 of the DED display
+238;DED/PFL;string;DEDLine3f;First half of the Line 3 of the DED display
+239;DED/PFL;string;DEDLine4f;First half of the Line 4 of the DED display
+240;DED/PFL;string;DEDLine5f;First half of the Line 5 of the DED display
+241;DED/PFL;string;DEDLine1s;Second half of the Line 1 of the DED display
+242;DED/PFL;string;DEDLine2s;Second half of the Line 2 of the DED display
+243;DED/PFL;string;DEDLine3s;Second half of the Line 3 of the DED display
+244;DED/PFL;string;DEDLine4s;Second half of the Line 4 of the DED display
+245;DED/PFL;string;DEDLine5s;Second half of the Line 5 of the DED display
+246;DED/PFL;string[];Invert;Marks inverted parts of the DED display
 250;ENGINE;float;epuFuel;Ownship EPU fuel (Percent 0-100)
+251;ENGINE;int;epuFuel(g);EPU gauge indicator (0..65535)
 260;ENGINE;float;ftit;Ownship Forward Turbine Inlet Temp (Degrees C)
+261;ENGINE;int;ftit(g);FTIT gauge indicator  (0..65535)
 270;ENGINE;float;ftit2;Ownship Forward Turbine Inlet Temp2 (Degrees C)
+271;ENGINE;int;ftit2;FTIT2 gauge indicator  (0..65535)
 280;ENGINE;float;hydPressureA;Ownship Hydraulic Pressure A
+281;ENGINE;int;hydPressureA(g);HydPres A gauge indicator (0..65535)
 290;ENGINE;float;hydPressureB;Ownship Hydraulic Pressure B
+291;ENGINE;int;hydPressureB(g);HydPres B gauge indicator (0..65535)
 300;ENGINE;float;nozzlePos;Ownship engine nozzle percent open (0-100)
+301;ENGINE;int;nozzePos(g);Nozzle gauge indicator (0..65535)
 310;ENGINE;float;nozzlePos2;Ownship engine nozzle2 percent open (0-100)
+311;ENGINE;int;nozzePos(g);Nozzle2 gauge indicator (0..65535)
 320;ENGINE;float;oilPressure;Ownship Oil Pressure (Percent 0-100)
+321;ENGINE;int;oilPressure(g);OilPress gaugle indicator(0..65535)
 330;ENGINE;float;oilPressure2;Ownship Oil Pressure2 (Percent 0-100)
+331;ENGINE;int;oilPressure2(g);OilPress2 gaugle indicator (0..65535)
 340;ENGINE;float;rpm;Ownship engine rpm (Percent 0-103)
+341;ENGINE;int;rpm(g);RPM gauge indicator (0..65535)
 350;ENGINE;float;rpm2;Ownship engine rpm2 (Percent 0-103)
+351;ENGINE;int;rpm2(g);RPM2 gauge indicator (0..65535)
 360;ENVIROMENT;float;windOffset;Wind delta to FPM (Radians)
 370;ENVIROMENT;float;bullseyeX;Bullseye X in sim coordinates (same as ownship, i.e. North (Ft))
 380;ENVIROMENT;float;bullseyeY;Bullseye Y in sim coordinates (same as ownship, i.e. East (Ft))
@@ -64,10 +77,13 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 490;FUEL;float;bingoFuel;Bingo fuel level
 500;FUEL;float;externalFuel;Ownship external fuel (Lbs)
 510;FUEL;float;fuelFlow;Ownship fuel flow (Lbs/Hour)
+511;FUEL;string;fuelFlow(s);Fuelflow as string value
 520;FUEL;float;fuelFlow2;Ownship fuel flow2 (Lbs/Hour)
+;GFUEL;string;fuelFlow2(s);Fuelflow2 as string value
 530;FUEL;float;fwd;Fuel quantity in forward tank in lbs
 540;FUEL;float;internalFuel;Ownship internal fuel (Lbs)
 550;FUEL;float;total;Total fuel in lbs
+551;FUEL;string;total(s);Total Fuel (as 5 digit string)
 560;GEAR;float;bumpIntensity;"Intensity of a ""bump"" while taxiing/rolling, 0..1"
 570;GEAR;float;gearPos;Ownship Gear position 0 = up, 1 = down
 580;GEAR;float;LeftGearPos;Position of the left landinggear
@@ -128,7 +144,22 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1080;NAVIGATION;float;latitude;Ownship latitude in degrees (as known by avionics)
 1090;NAVIGATION;float;longitude;Ownship longitude in degrees (as known by avionics)
 1100;DED/PFL;string[];PFLLines;25 usable chars
-1110;DED/PFL;string[];PFLInvert;25 usable chars
+1101;DED/PFL;string;PFLLine1;Line 1 of PFL display
+1102;DED/PFL;string;PFLLine2;Line 2 of PFL display
+1103;DED/PFL;string;PFLLine3;Line 3 of PFL display
+1104;DED/PFL;string;PFLLine4;Line 4 of PFL display
+1105;DED/PFL;string;PFLLine5;Line 5 of PFL display
+1106;DED/PFL;string;PFLLine1f;First half of Line 1 of PFL
+1107;DED/PFL;string;PFLLine2f;First half of Line 2 of PFL
+1108;DED/PFL;string;PFLLine3f;First half of Line 3 of PFL
+1109;DED/PFL;string;PFLLine4f;First half of Line 4 of PFL
+1110;DED/PFL;string;PFLLine5f;First half of Line 5 of PFL
+1111;DED/PFL;string;PFLLine1s;Second half of Line 1 of PFL
+1112;DED/PFL;string;PFLLine2s;Second half of Line 2 of PFL
+1113;DED/PFL;string;PFLLine3s;Second half of Line 3 of PFL
+1114;DED/PFL;string;PFLLine4s;Second half of Line 4 of PFL
+1115;DED/PFL;string;PFLLine5s;Second half of Line 5 of PFL
+1116;DED/PFL;string[];PFLInvert;25 usable chars
 1120;RADIO;string;bupUhfFreq;BUP UHF channel frequency
 1130;RADIO;string;bupUhfPreset;BUP UHF channel preset
 1140;IVC;RadioClientControl;ivc_RadioClientControlData;???
@@ -404,3 +435,22 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1750;HUD/HMCS;string;HMS_commands;2D drawing commands für HMCS
 1760;CMDS/RWR;int;RWR_length;"The length of the string in ""RWR_commands"" (1770)"
 1770;CMDS/RWR;string;RWR_commands;2D drawing commands für RWR
+5000;DCSCommon;string;DCSBIOSVer;Version of DCSBIOS
+5010;DCS_GFS;int;SpeedbrakeLeft;Position of left speedbrake
+5020;DCS_GFS;int;SpeedbrakeRight;Position of right speedbrake
+5030;DCS_GFS;bool;Flaps_Warn;Flaps overspeed warning light
+5031;DCS_GFS;bool;Flaps_Half;Flaps Half indicator light
+5032;DCS_GFS;bool;Flaps_Full;Flaps Full indicator light
+5043;DCS_Indexer;bool;Lock;Lock indexer light
+5044;DCS_Indexer;bool;Shoot;Shoot indexer light
+5060;DCS_Indexer;bool;Shoot_Strobe;Shoot indexer light is blinking
+5061;DCS_Indexer;bool;AA_Mode;F18 AA Mode indicator light
+5062;DCS_Indexer;bool;AG_Mode;F18 AG Mode indicator light
+5063;DCS_Caution;bool;DISCH;F18 Fire extiguisher discharge indicator light
+5064;DCS_Caution;bool;MC_Ready;F18 Fire extiguisher ready indicator light
+5065;DCS_Caution;bool;Eng_Fire_Right;Right engine fire warning light (Left is on ID 1506)
+5066;DCS_Caution;bool;APU_Fire;APU fire warning light
+5067;DCS_Caution;bool;Spin;Spin warning light
+;DCS_Caution;bool;APU;APU warning light
+;DCS_Caution;bool;Gen_L;Generator left failure warning light
+;DCS_Caution;bool;Gen_R;Generator right failure warning light
