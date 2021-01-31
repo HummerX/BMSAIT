@@ -65,7 +65,7 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description ID    DT    OT    target Ref2  Ref3 Ref4 Ref5  IV
-       {"BUHFF",  "1120", 's',  30,     0,    6,    1,   3,    0, "000000"}     //Example Variable 0 - Backup UHF Frequency   //Example Variable 0 - Right Eyebrow Engine Fire
+      //Description ID    DT    OT    target Ref2  Ref3 Ref4 Ref5       IV
+       {"BUHFF",  "1120", 's',  30,     0,    0,    6,    1,  99,  "123456"}     //Example Variable 0 - Backup UHF Frequency   //Example Variable 0 - Right Eyebrow Engine Fire
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
