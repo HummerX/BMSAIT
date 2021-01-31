@@ -1,4 +1,5 @@
 // settings and functions to drive simple LED
+// datenfeld.target defines the PIN of a single LED
 
 void SetupLED()
 {
@@ -7,7 +8,7 @@ void SetupLED()
      {
      if ((datenfeld[a].typ==10) || (datenfeld[a].typ==11))
       {
-      pinMode(datenfeld[a].ziel, OUTPUT);
+      pinMode(datenfeld[a].target, OUTPUT);
       }
      }
 }
@@ -17,11 +18,11 @@ void UpdateLED_PINHIGH(byte p)
 {
   if ((datenfeld[p].wert[0]=='T'))        // if the first character is T(rue), the LED will be turned on
   {
-    digitalWrite(datenfeld[p].ziel,HIGH);
+    digitalWrite(datenfeld[p].target,HIGH);
   }
   else                                  // otherwise the LED will be turned off
   {
-    digitalWrite(datenfeld[p].ziel,LOW);
+    digitalWrite(datenfeld[p].target,LOW);
   }
 }
 
@@ -30,10 +31,10 @@ void UpdateLED_PINLOW(byte p)
 {
   if ((datenfeld[p].wert[0]=='T'))        // if the first character is T(rue), the LED will be turned on
   {
-    digitalWrite(datenfeld[p].ziel,LOW);
+    digitalWrite(datenfeld[p].target,LOW);
   }
   else                                  // otherwise the LED will be turned off
   {
-    digitalWrite(datenfeld[p].ziel,HIGH);
+    digitalWrite(datenfeld[p].target,HIGH);
   }
 }
