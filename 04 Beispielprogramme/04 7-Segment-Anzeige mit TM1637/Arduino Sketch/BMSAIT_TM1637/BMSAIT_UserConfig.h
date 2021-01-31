@@ -66,7 +66,7 @@
   Datenfeld datenfeld[]=
     {
       //Description ID    DT    OT    target Ref2 Ref3 Ref4 Ref5  IV
-      {"Chaff",   "150", 'f',   31,     0,    2,   3,   0,   0,   "00"}     //Example Variable 0 - Chaff remaining
-     ,{"Flare",   "160", 'f',   31,     0,    2,   0,   0,   0,   "00"}     //Example Variable 1 - Flare remaining
+      {"Chaff",   "150", 'f',   31,     0,    0,   2,   3,   0,   "00"}     //Example Variable 0 - Chaff remaining
+     ,{"Flare",   "160", 'f',   31,     0,    0,   2,   0,   0,   "00"}     //Example Variable 1 - Flare remaining
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
