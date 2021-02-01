@@ -4,7 +4,7 @@
 
 //MODULE SELECTION - uncomment the modules you want to use.
    
-   //#define LED               //drive LEDs
+  //#define LED               //drive LEDs
   //#define LEDMatrix         //drive LED Matrix using a MAX7219 controller
   //#define LCD               //drive LCD display
   //#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
@@ -65,8 +65,8 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description ID    DT    OT    target Ref2 Ref3 Ref4 Ref5  IV
-      {"Chaff",   "150", 'f',   31,     0,    0,   2,   3,   0,   "00"}     //Example Variable 0 - Chaff remaining
-     ,{"Flare",   "160", 'f',   31,     0,    0,   2,   0,   0,   "00"}     //Example Variable 1 - Flare remaining
+      //Description ID     DT    OT      target Ref2 Ref3 Ref4 Ref5  IV
+      {"Chaff",    "150", 'f',   31,       0,    0,   2,   2,   0,  "12"}     //Example Variable 0 - Chaff remaining
+     ,{"Flare",    "160", 'f',   31,       0,    0,   2,   0,   0,  "34"}     //Example Variable 1 - Flare remaining
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
