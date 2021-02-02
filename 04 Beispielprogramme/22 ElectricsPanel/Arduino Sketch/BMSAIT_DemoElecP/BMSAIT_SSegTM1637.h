@@ -1,32 +1,73 @@
-// settings and functions to display numbers on 7-segment-displays
 
-#include <TM1637Display.h>
+// This LEDDisplayDriver.h library is used to drive a TM1637 module with 6 digits
+// Manual for library: http://lygte-info.dk/project/DisplayDriver%20UK.html
+// By HKJ from lygte-info.dk
+
+// settings and functions to display numbers on 7-segment-displays
+//target= device ID (if multiple displays are connected
+//ref2= not used
+//ref3= number of figures to display
+//ref4= offset position 
+//ref5= decimal point
+
+#include <LEDDisplayDriver.h>
+
+#ifndef _TM1637_
+#error "_TM1637_ must be defined in LEDDisplayDriver.h for this sketch to work"
+#endif
 
 // Call 7-Segment-Display with TM1637 controller
-#define TM1637_CLK A5
-#define TM1637_DIO A4
+#define TM1637_SDA_PIN 2 //DIO
+#define TM1637_SCL_PIN 3 //CLK
+#define TM1637_BRIGHTNESS 0x0f
 
-TM1637Display TM1637_display=TM1637Display(TM1637_CLK, TM1637_DIO);
-//uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
-//uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
+LEDDisplayDriver TM1637_display[] = {
+    LEDDisplayDriver(TM1637_SDA_PIN, TM1637_SCL_PIN,true, 6)
+    //LCDDisplayDriver(/*SDA_PIN*/,/* SCL_PIN*/,true, /*num of digits*/)
+};
 
-  
+
 void SetupTM1637()
 {
-  
-  TM1637_display.setBrightness(0x0f);
-  TM1637_display.clear();
+  TM1637_display[0].setBrightness(TM1637_BRIGHTNESS);
+  TM1637_display[0].clear();
+  //TM1637_display[1].setBrightness(TM1637_BRIGHTNESS);
+  //TM1637_display[1].clear();
 }
 
-//display a 4-digit number from the flight data on the display
-void UpdateTM1637(byte p)
-{
-  uint16_t number = atoi(datenfeld[p].wert);
-  uint8_t dots;
-  if (datenfeld[p].dp==0) dots=0b10000000;
-  if (datenfeld[p].dp==1) dots=0b01000000;
-  if (datenfeld[p].dp==2) dots=0b00100000;
-  if (datenfeld[p].dp==3) dots=0b00010000;
-  TM1637_display.showNumberDecEx(number, dots,true);
 
+void UpdateTM1637(int p)
+{
+  byte disp[6] ={0,0,0,0,0,0};
+  memcpy(disp,datenfeld[p].wert,datenfeld[p].ref3);
+  byte pos=0;
+  
+  for (byte x=0;x<datenfeld[p].ref3;x++)
+  {
+    switch (5-x-datenfeld[p].ref4)
+    {
+      case 0: 
+        pos=3; 
+        break;
+      case 1: 
+        pos=4; 
+        break;
+      case 2: 
+        pos=5; 
+        break;
+      case 3: 
+        pos=0; 
+        break;
+      case 4: 
+        pos=1; 
+        break;
+      case 5: 
+        pos=2; 
+        break;
+    }
+    if ((datenfeld[p].ref5-1)==x)
+      TM1637_display[datenfeld[p].target].showNumWithPoint(disp[x]-48,0,pos,1);
+    else 
+      TM1637_display[datenfeld[p].target].showNum(disp[x]-48,pos,1);
+  }
 }
