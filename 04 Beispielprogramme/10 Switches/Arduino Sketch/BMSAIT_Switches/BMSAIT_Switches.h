@@ -42,6 +42,7 @@ Rotary analogSchalter[][STATES]=
 {
  {
   //example setting for a 3-position rotary switch
+  //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
    {    "06",         true,               0,             334}     //send command 04 if analog read is between 0 and 334 (of 1024)
   ,{    "07",         true,             335,             668}     //send command 05 if analog read is between 335 and 668 (of 1024)
   ,{    "08",         true,             669,            1024}     //send command 06 if analog read is between 669 and 1024 (of 1024)
@@ -100,7 +101,7 @@ void SetupSwitches()
     else
     {
     //setup for analog reading of PIN x
-    pinMode(schalter[index].pIN, INPUT_PULLUP);
+    pinMode(schalter[index].pIN, INPUT);
     schalter[index].lastPINState=analogRead(schalter[index].pIN);  
     }
   }  
@@ -149,11 +150,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].command ,3);
-            //debug
-            //char buf[5];
-            //itoa(currentPINState,buf,10);
-            //SendMessage(buf,1);
-            //debug
+            if (testmode)
+            {
+              char buf[5];
+              itoa(currentPINState,buf,10);
+              SendMessage(buf,1);
+            }
           }
         }
       } 
