@@ -6,13 +6,14 @@
 
 // Declare screen Object
 // make sure to find the correct constructor here
-#if defined(DUE) || defined(MEGA)
+#if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
   //arduino board with enough memory will use the unbuffered mode
   U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI DisplayFFI(U8G2_R0, 2/*clock (D0) */, 3/*data (D1) */, 6/*cs*/,5/*dc*/, 4/*reset*/); 
 #else
   //arduino board with low memory will have to use the buffered mode
   U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI DisplayFFI(U8G2_R0, 2/*clock (D0) */, 3/*data (D1) */, 6/*cs*/,5/*dc*/, 4/*reset*/);
 #endif
+
 // Change these display sizes if needed
 #define FFI_SCREEN_W 128
 #define FFI_SCREEN_H 64
@@ -26,14 +27,13 @@
 #define FF_V_CONST 0 // - Define Character vertical offset. By design this text is perfectly centered on the display. Offset only when needed.
 
 
-#if defined(MEGA) || defined(DUE)
-  // if running Uno - disable the "expensive stuff" without actually asking the users
-  // Advanced user - feel free to disable the undefs following if you are using a Mega or something which has the RAM to handle this - the Uno not as much.
-  #define RealFFI
-  #define Bezel
+#if defined(MEGA) || defined(DUE) || defined(DUE_NATIVE)
+  // disable the "expensive stuff" without actually asking the users
+  #define REALFFI
+  #define BEZEL
 #endif
 
-#ifdef Bezel
+#ifdef BEZEL
   // FONT DEFINITIONS - "FUEL FLOW"-text in bezel
   // - Define Character width and height, pertains to this particular font, best not change.
   #define BEZEL_FF_CHAR_W 10
@@ -50,7 +50,6 @@
   #define BEZEL_PPH_H_CONST 1
   #define BEZEL_PPH_V_CONST 5
 #endif
-
 
 
 
@@ -84,7 +83,7 @@ const unsigned short FF_POS_X_5 = int(FFI_SCREEN_W_MID - ((FF_CHAR_W * 7) / 2)) 
 // Fuel flow number, Y position (base)
 const unsigned short FF_POS_Y = FFI_SCREEN_H_MID + FF_V_CONST;
 
-#ifdef Bezel
+#ifdef BEZEL
   // FUEL-position X and Y not needed, these are constants already. No need to spend more memory on putting them in new variables
   
   // FLOW-position X. Y-position already is a constant, so no need to re-calculate
@@ -102,7 +101,7 @@ const unsigned short FF_POS_Y = FFI_SCREEN_H_MID + FF_V_CONST;
   const unsigned short WIPE_BOX_W = FFI_SCREEN_W;
   //const unsigned short WIPE_BOX_H = BEZEL_PPH_CHAR_H + 2;
   const unsigned short WIPE_BOX_H = FFI_SCREEN_H - WIPE_BOX_Y;
-  #ifdef RealFFI
+  #ifdef REALFFI
     #define FF_WIPE_X 0
     #define FF_WIPE_TOP_Y 0
     const unsigned short FF_WIPE_BOTTOM_Y =  FF_POS_Y + (FF_CHAR_H / 2);
@@ -115,14 +114,14 @@ const unsigned short FF_POS_Y = FFI_SCREEN_H_MID + FF_V_CONST;
 ////////////////////
 //// Functions ////
 ///////////////////
-#ifdef Bezel
+#ifdef BEZEL
   // Function drawBezel
   // My intention is to create re-usable code. Why code something twice (having to change it twice if in error), when one can fix it with a function?
   void drawBezel() {
     // Wipe the PPH block
     DisplayFFI.setColorIndex(0);
     DisplayFFI.drawBox(WIPE_BOX_X, WIPE_BOX_Y, WIPE_BOX_W, WIPE_BOX_H ); // Clear the area below the "PPH" so the hundreds digits dont show there
-  #ifdef RealFFI
+  #ifdef REALFFI
     // Wipe the higher digits roll
     DisplayFFI.drawBox(FF_WIPE_X, FF_WIPE_TOP_Y, FF_WIPE_BOX_W , FF_WIPE_BOX_H); //top box
     DisplayFFI.drawBox(FF_WIPE_X, FF_WIPE_BOTTOM_Y, FF_WIPE_BOX_W , FF_WIPE_BOX_H); //Bottom box
@@ -135,6 +134,12 @@ const unsigned short FF_POS_Y = FFI_SCREEN_H_MID + FF_V_CONST;
   }
 #endif
 
+void ClearDisplayFFI()
+{
+  DisplayFFI.firstPage();
+  do {  } while ( DisplayFFI.nextPage() );
+}
+
 void SetupFFI() 
 {
   DisplayFFI.begin();
@@ -146,213 +151,228 @@ void SetupFFI()
   DisplayFFI.firstPage();
   do 
   {
-    #ifdef Bezel
+    #ifdef BEZEL
       drawBezel(); // Moved all this bezel stuff into a function to prevent us from needing to change everything twice
     #endif
-  
-      // I've centered this in the same fashion as the "PPH"
-      DisplayFFI.drawStr(FF_POS_X_1, FF_POS_Y, "00000");
-  
-    #ifdef crosshair
-      DisplayFFI.drawFrame(0, 0, 128, 64);
-      DisplayFFI.drawLine(64, 0, 64, 64);
-      DisplayFFI.drawLine(0, 32, 128, 32);
-    #endif
+
+    // I've centered this in the same fashion as the "PPH"
+    DisplayFFI.drawStr(FF_POS_X_1, FF_POS_Y, "00000");
+      
   } while ( DisplayFFI.nextPage() );
   /// End Picture loop ///
+  lastInput=millis();  // make sure the initial screen shows for 10 seconds
 }
 
 
 void UpdateFFI(byte x) 
 {
-  for (byte c=0;c<4;c++)
-    {FuelFlow[c]=datenfeld[x].wert[c];}
-  FuelFlow[4]='0';
-  //if (FuelFlow[3] == 0) { // Check if FF is zeroed out (i.e middle digit is null (not the number 0)
-  if (false)
+  if ((millis()-lastInput)>10000) //if no data was recieved within 10 seconds, shut down display
   {
-    DisplayFFI.firstPage();
-    do {  } while ( DisplayFFI.nextPage() );
-  }  
-  else 
+    if (!testmode) //display remains on in testmode
+    {
+      ClearDisplayFFI();
+      delay(1);
+      return;
+    }
+  }
+
+  if (datenfeld[0].wert[0]=='T')
   {
-    // get the actual fuelflow from the flightdata
-    char FFtt = datenfeld[x].wert[0];
-    char FFt = datenfeld[x].wert[1];
-    char FFh = datenfeld[x].wert[2];
-
-    // Now for the animation:
-    //Find the previous digit.
-    char FFhPrev;
-    if (FFh == 48)  
-    {
-      FFhPrev = 57; //if FFh=0, the prev value is 9
-    } 
-    else 
-    {
-      FFhPrev = FFh - 1; //otherwise subtract one from FFh
-    }
-    
-    //Find the next digit.
-    char FFhNext;
-    if (FFh == 57) 
-    { 
-      FFhNext = 48; //if it's a 9 then next is 0
-    } 
-    else 
-    {
-      FFhNext = FFh + 1; //otherwise add one to FFh
-    }
-    
-    //Find the next but one digit.
-    char FFhTwoOver;
-    if (FFhNext == 57) 
-    {
-      FFhTwoOver = 48; //if FFhNext=9, the next but one value is 0
-    } 
-    else 
-    {
-      FFhTwoOver = FFhNext + 1; //otherwise add one to FFhNext
-    }
-
-
-  #ifdef RealFFI
-    byte RollOverFlags = 0; // to save memory, we will be using a single byte with bit flags
-    #define FFtRollOver (RollOverFlags & 0x01) // FFt is about to roll over
-    #define FFttRollOver (RollOverFlags & 0x02) // FFtt is about to roll over
-
-    // FFt
-    char FFtNext;
-    char FFtPrev;
-
-    if (FFt == 48) 
-    {
-      FFtPrev = 57; //if FFt=0, the prev value is 9
-    } 
-    else 
-    {
-      FFtPrev = FFt - 1; //otherwise subtract one from FFt
-    }
-
-    if (FFt == 57)  
-    { 
-      FFtNext = 48;   //if it's a 9 then next is 0
-    }  
-    else 
-    {
-      FFtNext = FFt + 1; //otherwise add one to FFt
-    }
-
-    //FFtt
-    char FFttNext;
-    char FFttPrev;
-
-    if (FFtt == 57) 
-    { 
-      FFttNext = 48;  //if it's a 9 then next is 0
-    } 
-    else 
-    {
-      FFttNext = FFtt + 1; //otherwise add one to FFtt
-    }
-    
-    if (FFtt == 48) 
-    {
-      FFttPrev = 47; 
-      FFtt = 47;
-    } 
-    else if (FFtt == 49) 
-    {
-      FFttPrev = 47;
-    } 
-    else 
-    {
-      FFttPrev = FFtt - 1;
-    }
-
-    if (FFh == 57)  //If FFh is ASCII 9 we are at roll over (up or down doesn't matter)
-    { 
-      RollOverFlags |= 0x01; //if FFh is 9 I'm going up
-      // find above and below values
-      if (FFt == 57)  // if FFt is 9 and rolling over the FFt is rolling over
-      {
-        RollOverFlags |= 0x02;
-      }
-    }
-  #endif
-
-    // use tens digit to calculate the vertical offset for animation (tens and singles are always 0 on the gauge)
-    short offset = short((FuelFlow[3] - '0') * FF_CHAR_H / 10); 
-
-    
-    /// Begin Picture loop ///
+    for (byte c=0;c<4;c++)
+     {FuelFlow[c]=datenfeld[x].wert[c];} //display FF value only if player is in 3D
+    FuelFlow[4]='0';
+  }
+  else
+  {
     DisplayFFI.firstPage();
     do 
     {
-      #ifdef RealFFI
-        // Draw FFtt
-        if (FFttRollOver) { // if rolling over - Animate
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFttNext);
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFtt);
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFttPrev);
-        } else { // just print
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + FF_V_CONST);
-          DisplayFFI.print(FFttNext);
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + FF_V_CONST);
-          DisplayFFI.print(FFtt);
-          DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + FF_V_CONST);
-          DisplayFFI.print(FFttPrev);
-        }
-        // Draw FFt
-        if (FFtRollOver)  //FFtRollOver rollOver is true then something is about to change - draw both up and down
-        {
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFtNext);
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFt);
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
-          DisplayFFI.print(FFtPrev);
-        } 
-        else  //FFtRollOver is false - draw normal digits
-        { 
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + FF_V_CONST);
-          DisplayFFI.print(FFtNext);
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + FF_V_CONST);
-          DisplayFFI.print(FFt);
-          DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + FF_V_CONST);
-          DisplayFFI.print(FFtPrev);
-        }
-      #else
-        // Draw normal FFtt and FFt
-        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + FF_V_CONST);
-        DisplayFFI.print(FFtt); // First two digits
-        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + FF_V_CONST);
-        DisplayFFI.print(FFt); // First two digits
-      #endif
-
-      // print the FFh animation
-      DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -2)) + offset + FF_V_CONST);
-      DisplayFFI.print(FFhTwoOver);
-      DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
-      DisplayFFI.print(FFhNext);
-      DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
-      DisplayFFI.print(FFh);
-      DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
-      DisplayFFI.print(FFhPrev);
-
-      // Print the statics
-      // thousand and tens of thousands
-      // and two 0 for the end - two commants are for even spacing (at a cost of performance
-      DisplayFFI.drawStr(FF_POS_X_4, FFI_SCREEN_H_MID + FF_V_CONST, "0"); // Last two digits
-      DisplayFFI.drawStr(FF_POS_X_5, FFI_SCREEN_H_MID + FF_V_CONST, "0"); // Last two digits
-  
-      #ifdef Bezel
+      DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + FF_V_CONST);
+      DisplayFFI.print("00000");
+      #ifdef BEZEL
           drawBezel();
       #endif
     } while ( DisplayFFI.nextPage() );
-      /// End Picture loop ///
+    return;
   }
+    
+  // get the actual fuelflow from the flightdata
+  char FFtt = FuelFlow[0];
+  char FFt = FuelFlow[1];
+  char FFh = FuelFlow[2];
+
+  // Now for the animation:
+  //Find the previous digit.
+  char FFhPrev;
+  if (FFh == 48)  
+  {
+    FFhPrev = 57; //if FFh=0, the prev value is 9
+  } 
+  else 
+  {
+    FFhPrev = FFh - 1; //otherwise subtract one from FFh
+  }
+  
+  //Find the next digit.
+  char FFhNext;
+  if (FFh == 57) 
+  { 
+    FFhNext = 48; //if it's a 9 then next is 0
+  } 
+  else 
+  {
+    FFhNext = FFh + 1; //otherwise add one to FFh
+  }
+  
+  //Find the next but one digit.
+  char FFhTwoOver;
+  if (FFhNext == 57) 
+  {
+    FFhTwoOver = 48; //if FFhNext=9, the next but one value is 0
+  } 
+  else 
+  {
+    FFhTwoOver = FFhNext + 1; //otherwise add one to FFhNext
+  }
+
+
+#ifdef REALFFI
+  byte RollOverFlags = 0; // to save memory, we will be using a single byte with bit flags
+  #define FFtRollOver (RollOverFlags & 0x01) // FFt is about to roll over
+  #define FFttRollOver (RollOverFlags & 0x02) // FFtt is about to roll over
+
+  // FFt
+  char FFtNext;
+  char FFtPrev;
+
+  if (FFt == 48) 
+  {
+    FFtPrev = 57; //if FFt=0, the prev value is 9
+  } 
+  else 
+  {
+    FFtPrev = FFt - 1; //otherwise subtract one from FFt
+  }
+
+  if (FFt == 57)  
+  { 
+    FFtNext = 48;   //if it's a 9 then next is 0
+  }  
+  else 
+  {
+    FFtNext = FFt + 1; //otherwise add one to FFt
+  }
+
+  //FFtt
+  char FFttNext;
+  char FFttPrev;
+
+  if (FFtt == 57) 
+  { 
+    FFttNext = 48;  //if it's a 9 then next is 0
+  } 
+  else 
+  {
+    FFttNext = FFtt + 1; //otherwise add one to FFtt
+  }
+  
+  if (FFtt == 48) 
+  {
+    FFttPrev = 47; 
+    FFtt = 47;
+  } 
+  else if (FFtt == 49) 
+  {
+    FFttPrev = 47;
+  } 
+  else 
+  {
+    FFttPrev = FFtt - 1;
+  }
+
+  if (FFh == 57)  //If FFh is ASCII 9 we are at roll over (up or down doesn't matter)
+  { 
+    RollOverFlags |= 0x01; //if FFh is 9 I'm going up
+    // find above and below values
+    if (FFt == 57)  // if FFt is 9 and rolling over the FFt is rolling over
+    {
+      RollOverFlags |= 0x02;
+    }
+  }
+#endif
+
+  // use tens digit to calculate the vertical offset for animation (tens and singles are always 0 on the gauge)
+  short offset = short((FuelFlow[3] - '0') * FF_CHAR_H / 10); 
+
+  
+  /// Begin Picture loop ///
+  DisplayFFI.firstPage();
+  do 
+  {
+    #ifdef REALFFI
+      // Draw FFtt
+      if (FFttRollOver) { // if rolling over - Animate
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFttNext);
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFtt);
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFttPrev);
+      } else { // just print
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + FF_V_CONST);
+        DisplayFFI.print(FFttNext);
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + FF_V_CONST);
+        DisplayFFI.print(FFtt);
+        DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + FF_V_CONST);
+        DisplayFFI.print(FFttPrev);
+      }
+      // Draw FFt
+      if (FFtRollOver)  //FFtRollOver rollOver is true then something is about to change - draw both up and down
+      {
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFtNext);
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFt);
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
+        DisplayFFI.print(FFtPrev);
+      } 
+      else  //FFtRollOver is false - draw normal digits
+      { 
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + FF_V_CONST);
+        DisplayFFI.print(FFtNext);
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + FF_V_CONST);
+        DisplayFFI.print(FFt);
+        DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + FF_V_CONST);
+        DisplayFFI.print(FFtPrev);
+      }
+    #else
+      // Draw normal FFtt and FFt
+      DisplayFFI.setCursor(FF_POS_X_1, FFI_SCREEN_H_MID + FF_V_CONST);
+      DisplayFFI.print(FFtt); // First two digits
+      DisplayFFI.setCursor(FF_POS_X_2, FFI_SCREEN_H_MID + FF_V_CONST);
+      DisplayFFI.print(FFt); // First two digits
+    #endif
+
+    // print the FFh animation
+    DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -2)) + offset + FF_V_CONST);
+    DisplayFFI.print(FFhTwoOver);
+    DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * -1)) + offset + FF_V_CONST);
+    DisplayFFI.print(FFhNext);
+    DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 0)) + offset + FF_V_CONST);
+    DisplayFFI.print(FFh);
+    DisplayFFI.setCursor(FF_POS_X_3, FFI_SCREEN_H_MID + short(((FF_CHAR_H + 1) * 1)) + offset + FF_V_CONST);
+    DisplayFFI.print(FFhPrev);
+
+    // Print the statics
+    // thousand and tens of thousands
+    // and two 0 for the end - two commants are for even spacing (at a cost of performance
+    DisplayFFI.drawStr(FF_POS_X_4, FFI_SCREEN_H_MID + FF_V_CONST, "0"); // Last two digits
+    DisplayFFI.drawStr(FF_POS_X_5, FFI_SCREEN_H_MID + FF_V_CONST, "0"); // Last two digits
+
+    #ifdef BEZEL
+        drawBezel();
+    #endif
+  } while ( DisplayFFI.nextPage() );
+    /// End Picture loop ///
+
 }

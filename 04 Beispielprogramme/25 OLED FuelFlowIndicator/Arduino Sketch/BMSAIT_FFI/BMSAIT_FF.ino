@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.1   26.01.2021
+// Version: 1.3.2   29.01.2021
 // Robin "Hummer" Bruns
 
 
@@ -62,8 +62,9 @@
   byte state =0;              //marker to memorize the current position in a message string
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
   bool testmode=false;        //Testmode on/off
-
-  #ifdef DUE
+  unsigned long lastInput =0; //last successful transmission
+  
+  #ifdef DUE_NATIVE
     #define SERIALCOM SerialUSB   //enable communication over the native port of the DUE
   #else
     #define SERIALCOM Serial      //standard serial connection
@@ -659,6 +660,7 @@ void ReadResponse()
                   {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
                 memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
               }
+              lastInput=millis(); //store last transmission time
               if (testmode){DebugReadback(neuer_wert.varNr);}
             }  
             state=0;

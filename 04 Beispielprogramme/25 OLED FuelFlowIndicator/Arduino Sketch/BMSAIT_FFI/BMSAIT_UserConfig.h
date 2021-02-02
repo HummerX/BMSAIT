@@ -25,24 +25,23 @@
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
 
-
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
-  #define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
+  //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_FFI"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
 
   
 //BOARD SELECTION
 
-  //#define UNO         //uncomment this if this sketch will be loaded on an UNO
+  #define UNO         //uncomment this if this sketch will be loaded on an UNO
   //#define NANO        //uncomment this if this sketch will be loaded on an NANO
   //#define MICRO       //uncomment this if this sketch will be loaded on an MICRO
   //#define LEONARDO    //uncomment this if this sketch will be loaded on an LEONARDO
-  #define MEGA        //uncomment this if this sketch will be loaded on an MEGA
-  //#define DUE         //uncomment this if this sketch will be loaded on an DUE
-
+  //#define MEGA        //uncomment this if this sketch will be loaded on an MEGA
+  //#define DUE         //uncomment this if this sketch will be loaded on an DUE (connection on programming port)
+  //#define DUE_NATIVE  //uncomment this if this sketch will be loaded on an DUE (connection on native port)
 
 //DATA VARIABLES
   
@@ -62,6 +61,8 @@
   Datenfeld datenfeld[]=
     {
       //Description ID     DT   OT    Ref1 Ref2 Ref3 Ref4 Ref5  IV
-       {"FF",    "0511",  's',  72,    0,   0,   0,   0,  0,   "2222"}       //Variable 0 - FuelFlow
+       {"In3D",  "1651",  'b',  99,    0,   0,   0,   0,  0,   "F"}          //Variable 1 - Player is in 3D
+       ,{"FF",    "0511",  's',  72,    0,   0,   0,   0,  0,   "00000"}       //Variable 0 - FuelFlow
+       
     }; 
   const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
