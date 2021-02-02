@@ -2,6 +2,7 @@
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
 
 
+
 typedef struct //data field structure for switches and buttons
 {
   byte pIN;                       //sets the PIN the switch is connected to
@@ -12,7 +13,7 @@ typedef struct //data field structure for switches and buttons
   char signalOn[3];               //sets the command that will be send to the windows app when the switch gets activated
   char signalOff[3];              //sets the command that will be send to the windows app when the switch gets deactivated
   byte intCommand;                //placeholder to set an internal command (can be used to control actions within the arduino, i.e. turn on/off displays)
-} Schalter;
+} Switch;
   
   
 typedef struct //data field structure to define commands for rotary switches with analog reading
@@ -21,10 +22,10 @@ typedef struct //data field structure to define commands for rotary switches wit
   bool ext;              // defines if a command is used within the arduino enviroment or to be send to the Windows app
   uint16_t untergrenze;  // lowest value of the analog read that will initiate this command (0..1024)
   uint16_t obergrenze;   // highest value of the analog read that will initiate this command (0..1024)
-} Drehschalter;
+} Rotary;
 
 
-Schalter schalter[]=
+Switch schalter[]=
 {
 //Switch definition. If you add a switch, add a line to the following list 
 //,{<PIN>,<description>,<type>,<rotarySwitchID>,0,<commandID when pressed>,<commandID when released>,<internal command>}
@@ -42,7 +43,7 @@ const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);
 //define commands for analog readings of a rotary switch or poti. This is an example for a 10-position switch
 
 #define STATES 10  //number of positions of the rotary switch(es)
-Drehschalter analogSchalter[][STATES]=
+Rotary analogSchalter[][STATES]=
 {
  {
   //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
@@ -122,12 +123,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].kommando ,3);
-            //if (testmode)
-            //  {
-            //  char buf[5];
-            //  itoa(currentPINState,buf,10);
-            //  SendMessage(buf,1);
-            //  }
+            if (testmode)
+              {
+              char buf[5];
+              itoa(currentPINState,buf,10);
+              SendMessage(buf,1);
+              }
           }
         }
       } 
