@@ -3,6 +3,10 @@
 #define check_for_UHF_Main_Switch
 #define check_for_UHF_Volume_On
 
+//function declarations
+void debug_readbackBUP(byte posID);
+void CheckSwitchesBUPRadio();
+void PullRequestBUP();
 
 //modification for BUPRadio
 byte mainPwr = 99;               //memorizes the line in the data container that contains the electric status
@@ -21,27 +25,27 @@ long channel_got_changed=0;      //memorize the last time the UHF channel switch
 
 Datenfeld BUPRadioFreq[21]=
   {
-   {"LEER ","0000",'s',0,0,0,0,0,"000000"}
-  ,{"UHFP1","1611",'s',0,0,0,0,0,"000000"}  //Variable  1 - BUP UHF Ch1 
-  ,{"UHFP2","1612",'s',0,0,0,0,0,"000000"}  //Variable  2 - BUP UHF Ch2 
-  ,{"UHFP3","1613",'s',0,0,0,0,0,"000000"}  //Variable  3 - BUP UHF Ch3 
-  ,{"UHFP4","1614",'s',0,0,0,0,0,"000000"}  //Variable  4 - BUP UHF Ch4 
-  ,{"UHFP5","1615",'s',0,0,0,0,0,"000000"}  //Variable  5 - BUP UHF Ch5 
-  ,{"UHFP6","1616",'s',0,0,0,0,0,"000000"}  //Variable  6 - BUP UHF Ch6 
-  ,{"UHFP7","1617",'s',0,0,0,0,0,"000000"}  //Variable  7 - BUP UHF Ch7 
-  ,{"UHFP8","1618",'s',0,0,0,0,0,"000000"}  //Variable  8 - BUP UHF Ch8 
-  ,{"UHFP9","1619",'s',0,0,0,0,0,"000000"}  //Variable  9 - BUP UHF Ch9 
-  ,{"UHF10","1620",'s',0,0,0,0,0,"000000"}  //Variable 10 - BUP UHF Ch10 
-  ,{"UHF11","1621",'s',0,0,0,0,0,"000000"}  //Variable 11 - BUP UHF Ch11 
-  ,{"UHF12","1622",'s',0,0,0,0,0,"000000"}  //Variable 12 - BUP UHF Ch12 
-  ,{"UHF13","1623",'s',0,0,0,0,0,"000000"}  //Variable 13 - BUP UHF Ch13 
-  ,{"UHF14","1624",'s',0,0,0,0,0,"000000"}  //Variable 14 - BUP UHF Ch14 
-  ,{"UHF15","1625",'s',0,0,0,0,0,"000000"}  //Variable 15 - BUP UHF Ch15 
-  ,{"UHF16","1626",'s',0,0,0,0,0,"000000"}  //Variable 16 - BUP UHF Ch16 
-  ,{"UHF17","1627",'s',0,0,0,0,0,"000000"}  //Variable 17 - BUP UHF Ch17 
-  ,{"UHF18","1628",'s',0,0,0,0,0,"000000"}  //Variable 18 - BUP UHF Ch18 
-  ,{"UHF19","1629",'s',0,0,0,0,0,"000000"}  //Variable 19 - BUP UHF Ch19 
-  ,{"UHF20","1630",'s',0,0,0,0,0,"000000"}  //Variable 20 - BUP UHF Ch20  
+   {"LEER ","0000",'s',99,0,0,0,0,0,"000000"}
+  ,{"UHFP1","1611",'s',99,0,0,0,0,0,"000000"}  //Variable  1 - BUP UHF Ch1 
+  ,{"UHFP2","1612",'s',99,0,0,0,0,0,"000000"}  //Variable  2 - BUP UHF Ch2 
+  ,{"UHFP3","1613",'s',99,0,0,0,0,0,"000000"}  //Variable  3 - BUP UHF Ch3 
+  ,{"UHFP4","1614",'s',99,0,0,0,0,0,"000000"}  //Variable  4 - BUP UHF Ch4 
+  ,{"UHFP5","1615",'s',99,0,0,0,0,0,"000000"}  //Variable  5 - BUP UHF Ch5 
+  ,{"UHFP6","1616",'s',99,0,0,0,0,0,"000000"}  //Variable  6 - BUP UHF Ch6 
+  ,{"UHFP7","1617",'s',99,0,0,0,0,0,"000000"}  //Variable  7 - BUP UHF Ch7 
+  ,{"UHFP8","1618",'s',99,0,0,0,0,0,"000000"}  //Variable  8 - BUP UHF Ch8 
+  ,{"UHFP9","1619",'s',99,0,0,0,0,0,"000000"}  //Variable  9 - BUP UHF Ch9 
+  ,{"UHF10","1620",'s',99,0,0,0,0,0,"000000"}  //Variable 10 - BUP UHF Ch10 
+  ,{"UHF11","1621",'s',99,0,0,0,0,0,"000000"}  //Variable 11 - BUP UHF Ch11 
+  ,{"UHF12","1622",'s',99,0,0,0,0,0,"000000"}  //Variable 12 - BUP UHF Ch12 
+  ,{"UHF13","1623",'s',99,0,0,0,0,0,"000000"}  //Variable 13 - BUP UHF Ch13 
+  ,{"UHF14","1624",'s',99,0,0,0,0,0,"000000"}  //Variable 14 - BUP UHF Ch14 
+  ,{"UHF15","1625",'s',99,0,0,0,0,0,"000000"}  //Variable 15 - BUP UHF Ch15 
+  ,{"UHF16","1626",'s',99,0,0,0,0,0,"000000"}  //Variable 16 - BUP UHF Ch16 
+  ,{"UHF17","1627",'s',99,0,0,0,0,0,"000000"}  //Variable 17 - BUP UHF Ch17 
+  ,{"UHF18","1628",'s',99,0,0,0,0,0,"000000"}  //Variable 18 - BUP UHF Ch18 
+  ,{"UHF19","1629",'s',99,0,0,0,0,0,"000000"}  //Variable 19 - BUP UHF Ch19 
+  ,{"UHF20","1630",'s',99,0,0,0,0,0,"000000"}  //Variable 20 - BUP UHF Ch20  
   };  
     
 
@@ -102,8 +106,6 @@ bool checkPowerOn(byte disp)
     
     return false;  //otherwise, turn off display
   }
-
-  
   return true;
 }
 
@@ -111,6 +113,8 @@ bool checkPowerOn(byte disp)
 //adds functions to the 7-Segement update to simulate the BUPRadio more accurately
 void BUPRadioUpdate(byte p)
 {
+  PullRequestBUP();  //adds another request to update the BUPFreq container
+
   CheckSwitchesBUPRadio(); //check switch positions to determine display behaviour
 
   bool power=checkPowerOn(p);  //check if internal commands require a powerdown of the current display
@@ -208,5 +212,41 @@ void PullRequestBUP()
   {nachricht[6+lauf]=BUPRadioFreq[BUPpull].ID[lauf];} //add the variable ID
   nachricht[11]='\0';
   SendMessage(nachricht,2);
-  delay(5);
+  byte x=0;
+  while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
+  {
+    delay(1);
+    x++;  
+  }
+  while(SERIALCOM.available()>1)  //read incoming data     
+  {
+    delay(2);
+    ReadResponse();
+  }
 }
+
+//mod
+void DebugReadbackBUP(byte posID)
+{
+  byte laenge=sizeof(BUPRadioFreq[posID].wert);
+  char antwort[laenge+4];
+  char pos[4]="";
+  itoa(posID,pos,10);
+  if (posID<10)
+  {
+    antwort[0]=pos[0];
+    antwort[1]=' ';
+    antwort[2]=' ';
+  }
+  else
+  {
+    antwort[0]=pos[0];
+    antwort[1]=pos[1];
+    antwort[2]=' ';
+  }
+  for (byte lauf=0;lauf<laenge;lauf++)
+    {antwort[lauf+3]=BUPRadioFreq[posID].wert[lauf];}
+  antwort[laenge+3]='\0';
+  SendMessage(antwort,1);
+}
+//mod
