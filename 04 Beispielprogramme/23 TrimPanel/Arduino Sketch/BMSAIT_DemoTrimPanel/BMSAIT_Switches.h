@@ -134,11 +134,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].command ,3);
-            //debug
-            //char buf[5];
-            //itoa(currentPINState,buf,10);
-            //SendMessage(buf,1);
-            //debug
+            if (testmode)
+            {
+              char buf[5];
+              itoa(currentPINState,buf,10);
+              SendMessage(buf,1);
+            }
           }
         }
       } 

@@ -1,7 +1,12 @@
 // settings and functions to drive a motor driven potentiometer
 
 #define DIR_DELAY 50 // brief delay for abrupt motor changes
-#define BUFFER 10     // threshold that needs to be crossed to consider a change on the analog value as a movement
+#define BUFFER 20     // threshold that needs to be crossed to consider a change on the analog value as a movement
+
+
+//function declaration
+void MotorPoti_Zeroize();
+
 
 typedef struct 
 {
@@ -18,18 +23,33 @@ typedef struct
 
 Struc_MotorPoti motorPoti[]=
 {
-	  	//PIN1	PIN2	 pWM	  dir	   poti 	intP	 extP   command
-		 {   9,    10,	 254,	  true,	  A0,  	500,	 500,    67} //Motor B // Roll
-    ,{   6,     5,   254,   true,   A1,   500,   500,    66} //Motor A // Pitch
+	  //  PIN1	 PIN2	  pWM	  dir	   poti  	intP	 extP   command
+     {   4,     5,   254,   true,   A0,   500,   500,    1} //Motor B // Roll
+    ,{   2,     3,   254,   true,   A1,   500,   500,    2} //Motor A // Pitch
+
 };
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
 
 bool error=false;
-bool reSet=false;
+bool reSet =false;
 long time_status=0; //time for new status message
-long time_pause_int=0; //pause when poti was moved
-long time_pause_ext=0; //pause when BMS value changed
+long time_pause=0; //pause when poti was moved
 
+void SetupMotorPoti() 
+{
+  for (byte x=0;x<motorPotiAnz;x++)
+  {
+    byte mp=x;
+    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
+    pinMode( motorPoti[mp].pIN1, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN1, LOW );
+    pinMode( motorPoti[mp].pIN2, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN2, LOW );
+  }
+  time_status=0;
+  time_pause=0;
+  MotorPoti_Zeroize();
+}
 
 void MotorMoveCW(byte mp)
 {
@@ -61,64 +81,95 @@ void MotorStop(byte mp)
   delay(10);
 }
 
+bool CheckDirection(byte motor,bool richtung,bool recursive)
+{
+  int tmp=0;
+  int oldPos=analogRead(motorPoti[motor].poti);
+  if (richtung)
+  {
+    //current position is left of center, so check CW movement
+    MotorMoveCW(motor);
+    delay(1500);
+    MotorStop(motor);
+    
+    //motor moved CW for 1.5 seconds. Now check if the poti readout increased
+    tmp=analogRead(motorPoti[motor].poti);
+
+    if (tmp>oldPos+BUFFER) 
+      {motorPoti[motor].dir=true;} 
+    else if (tmp<oldPos-BUFFER) 
+      {motorPoti[motor].dir=false;} 
+    else
+    {  
+      if (recursive) return true;
+      
+      //no good signal so far. Lets try the other direction
+      if (CheckDirection(motor,!richtung,true))   
+        {return false;} //motor recovered
+      else  
+        {return true;} //motor didn`t move or poti readout is faulty  
+    }
+  }
+  else
+  {
+    //current position is right of center, so check CCW movement
+    MotorMoveCCW(motor);
+    delay(1500);
+    MotorStop(motor);
+      
+    //motor moved CCW for 1.5 seconds. Now check if the poti readout decreased
+    tmp=analogRead(motorPoti[motor].poti);
+    if (tmp>oldPos+BUFFER) 
+        {motorPoti[motor].dir=false;}  
+    else if (tmp<oldPos-BUFFER) 
+        {motorPoti[motor].dir=true;} 
+    else
+    {
+      if (recursive) return true;
+    
+      //no good signal so far. Lets try the other direction
+      if (CheckDirection(motor,!richtung,true))   
+        {return false;} //motor recovered
+      else  
+        {return true;} //motor didn`t move or poti readout is faulty  
+    }
+  }
+  return false;
+}
+
+
 void MotorPoti_Zeroize()
 {
   error=false;
-  for (byte mp=0;mp<motorPotiAnz;mp++)
+  byte result;
+  for (byte x=0;x<motorPotiAnz;x++)
   {
+    byte mp=x;
     if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
-  
-    int oldPos=analogRead(motorPoti[mp].poti);
-    int tmp=0;
-    // check if the direction of motor movement and poti readout matches
-    if (oldPos<=512)
-    {
-      //current position is left of center, so check CW movement
-      MotorMoveCW(mp);
-      delay(1000);
-      MotorStop(mp);
     
-      //motor moved CW for 1 second. Now check if the poti readout increased
-      tmp=analogRead(motorPoti[mp].poti);
-      if (tmp>oldPos+BUFFER) 
-          {motorPoti[mp].dir=true;} 
-      else if (tmp<oldPos-BUFFER) 
-          {motorPoti[mp].dir=false;} 
-      else
-          {error=true;} //motor didn`t move or poti readout is faulty  
-    }
+    int initialPos=analogRead(motorPoti[mp].poti);
+    
+    // check if the direction of motor movement and poti readout matches
+    if (initialPos<=512)
+    { error=CheckDirection(mp,true,false);}
     else
-    {
-      //current position is right of center, so check CCW movement
-      MotorMoveCCW(mp);
-      delay(1000);
-      MotorStop(mp);
-      
-      //motor moved CCW for 1 second. Now check if the poti readout decreased
-      tmp=analogRead(motorPoti[mp].poti);
-      if (tmp>oldPos+BUFFER) 
-          {motorPoti[mp].dir=false;}
-      else if (tmp<oldPos-BUFFER) 
-          {motorPoti[mp].dir=true;} 
-      else
-          {error=true;} //motor didn`t move or poti readout is faulty
-    }
-        
+    { error=CheckDirection(mp,false,false);}
+    SendMessage("CheckDir complete",1);
+     
     if (!error)
     {
+      initialPos=analogRead(motorPoti[mp].poti);
       //move motor to center position
-      if (tmp>(512+BUFFER))
+      if (initialPos>(512+BUFFER))
       {
-        if (motorPoti[mp].dir) {MotorMoveCCW(mp);} else {MotorMoveCW(mp);}
-        
+        if (motorPoti[mp].dir) MotorMoveCCW(mp); else MotorMoveCW(mp);
         while((analogRead(motorPoti[mp].poti)>=512))
           {delay(1);}
         MotorStop(mp);
       }
-      else if (tmp<(512-BUFFER))
+      else if (initialPos<(512-BUFFER))
       {
-        if (motorPoti[mp].dir) {MotorMoveCW(mp);} else {MotorMoveCCW(mp);}
-        
+        if (motorPoti[mp].dir) MotorMoveCW(mp); else MotorMoveCCW(mp);
         while((analogRead(motorPoti[mp].poti)<=512))
           {delay(1);}
         MotorStop(mp);
@@ -136,29 +187,11 @@ void MotorPoti_Zeroize()
 
 void SignalSenden(byte mp)
 {
-  //send current analog value to BMSAIT Win App
+  //send current analog value to BMSAIT WinApp
   char buf[9]="        ";
   sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
   SendMessage(buf,4);
-  delay(10);
-  if (testmode){SendMessage(buf,1);}
-}
-
-void SetupMotorPoti() 
-{
-  for (byte x=0;x<motorPotiAnz;x++)
-  {
-    byte mp=x;
-    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
-    pinMode( motorPoti[mp].pIN1, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN1, LOW );
-    pinMode( motorPoti[mp].pIN2, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN2, LOW );
-  }
-  time_status=0;  //memorize time till next position broadcast in testmode
-  time_pause_int=0; //memorize time of last change
-  time_pause_ext=0; //memorize time of last change
-  MotorPoti_Zeroize();
+  delay(5);
 }
 
 void CheckBMS(byte pos, byte mp)
@@ -166,7 +199,7 @@ void CheckBMS(byte pos, byte mp)
   //conversion of the trim axis value from BMS (-0.5..0.5) into an analog axis value (0..1024)
   float newVal=atof(datenfeld[pos].wert);
   motorPoti[mp].trimPos_ext= map((newVal*1000),-500,500,1,1023);
-
+  
   //check if the internal trim pos matches the position in BMS
   if (motorPoti[mp].trimPos_ext>(motorPoti[mp].trimPos_int+BUFFER))
   {
@@ -174,11 +207,9 @@ void CheckBMS(byte pos, byte mp)
     motorPoti[mp].trimPos_int=motorPoti[mp].trimPos_ext;
     if (motorPoti[mp].dir) MotorMoveCW(mp); else MotorMoveCCW(mp);
 
-    while(analogRead(motorPoti[mp].poti)<motorPoti[mp].trimPos_int)
-      {delay(1);} //wait for motor to move in the correct position
-    MotorStop(mp);
-    
-    time_pause_ext=(millis()+500);  //no checks for internal changes if BMS trim value recently changed
+    while(analogRead(motorPoti[mp].poti)<(motorPoti[mp].trimPos_int-BUFFER))
+      {delay(1);} //warten bis der Motor die richtige Position erreicht hat
+    MotorStop(mp); 
   }
   else if (motorPoti[mp].trimPos_ext<(motorPoti[mp].trimPos_int-BUFFER))
   {
@@ -186,44 +217,29 @@ void CheckBMS(byte pos, byte mp)
     motorPoti[mp].trimPos_int=motorPoti[mp].trimPos_ext;
     if (motorPoti[mp].dir) MotorMoveCCW(mp); else MotorMoveCW(mp);
     
-    while(analogRead(motorPoti[mp].poti)>motorPoti[mp].trimPos_int)
+    while(analogRead(motorPoti[mp].poti)>(motorPoti[mp].trimPos_int+BUFFER))
       {delay(1);} //wait for motor to move in the correct position
     MotorStop(mp);
-
-    time_pause_ext=(millis()+500);  //no checks for internal changes if BMS trim value recently changed
   }
 }
 
-void CheckInternalMovement(byte mp)     //check if pilot turned the trim knob
-{ 
+void CheckInternalMovement(byte mp)
+{
+  //Prüfen, ob der Motor bewegt wurde
   int trimPos_Motor=analogRead(motorPoti[mp].poti);
-   
+  
   if ((trimPos_Motor>(motorPoti[mp].trimPos_int+BUFFER)) || (trimPos_Motor<(motorPoti[mp].trimPos_int-BUFFER)))
   {
-    //trim knob got moved. Send new value to BMSAIT Win App 
+    //Poti got moved. Send new value to BMSAIT Win App  
     motorPoti[mp].trimPos_int=trimPos_Motor;
     SignalSenden(mp);
-    time_pause_int=(millis()+1000);  //no checks for changes in BMS data if trim knob was recently moved
+    time_pause=(millis()+2000);  //pause check for BMS data if poti was recently moved
   }
 }
 
 void UpdateMotorPoti(byte pos) 
 {
   long curr_time=millis();
-
-  //mod
-  if (reSet) //Center all trim knobs and anlog axis
-  {
-      for (byte mp=0;mp<motorPotiAnz;mp++)
-      {
-        memcpy(datenfeld[pos].wert, "0.0", sizeof("0.0"));
-        CheckBMS(pos, mp);
-        SignalSenden(mp);
-      }
-      reSet=false;
-  }
-  //mod
-  
   if (time_status<(curr_time-10000))
   {
     time_status=curr_time;
@@ -232,7 +248,7 @@ void UpdateMotorPoti(byte pos)
     else if (testmode)
     {
       char buf[9]="        ";
-      sprintf (buf, "%03u,%04u", motorPoti[datenfeld[pos].ziel].command, motorPoti[datenfeld[pos].ziel].trimPos_int);
+      sprintf (buf, "%03u,%04u", motorPoti[datenfeld[pos].target].command, motorPoti[datenfeld[pos].target].trimPos_int);
       SendMessage(buf,1);
     }
     else
@@ -242,11 +258,10 @@ void UpdateMotorPoti(byte pos)
   if (!error) //only continue if no error occured
   {  
     //check external movement
-    if ((curr_time>time_pause_int)&&(!testmode))   //pause check for BMS data if poti was moved recently 
-      {CheckBMS(pos,datenfeld[pos].ziel);} 
+    if ((curr_time>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
+      {CheckBMS(pos,datenfeld[pos].target);} 
 
     //check internal movement
-    if (curr_time>time_pause_ext)
-      {CheckInternalMovement(datenfeld[pos].ziel);}
+    CheckInternalMovement(datenfeld[pos].target);
   }
 }

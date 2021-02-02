@@ -11,9 +11,7 @@ typedef struct //data field structure for storage of data variables
   
 AAchse analogaxis[] = {
    // PIN  Command   Value
-       { A2,   68,        0   } //YawTrim
-    //,{ A0,    2,        0   } //RollTrim
-    //,{ A1,    1,        0   } //PitchTrim
+       { A2,    3,        0   } //YawTrim
 };
 const int axisCount = sizeof(analogaxis)/sizeof(analogaxis[0]);
 
@@ -38,16 +36,11 @@ void ReadAnalogAxis()
       if (((currAxisVal+ATH)<analogaxis[axisIndex].val) || ((currAxisVal-ATH)>analogaxis[axisIndex].val)) //check if axis got moved
       {
         // send new value to the BMSAIT App
-        char buf[9]="        ";
+        char buf[9]={0,0,0,0,0,0,0,0};
         sprintf (buf, "%03u,%04u",analogaxis[axisIndex].command,currAxisVal);
         SendMessage(buf,4);
-        
-        if (testmode)
-        {
-          delay(10);
-          SendMessage(buf,1);
-        }
-
+          
+        if (testmode) {SendMessage(buf,1);}
         
         //memorize new value
         analogaxis[axisIndex].val=currAxisVal;
