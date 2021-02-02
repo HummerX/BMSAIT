@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.2   29.10.2020
+// Version: 1.3.2   29.01.2021
 // Robin "Hummer" Bruns
 
 
@@ -8,7 +8,6 @@
   #include <Arduino.h>
 
   #define DATENLAENGE 8       // maximum length of a data set
-  #define BAUDRATE 57600      // serial connection speed
   #define MESSAGEBEGIN 255    // this byte marks the beginning of a new message from the Windows app
   #define HANDSHAKE 128       // this byte marks an identification request from the Windows app
   #define CALIBRATE 160       // this byte marks a request to reset motors to inital position
@@ -31,10 +30,7 @@
   void SendSysCommand(const char text[]); 
   void SendMessage(const char message[], byte option);
   void ResetMotors();
-  //mod
-  void debug_readbackBUP(byte posID);
-  void CheckSwitchesBUPRadio();
-  //mod
+
   
 //Struct definitions
   typedef struct //data field structure for storage of data variables
@@ -51,9 +47,9 @@
     char wert[DATENLAENGE];         //contains the current value
   } Datenfeld;
 
-  typedef struct              //container to store incoming data from the Windows app
+  typedef struct                    //container to store incoming data from the Windows app
   {
-    byte varNr;                      //position for this data in the local file container 
+    byte varNr;                     //position for this data in the local file container 
     char typ;                       //file format of this data 
     char wert[DATENLAENGE];         //data
   } Uebertragung;
@@ -68,9 +64,9 @@
   byte state =0;              //marker to memorize the current position in a message string
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
   bool testmode=false;        //Testmode on/off
+  long lastInput =0;          //last successful transmission
 
-
-  #ifdef DUE
+  #ifdef DUE_NATIVE
     #define SERIALCOM SerialUSB   //enable communication over the native port of the DUE
   #else
     #define SERIALCOM Serial      //standard serial connection
@@ -84,13 +80,13 @@
 //settings for PULL logic
 
 
-//mod
 
 //switch and signal settings
 #ifdef Switches                
   #include "BMSAIT_Switches.h" 
 #endif  
 
+//mod
 #ifdef BUPRadio              
   #include "BMSAIT_BUPRadio.h"
 #endif 
@@ -166,18 +162,27 @@
   #include "BMSAIT_MotorPoti.h"
 #endif 
 
-#ifdef DED_PFL                             
-  #include "BMSAIT_DED_PFL.h"
+#ifdef OLED
+  #include "BMSAIT_OLED.h"
 #endif
 
 #ifdef SpeedBrake                             
   #include "BMSAIT_SBI.h"
 #endif
 
+#ifdef FuelFlowIndicator
+  #include "BMSAIT_FF.h"
+#endif
+
+#ifdef DED_PFL                             
+  #include "BMSAIT_DED_PFL.h"
+#endif
+
 //example how to add your own project to this sketch. 
 #ifdef NewDevice                
   #include "BMSAIT_Placeholder.h"
-#endif 
+#endif  
+
   
  
 //********************
@@ -234,13 +239,21 @@ void setup()
     SetupMotorPoti();
   #endif                                //MotorPoti setup end
  
-  #ifdef DED_PFL                        //DED setup begin
-    SetupDED();
-  #endif                                //DED setup end
-
+  #ifdef OLED                           //OLED setup begin
+    SetupOLED();
+  #endif                                //OLED setup end
+  
   #ifdef SpeedBrake                     //SBI setup begin
     SetupSBI();
   #endif                                //SBI setup end
+  
+  #ifdef FuelFlowIndicator              //FFI setup begin
+   SetupFFI();
+  #endif                                //FFI setup end
+  
+  #ifdef DED_PFL                        //DED setup begin
+    SetupDED();
+  #endif                                //DED setup end
 
   #ifdef Switches                       //Input controller setup begin
    SetupSwitches();
@@ -315,20 +328,13 @@ void ResetMotors()
   #endif
 }
 
-
 ///check for fresh sharedMem data 
 void ReadData()
 {
   if (pull)  //send data requests if PULL mode is active
   {
     for (byte v=0;v<VARIABLENANZAHL;v++)
-    {
-      PullRequest(v);
-      delay(5);
-      //modification BUP Radio
-      PullRequestBUP();  //adds another request to update the BUPFreq container
-      //modification BUP Radio
-    }
+    {PullRequest(v); }
   }   
   else  
   {
@@ -341,7 +347,12 @@ void ReadData()
       UpdateInput();   //throw in another update if inputs are priorized 
       #endif
       ReadResponse();   //check for new data from the windows app
-    }        
+    }   
+    if (millis()>lastPoll+500) //do not ask for new data for more than twice per second if no data is recieved
+    {
+      SendMessage("",5); // reqest new data
+      lastPoll=millis();
+    }       
   }
 }
 
@@ -426,9 +437,21 @@ void UpdateOutput()
           break;      
       #endif
 
+      #ifdef OLED
+        case 70: //generic OLED
+          UpdateOLED(x);
+          break;      
+      #endif
+      
       #ifdef SpeedBrake
         case 71: //Speedbrake OLED
           UpdateSBI(x);
+          break;      
+      #endif
+      
+      #ifdef FuelFlowIndicator
+        case 72: //FFI OLED
+          UpdateFFI(x);
           break;      
       #endif
       
@@ -468,26 +491,34 @@ void UpdateInput()
 void PullRequest(byte var)
 {
   //build message string <pos>,<vartype>,<varID>
-  char nachricht[11]={0};
-  char pos[2]={0,0};
+  char nachricht[12]={0};
+  char pos[3]={0,0,0};
   if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
     itoa(var,pos,10);  //write data container position as character
     if (var<10) 
     {
-      nachricht[0]='0'; 
-      nachricht[1]=pos[0];
+      nachricht[0]='0';
+      nachricht[1]='0'; 
+      nachricht[2]=pos[0];
     }
-    else 
+    else if (var<100) 
     {
+      nachricht[0]='0';
+      nachricht[1]=pos[0]; 
+      nachricht[2]=pos[1];
+    }
+    else
+     {
       nachricht[0]=pos[0]; 
       nachricht[1]=pos[1];
+      nachricht[2]=pos[2];
     }
-    nachricht[2]=',';
-    nachricht[3]=datenfeld[var].format;  //add the variable type
-    nachricht[4]=',';
+    nachricht[3]=',';
+    nachricht[4]=datenfeld[var].format;  //add the variable type
+    nachricht[5]=',';
     for (byte lauf=0;lauf<5;lauf++)
-      {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
-    nachricht[10]='\0';
+      {nachricht[6+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
+    nachricht[11]='\0';
     SendMessage(nachricht,2);
     byte x=0;
     while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
@@ -505,189 +536,197 @@ void PullRequest(byte var)
         x++;  
       #endif
     }
-    while(SERIALCOM.available()>1)  //read incoming data
-      {ReadResponse();}
+    while(SERIALCOM.available()>1)  //read incoming data     
+    {
+      delay(5);
+      ReadResponse();
+    }
 }
 
-
+void Reset()
+{
+  while (SERIALCOM.available()){SERIALCOM.read();}
+  SendMessage("",5); // reqest new data
+  state=0;
+}
 
 /// Check incoming serial data for data. Expects structured messages --> CommandBit VariableID {VariableType}<Data>
 void ReadResponse()       
 {
-  if (SERIALCOM.available()>1)
+  if (!SERIALCOM.available())
+  {}
+  else
   {
-     if (state==0)
-     {
-       inputByte_0=SERIALCOM.read();
-       if (inputByte_0 == MESSAGEBEGIN ) //Check for start of Message - byte (255)
-       {
-         state=1;
-       }
-     }
+    lastPoll=0;
+    if (state==0)
+    {
+      while (SERIALCOM.available() && (state==0))
+      {
+        inputByte_0=SERIALCOM.read();
+        if (inputByte_0 == MESSAGEBEGIN) //Check for start of Message - byte (255)
+         {state=1;}
+      }
+    }
      
-     if (state==1)
-     {
-       inputByte_1=SERIALCOM.read();
-       if (inputByte_1 == HANDSHAKE)
-       {
-         SERIALCOM.flush();
-         SendSysCommand(ID); //Send ID to idendify this board
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         state=0;
-       }
-       else if (inputByte_1 == STARTPULL)
-       {
+    if ((state==1) && SERIALCOM.available())
+    {
+      inputByte_1=SERIALCOM.read();
+      if (inputByte_1 == HANDSHAKE)
+      {
+        SendSysCommand(ID); //Send ID to idendify this board
+        Reset();
+      }
+      else if (inputByte_1 == STARTPULL)
+      {
          //confirm start of PULL requests
-         pull=true;
-         SERIALCOM.flush();
-         SendSysCommand("on");
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         state=0;
-       }  
-       else if (inputByte_1 == ENDPULL)
-       {
-         //confirm termination of PULL requests
-         pull=false;
-         SERIALCOM.flush();
-         SendSysCommand("off");
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         state=0;
-       } 
-       else if (inputByte_1 == CALIBRATE)
-       {
-         //reset motor position to zero
-         SERIALCOM.flush();
-         SendSysCommand("ok");
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         ResetMotors();
-         state=0;
-       }       
-       else if (inputByte_1 == TESTON)
-       {
-         //confirm testmode
-         testmode=true;
-         SERIALCOM.flush();
-         SendSysCommand("on");
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         state=0;
-       }  
-       else if (inputByte_1 == TESTOFF)
-       {
-         //confirm end of testmode
-         testmode=false;
-         SERIALCOM.flush();
-         SendSysCommand("off");
-         while (SERIALCOM.available()){SERIALCOM.read();} //clear buffer
-         state=0;
-       }
-       else if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
-       {
-         neuer_wert.varNr=(int)inputByte_1;
-         state=2;
-         delay(1);
-       }
-       else 
-       { 
-         state=0;    //unexpected value. discard data and start over.  
-         if (testmode){SendMessage("Fehler State 1",1);}
-       }
-     }
-
-     if ((state==2) && (SERIALCOM.available()>2))
-     {
-       if (SERIALCOM.read()==TYP_ANFANG) //if the message is in the correct format, the defined char TYP_ANFANG can be found here
-       {
-         neuer_wert.typ=SERIALCOM.read();  //reads the VariableType ('i'=integer, 'f'=float, 's'=string ...)
-         SERIALCOM.read();  //Dump the char '}'
-         state=3;
-       }
-       else
-       {
-         state=0;  //unexpected value. discard data and start over.
-         if (testmode){SendMessage("Fehler State 2",1);}
-       }  
-     }
-      
-     if ((state==3) && (SERIALCOM.available()))
-     {
-       if (SERIALCOM.read()==VAR_BEGIN) //if the message is in the correct format, the defined char VAR_BEGIN can be found here
-       {
-         Uebertragung_pos=0;
-         neuer_wert.wert[0]='\0';
-         state=4;
-       }
-       else
-       {
-         state=0;  //unexpected value. discard data and start over.
-         if (testmode){SendMessage("Fehler State 3",1);}
-       }  
-     }
-      
-     while ((state==4)&&(SERIALCOM.available()))
-     {
-       byte c = SERIALCOM.read();
-
-       if (c==VAR_ENDE)  //the termination character arrived. Save the data.
-       {
-         // end of data found. Validate the buffer before writing the new data into the data container
-         
-         int laenge=sizeof(neuer_wert.wert);            
-         if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
-         {
-           if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
-           {
-             for (int lauf=DATENLAENGE-1;lauf>laenge;lauf--)
-               {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
-             memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
-           }
-           if (testmode){DebugReadback(neuer_wert.varNr);}
-         }
-        //modification for BUP Radio (varNr is between 101 and 121)
-        else 
+        pull=true;
+        SendSysCommand("on");
+        Reset();
+      }  
+      else if (inputByte_1 == ENDPULL)
+      {
+        //confirm termination of PULL requests
+        pull=false;
+        SendSysCommand("off");
+        Reset();
+      } 
+      else if (inputByte_1 == CALIBRATE)
+      {
+        //reset motor position to zero
+        SendSysCommand("ok");
+        ResetMotors();
+        Reset();
+      }       
+      else if (inputByte_1 == TESTON)
+      {
+        //confirm testmode
+        testmode=true;
+        SendSysCommand("on");
+        Reset();
+      }  
+      else if (inputByte_1 == TESTOFF)
+      {
+        //confirm end of testmode
+        testmode=false;
+        SendSysCommand("off");
+        Reset();
+      }
+      else if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
+      {
+        neuer_wert.varNr=(int)inputByte_1;
+        state=2;
+        delay(1);
+      }
+      else 
+      { 
+        state=0;    //unexpected value. discard data and start over.  
+        if (testmode){SendMessage("Fehler State 1",1);}
+      }
+    }
+          
+    if (state==2) 
+    {
+      if (!SERIALCOM.available())
+      {
+        delay(1);
+        if (!SERIALCOM.available()) 
+        {state=0;}
+      }
+      else
+      { 
+        if (SERIALCOM.read()==VAR_BEGIN) //if the message is in the correct format, the defined char VAR_BEGIN can be found here
         {
-          for (byte lauf=DATENLAENGE-1;lauf>laenge;lauf--)
-            {BUPRadioFreq[neuer_wert.varNr-100].wert[lauf]='\0';}
-            
-          memcpy(BUPRadioFreq[neuer_wert.varNr-100].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
-          if (testmode && (neuer_wert.varNr==120))
+          Uebertragung_pos=0;
+          neuer_wert.wert[0]='\0';
+          state=3;
+        }
+        else
+        {
+          if (testmode){SendMessage("Fehler State 2",1);}
+          state=0; //unexpected value. discard data and start over.
+        }  
+      }
+    }
+      
+    if (state==3)
+    {
+      if (!SERIALCOM.available())
+      {
+        delay(1);
+        if (!SERIALCOM.available())
+          {state=0;}
+      }
+      else
+      {
+        while (SERIALCOM.available() && (state==3))
+        {
+          byte c = SERIALCOM.read();
+          if (c==VAR_ENDE)  //the termination character arrived. Save the data.
           {
-            for (byte x=101;x<121;x++)
+            // end of data found. Validate the buffer before writing the new data into the data container
+        
+            int laenge=sizeof(neuer_wert.wert);            
+            if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
-              debug_readbackBUP(x-100); //send current data back to BMSAIT App for debug purposes
-              delay(5);
+              if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
+              {
+                for (int lauf=DATENLAENGE-1;lauf>laenge;lauf--)
+                  {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
+                memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
+              }
+              lastInput=millis(); //store last transmission time
+              if (testmode){DebugReadback(neuer_wert.varNr);}
             }
+            //modification for BUP Radio (varNr is between 101 and 121)
+            else 
+            {
+              for (byte lauf=DATENLAENGE-1;lauf>laenge;lauf--)
+                {BUPRadioFreq[neuer_wert.varNr-100].wert[lauf]='\0';}
+                
+              memcpy(BUPRadioFreq[neuer_wert.varNr-100].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
+              if (testmode && (neuer_wert.varNr==120))
+              {
+                for (byte x=101;x<121;x++)
+                {
+                  if (testmode) {DebugReadbackBUP(x-100);} //send current data back to BMSAIT App for debug purposes
+                  delay(2);
+                }
+              }
+            }
+            //modification for BUP Radio    
+            state=0;
+          }
+          else if (Uebertragung_pos>DATENLAENGE)  //end of variable missed. discard and start over.
+          { 
+            if (testmode){SendMessage("Fehler State 3.1",1);}       
+            state=0;
+          }
+          else if (c==MESSAGEBEGIN)    //end of variable missed. discard and start over.
+          {
+            if (testmode){SendMessage("Fehler State 3.2",1);}
+            state=1;
+          }
+          else                
+          {
+            //end of data not yet found. Add the current character to the buffer.
+            neuer_wert.wert[Uebertragung_pos]=c;
+            neuer_wert.wert[Uebertragung_pos + 1]='\0';
+            Uebertragung_pos++;
           }
         }
-         //modification for BUP Radio  
-         state=0;
-       }
-       else if (Uebertragung_pos>DATENLAENGE)  //end of variable missed. discard and start over.
-       { 
-         if (testmode){SendMessage("Fehler State 4.1",1);}       
-         state=0;
-       }
-       else if (c==MESSAGEBEGIN)    //end of variable missed. discard and start over.
-       {
-         if (testmode){SendMessage("Fehler State 4.2",1);}
-         state=1;
-       }
-       else                
-       {
-         //end of data not yet found. Add the current character to the buffer.
-         neuer_wert.wert[Uebertragung_pos]=c;
-         neuer_wert.wert[Uebertragung_pos + 1]='\0';
-         Uebertragung_pos++;
-       }
+      }
     }
   }
 }
 
 
+         
+
 //readback of recieved data for verification
 void DebugReadback(byte posID)
 {
   byte laenge=sizeof(datenfeld[posID].wert);
-  char antwort[laenge+2]="";
+  char antwort[laenge+2];
   char pos[3]="";
   itoa(posID,pos,10);
   if (posID<10)
@@ -708,29 +747,6 @@ void DebugReadback(byte posID)
   SendMessage(antwort,1);
 }
 
-void debug_readbackBUP(byte posID)
-{
-  byte laenge=sizeof(BUPRadioFreq[posID].wert);
-  char antwort[laenge+4]="";
-  char pos[4]="";
-  itoa(posID,pos,10);
-  if (posID<10)
-  {
-    antwort[0]=pos[0];
-    antwort[1]=' ';
-    antwort[2]=' ';
-  }
-  else
-  {
-    antwort[0]=pos[0];
-    antwort[1]=pos[1];
-    antwort[2]=' ';
-  }
-  for (byte lauf=0;lauf<laenge;lauf++)
-    {antwort[lauf+3]=BUPRadioFreq[posID].wert[lauf];}
-  antwort[laenge+3]='\0';
-  SendMessage(antwort,1);
-}
 
 ///send a system command to the BMSAIT App 
 void SendSysCommand(const char text[])  
@@ -760,6 +776,10 @@ void SendMessage(const char message[], byte option)
   {
     Serial.print('a');
   }
+    else if (option==5) //report empty input buffer
+  {
+    SERIALCOM.print('g');
+  }    
   else
   {
     //do nothing

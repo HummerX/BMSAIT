@@ -1,4 +1,4 @@
-// Version: 1.2    29.10.20
+// Version: 1.3.2    29.01.2021
 
 
 //MODULE SELECTION - uncomment the modules you want to use.
@@ -13,9 +13,11 @@
   //#define StepperBYJ        //drive stepper motor 28BYJ-48
   //#define StepperX27        //drive stepper motor X27.168
   //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
-  //#define MotorPoti         //motor-driven potentiometer control
-  //#define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display 
-  //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display
+  //#define MotorPoti         //motor-driven poti control
+  //#define OLED              //display data on an OLED display
+  //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)
+  //#define FuelFlowIndicator //Enable display of the FuelFlow indicator on an 128x64 OLED display (DEDunino)
+  //#define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display (DEDunino)
   #define Switches          //use the arduino to read switch positions and send keyboard commands
   //#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
   //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
@@ -27,7 +29,7 @@
 
 
 //BASIC SETTINGS
-
+  #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
   //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
@@ -40,7 +42,9 @@
   //#define MICRO       //uncomment this if this sketch will be loaded on an MICRO
   //#define LEONARDO    //uncomment this if this sketch will be loaded on an LEONARDO
   //#define MEGA        //uncomment this if this sketch will be loaded on an MEGA
-  //#define DUE         //uncomment this if this sketch will be loaded on an DUE
+  //#define DUE         //uncomment this if this sketch will be loaded on an DUE (connected via programming port)
+  //#define DUE_NATIVE  //uncomment this if this sketch will be loaded on an DUE (connected via native port)
+
 
 
 //DATA VARIABLES
