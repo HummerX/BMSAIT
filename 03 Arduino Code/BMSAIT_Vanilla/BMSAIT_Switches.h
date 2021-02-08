@@ -1,6 +1,7 @@
 // This module provides functions to read switches and send commands to the BMSAIT windows application
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
 
+
 typedef struct //data field structure for switches and buttons
 {
   byte pIN;                       //sets the PIN the switch is connected to
@@ -113,7 +114,7 @@ void CheckSwitches()
   {
     if ((schalter[index].typ==1) || (schalter[index].typ==2))  //Digitaler Taster, Kippschalter, Drehschalter
     {
-      uint16_t currentPINState = digitalRead(schalter[index].pIN);
+      int currentPINState = digitalRead(schalter[index].pIN);
       if (currentPINState != schalter[index].lastPINState)
       { 
         delay(5);        
@@ -149,12 +150,12 @@ void CheckSwitches()
           if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
           {
             SendMessage(analogSchalter[schalter[index].switchID][lauf].command ,3);
-            //if (testmode)
-            //  {
-            //  char buf[5];
-            //  itoa(currentPINState,buf,10);
-            //  SendMessage(buf,1);
-            //  }
+            if (testmode)
+            {
+              char buf[5];
+              itoa(currentPINState,buf,10);
+              SendMessage(buf,1);
+            }
           }
         }
       } 

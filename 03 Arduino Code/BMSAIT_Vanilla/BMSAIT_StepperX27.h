@@ -22,8 +22,8 @@ unsigned long lastUpdateX27=0;
 
 StepperdataX27 stepperdataX27[] =
 {
-  //  {PIN1 PIN2 PIN3 PIN4}    arc   arctable  MinVal  MaxVal   last
-    { {  2,   3,   4,   5   }, 315*3 ,   2,       0,     1200,    0   }  // example: FTIT
+  //  {PIN1 PIN2 PIN3 PIN4}    arc         last
+    { {  2,   3,   4,   5   }, 315*3 ,      0   }  // example: FTIT
 };
 
 const int stepperzahlX27 = sizeof(stepperdataX27)/sizeof(stepperdataX27[0]);
@@ -34,114 +34,60 @@ SwitecX25 stepperX27[stepperzahlX27]=
 }; 
 
 
+void StepperX27_Zeroize()
+{
+  unsigned long now=0;
+  for (byte x=0;x<stepperzahlX27;x++)
+  { 
+    //bring Steppers back down to 0
+    //2 seconds to allow steppers to move to new position
+    for (byte x=0;x<stepperzahlX27;x++)
+    {
+      stepperX27[x].setPosition(1);
+    }
+    now=millis();
+    while (now>(millis()-2000))
+    {
+      for (byte x=0;x<stepperzahlX27;x++)
+        {stepperX27[x].update();}
+      delay(1);
+    }
+    delay(1000);
+    for (byte x=0;x<stepperzahlX27;x++)
+    {
+      stepperX27[x].setPosition(stepperdataX27[x].arc-1);
+    }
+    now=millis();
+    while (now>(millis()-2000))
+    {
+      for (byte x=0;x<stepperzahlX27;x++)
+        {stepperX27[x].update();}
+      delay(1);
+    }
+    delay(1000);
+    for (byte x=0;x<stepperzahlX27;x++)
+    {
+      stepperX27[x].setPosition(1);
+    }
+    now=millis();
+    while (now>(millis()-2000))
+    {
+      for (byte x=0;x<stepperzahlX27;x++)
+        {stepperX27[x].update();}
+      delay(1);
+    }
+  }
+}
+
+
 void SetupStepperX27(void)
 {
   for (byte x=0;x<stepperzahlX27;x++)
   {
     stepperX27[x]=SwitecX25(stepperdataX27[x].arc, stepperdataX27[x].pIN[0], stepperdataX27[x].pIN[1], stepperdataX27[x].pIN[2], stepperdataX27[x].pIN[3]); 
-    // bring steppers to 0 position
-    stepperX27[x].zero();
   } 
 }
 
-void StepperX27_Zeroize()
-{
-  unsigned long now=0;
-  
-  //Set target position of all steppers to max
-  //2 seconds to allow steppers to move to new position
-  for (byte x=0;x<stepperzahlX27;x++)
-  { stepperX27[x].setPosition(stepperdataX27[x].arc-1);}
-  now=millis();
-  while (now>(millis()-2000))
-  {
-    for (byte x=0;x<stepperzahlX27;x++)
-      {stepperX27[x].update();}
-    delay(1);
-  }
-
-  //bring Steppers back down to 0
-  //2 seconds to allow steppers to move to new position
-  for (byte x=0;x<stepperzahlX27;x++)
-      {
-        stepperX27[x].setPosition(1);
-      }
-  now=millis();
-  while (now>(millis()-2000))
-  {
-    for (byte x=0;x<stepperzahlX27;x++)
-      {stepperX27[x].update();}
-    delay(1);
-  }
-}
-
-///allow adjustments to match an input value to the spefic behavior of different gauges
-int ConversionX27(float rawVal, byte pos, byte table=0)
-{
-
-  int ergebnis=0;
-  if (table==0)
-  {
-    //linear movement
-    if (stepperdataX27[datenfeld[pos].target].maxVal<=1)
-      {ergebnis=map(rawVal*100,stepperdataX27[datenfeld[pos].target].minVal,stepperdataX27[datenfeld[pos].target].maxVal*100,1,stepperdataX27[datenfeld[pos].target].arc-1);}
-    else if (stepperdataX27[datenfeld[pos].target].maxVal<=10)
-      {ergebnis=map(rawVal*10,stepperdataX27[datenfeld[pos].target].minVal,stepperdataX27[datenfeld[pos].target].maxVal*10,1,stepperdataX27[datenfeld[pos].target].arc-1);}
-    else
-      {ergebnis=map(rawVal,stepperdataX27[datenfeld[pos].target].minVal,stepperdataX27[datenfeld[pos].target].maxVal,1,stepperdataX27[datenfeld[pos].target].arc-1);}
-  }
-  else if (table==1)  //RPM Gauge
-  {
-    //nonlinear movement RPM
-    //    0%     0 Steps (0° arc)
-    //   65%   315 Steps (105° arc)
-    //  100%   810 Steps (270° arc)
-    //  110%   945 Steps (315° arc)
-    
-    if (rawVal<=65.0)
-    {
-      ergebnis=1+map(int(rawVal*10),0,650,0,314);
-    } 
-    else if (rawVal<=100.0)
-    {
-      ergebnis=315+map(int(rawVal*10),650,1000,0,495);
-    }
-    else if (rawVal>100.0)
-    {
-      ergebnis=810+map(int(rawVal*10),1000,1100,0,134);
-    }
-  }
-  else if (table==2)  //FTIT Gauge
-  {
-    //nonlinear movement FTIT
-    //  200°     0 Steps (0° arc)
-    //  700°   285 Steps (95° arc)
-    // 1000°   825 Steps (275° arc)
-    // 1200°   945 Steps (315° arc)
-    
-    if (rawVal<=2.0)
-    {
-      ergebnis=1;
-    } 
-    else if (rawVal<=7.0)
-    {
-      ergebnis=map(int(100*rawVal),200,700,0,285);
-    }
-    else if (rawVal<=10.0)
-    {
-      ergebnis=285+map(int(100*rawVal),700,1000,0,540);
-    }
-    else if (rawVal<=12.0)
-    {
-      ergebnis=825+map(int(100*rawVal),1000,1200,0,119);
-    }
-    else
-    {
-      ergebnis=944;
-    }
-  }
-  return ergebnis;
-}
 
 ///iniate a single step movement 
 void UpdateStepperX27(byte pos)
@@ -149,8 +95,7 @@ void UpdateStepperX27(byte pos)
   float newVal=atof(datenfeld[pos].wert);
   if (newVal!=stepperdataX27[datenfeld[pos].target].last)
   {
-    
-    int NewStepperPos=ConversionX27(newVal, pos, stepperdataX27[datenfeld[pos].target].arctable);
+    unsigned short  NewStepperPos=map(newVal, 0, 65535,0, stepperdataX27[datenfeld[pos].target].arc);
     stepperX27[datenfeld[pos].target].setPosition(NewStepperPos);
     stepperdataX27[datenfeld[pos].target].last=newVal;
     lastUpdateX27=millis();

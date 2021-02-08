@@ -11,8 +11,8 @@ typedef struct //data field structure for storage of data variables
   
 AAchse analogaxis[] = {
    // PIN  Command   Value
-    { A0,   2,         0   }
- //,{ A1,   3,         0   }
+    { A0,   1,         0   }
+   
 };
 const int axisCount = sizeof(analogaxis)/sizeof(analogaxis[0]);
 
@@ -28,21 +28,26 @@ void SetupAnalog()
 
 void ReadAnalogAxis()
 {
-  for (int axisIndex=0; axisIndex < axisCount; axisIndex++) //run through all axis
-  {  
-    int currAxisVal = analogRead(analogaxis[axisIndex].pIN);
 
-    if (((currAxisVal+ATH)<analogaxis[axisIndex].val) || ((currAxisVal-ATH)>analogaxis[axisIndex].val)) //check if axis got moved
-    {
-      // send new value to the BMSAIT App
-      char buf[9]={0,0,0,0,0,0,0,0};
-      sprintf (buf, "%03u,%04u",analogaxis[axisIndex].command,currAxisVal);
-      SendMessage(buf,4);
+    for (int axisIndex=0; axisIndex < axisCount; axisIndex++) //run through all axis
+    {  
 
-      if (testmode) {SendMessage(buf,1);}
-     
-      //memorize new value
-      analogaxis[axisIndex].val=currAxisVal;
+      int currAxisVal = analogRead(analogaxis[axisIndex].pIN);
+
+      if (((currAxisVal+ATH)<analogaxis[axisIndex].val) || ((currAxisVal-ATH)>analogaxis[axisIndex].val)) //check if axis got moved
+      {
+        // send new value to the BMSAIT App
+        char buf[9]="        ";
+        sprintf (buf, "%03u,%04u",analogaxis[axisIndex].command,currAxisVal);
+        SendMessage(buf,4);
+        
+        if (testmode){SendMessage(buf,1);}
+                
+        //memorize new value
+        analogaxis[axisIndex].val=currAxisVal;
+      }
     }
-  }   
+
+
+    
 }

@@ -6,10 +6,10 @@
 #include <LedControl.h>
 LedControl LEDM[2]={LedControl(0,0,0, 1),LedControl(0,0,0, 1)}; //empty call of the LEDControl class
 
-#define LEDM_CLK 8   //PIN "Clock" for the SPI connection of the LED-Matrix
-#define LEDM_CS 9    //PIN "Cable Select" for the SPI connection of the LED-Matrix
-#define LEDM_DIN 10  //PIN "Data In" for the SPI connection of the LED-Matrix
-#define LEDM_BRIGHTNESS 5  //sets the intensity of the LED-Matrix
+#define LEDM_CLK 4   //PIN "Clock" for the SPI connection of the MAX7219 LED Control
+#define LEDM_CS 3    //PIN "Cable Select" for the SPI connection of the MAX7219 LED Control
+#define LEDM_DIN 2  //PIN "Data In" for the SPI connection of the MAX7219 LED Control
+#define LEDM_BRIGHTNESS 5  //sets the intensity of the LEDs (0..15)
   
   
 void SetupLEDMatrix()
