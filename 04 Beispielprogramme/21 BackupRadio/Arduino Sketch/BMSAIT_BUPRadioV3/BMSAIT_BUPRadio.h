@@ -113,7 +113,7 @@ bool checkPowerOn(byte disp)
 //adds functions to the 7-Segement update to simulate the BUPRadio more accurately
 void BUPRadioUpdate(byte p)
 {
-  PullRequestBUP();  //adds another request to update the BUPFreq container
+  if (pull) PullRequestBUP();  //adds another request to update the BUPFreq container
 
   CheckSwitchesBUPRadio(); //check switch positions to determine display behaviour
 

@@ -30,14 +30,13 @@
 
 
 //BASIC SETTINGS
-
+  #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
   //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_BUPRadio"; 
   
 //BOARD SELECTION
-  #define BAUDRATE 57600      // serial connection speed
   #define UNO         //uncomment this if this sketch will be loaded on an UNO
   //#define NANO        //uncomment this if this sketch will be loaded on an NANO
   //#define MICRO       //uncomment this if this sketch will be loaded on an MICRO
