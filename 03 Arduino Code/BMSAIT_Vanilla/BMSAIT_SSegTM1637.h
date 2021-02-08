@@ -89,7 +89,7 @@ void UpdateTM1637(int p)
     #endif
   
 
-    if ((datenfeld[p].ref5-1)==x)
+    if ((datenfeld[p].ref5-1==x)&&(disp[x]!=' '))
       TM1637_display[datenfeld[p].target].showNumWithPoint(disp[x]-48,0,pos,1);
     else 
       TM1637_display[datenfeld[p].target].showNum(disp[x]-48,pos,1);
