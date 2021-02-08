@@ -36,8 +36,8 @@ Schalter schalter[]=
  ,{4,  "UHFMA" ,2, 0, 0, "02", "00", 2}    //UHF Main Switch - MAIN
  ,{5,  "UHFBO" ,2, 0, 0, "03", "00", 2}    //UHF Main Switch - BOTH
  ,{8,  "MNL"   ,2, 0, 0, "04", "00", 3}    //UHF Mode Switch Manual
- ,{9,  "PRE"   ,2, 0, 0, "05", "00", 4}    //UHF Mode Switch Manual
- ,{10, "GRD"   ,2, 0, 0, "06", "00", 5}    //UHF Mode Switch PRE
+ ,{9,  "PRE"   ,2, 0, 0, "05", "00", 4}    //UHF Mode Switch Preset
+ ,{10, "GRD"   ,2, 0, 0, "06", "00", 5}    //UHF Mode Switch Guard
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
     

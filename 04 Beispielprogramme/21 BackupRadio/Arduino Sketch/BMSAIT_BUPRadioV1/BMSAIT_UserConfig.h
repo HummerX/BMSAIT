@@ -65,8 +65,8 @@
   Datenfeld datenfeld[]=
     {
       //Description ID    DT    OT  target Ref2 Ref3 Ref4 Ref5  IV
-      { "UHFCH",  "1130", 's',  31,   0,    0,   2,   2,   99,  "99"}       //Variable 0 - UHF Preset
-      ,{"UHFFQ",  "1120", 's',  30,   0,    0,   6,   1,    3,  "123456"}   //Variable 1 - UHF Frequenz
+      { "UHFCH",  "1130", 's',  30,   0,    0,   2,   6,   99,  "99"}       //Variable 0 - UHF Preset
+      ,{"UHFFQ",  "1120", 's',  30,   0,    0,   6,   0,    3,  "123456"}   //Variable 1 - UHF Frequenz
       ,{"PWRST",  "1241", 'b',   0,   0,    0,   0,   0,    0,  "T"}        //Variable 2 - Status Power
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
