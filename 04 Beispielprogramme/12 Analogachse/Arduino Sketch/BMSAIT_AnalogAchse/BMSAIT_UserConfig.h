@@ -22,7 +22,7 @@
   //#define Switches          //use the arduino to read switch positions and send keyboard commands
   //#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
   //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
-  //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
+  #define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
 
