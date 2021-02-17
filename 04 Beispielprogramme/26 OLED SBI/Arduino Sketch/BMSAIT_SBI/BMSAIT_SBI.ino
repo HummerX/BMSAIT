@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.2   29.01.2021
+// Version: 1.3.3   14.02.2021
 // Robin "Hummer" Bruns
 
 
@@ -80,8 +80,8 @@
 //switch and signal settings
 #ifdef Switches                
   #include "BMSAIT_Switches.h" 
-#endif   
-
+#endif  
+ 
 //button matrix settings
 #ifdef ButtonMatrix               
   #include "BMSAIT_Buttonmatrix.h"
@@ -477,7 +477,7 @@ void UpdateInput()
 void PullRequest(byte var)
 {
   //build message string <pos>,<vartype>,<varID>
-  char nachricht[11]={0};
+  char nachricht[10]={0};
   char pos[2]={0,0};
   if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
     itoa(var,pos,10);  //write data container position as character
@@ -494,29 +494,27 @@ void PullRequest(byte var)
     nachricht[2]=',';
     nachricht[3]=datenfeld[var].format;  //add the variable type
     nachricht[4]=',';
-    for (byte lauf=0;lauf<5;lauf++)
+    for (byte lauf=0;lauf<4;lauf++)
       {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
-    nachricht[10]='\0';
+    nachricht[9]='\0';
     SendMessage(nachricht,2);
     byte x=0;
-    while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
+    while ((SERIALCOM.available()<3) && (x<30)) //wait for answer, but no longer than 30ms
     {
       #ifdef PRIORITIZE_OUTPUT
         UpdateOutput(); //throw in another update if outputs are priorized
-        x+=15;
+        x+=10;
       #endif
       #ifdef PRIORITIZE_INPUT
         UpdateInput();   //throw in another update if inputs are priorized
-        x+=15;
+        x+=10;
       #endif
-      #if !defined PRIORITIZE_OUTPUT && !defined PRIORITIZE_INPUT
-        delay(1);
-        x++;  
-      #endif
+      delay(1);
+      x++;  
     }
     while(SERIALCOM.available()>1)  //read incoming data     
     {
-      delay(5);
+      delay(1);
       ReadResponse();
     }
 }
@@ -652,7 +650,7 @@ void ReadResponse()
             // end of data found. Validate the buffer before writing the new data into the data container
         
             int laenge=sizeof(neuer_wert.wert);            
-            if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
+            if (neuer_wert.varNr<100)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
               if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
               {
@@ -716,7 +714,7 @@ void DebugReadback(byte posID)
 void SendSysCommand(const char text[])  
 { 
   SERIALCOM.println(text);
-  delay(10);
+  delay(5);
 }
 
 ///Send a message to the BMSAIT App

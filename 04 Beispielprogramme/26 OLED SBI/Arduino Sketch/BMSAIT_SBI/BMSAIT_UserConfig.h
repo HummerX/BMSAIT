@@ -29,7 +29,7 @@
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
-  #define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
+  //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_SBI"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
 
@@ -62,10 +62,9 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description ID      DT   OT    Ref1 Ref2 Ref3 Ref4 Ref5  IV
-       {"In3D",   "1651",  'b',  99,    0,   0,   0,   0,  0,   "F"}       //Variable 0 - Player is in 3D
-      ,{"BPEGY",  "1242",  'b',  99,    0,   0,   0,   0,  0,   "T"}       //Variable 1 - MainPower
-      ,{"SB",   "0201",    'i',  71,    0,   0,   0,   0,  0,   "0"}       //Variable 2 - Speedbrake position
-      
+      //Description  ID      DT   OT    Ref1 Ref2 Ref3 Ref4 Ref5  IV
+        {"In3D",   "1651",  'b',  99,    0,   0,   0,   0,  0,   "F"}       //Variable 0 - Player is in 3D
+       ,{"BPEGY",  "1242",  'b',  99,    0,   0,   0,   0,  0,   "T"}       //Variable 1 - MainPower
+       ,{"SB",     "0201",  'i',  71,    0,   0,   0,   0,  0,   "0"}       //Variable 2 - Speedbrake position
     }; 
   const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
