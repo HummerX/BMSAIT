@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.8.3   25.01.2021 (BMS 4.35)
+0;F4SM;bool;F4SMVar;Version of this file: 1.8.4   17.02.2021 (BMS 4.35)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -79,7 +79,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 510;FUEL;float;fuelFlow;Ownship fuel flow (Lbs/Hour)
 511;FUEL;string;fuelFlow(s);Fuelflow as string value
 520;FUEL;float;fuelFlow2;Ownship fuel flow2 (Lbs/Hour)
-;GFUEL;string;fuelFlow2(s);Fuelflow2 as string value
+521;GFUEL;string;fuelFlow2(s);Fuelflow2 as string value
 530;FUEL;float;fwd;Fuel quantity in forward tank in lbs
 540;FUEL;float;internalFuel;Ownship internal fuel (Lbs)
 550;FUEL;float;total;Total fuel in lbs
@@ -188,6 +188,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1245;SYSTEMS;bool;mainGenerator;True if the main generator is online
 1246;SYSTEMS;bool;standbyGenerator;True if the standby generator is online
 1247;SYSTEMS;bool;jetFuelStarter;True if JFS is running, can be used for magswitch
+1248;SYSTEMS;bool;avionicsPower;True if UFC switch is turned on
 1250;SYSTEMS;int;currentTime;Current time in seconds (max 60 * 60 * 24)
 1260;SYSTEMS;int;mainPower;???
 1270;CAUTION;uint;bettyBits;See BettyBits enum for details
