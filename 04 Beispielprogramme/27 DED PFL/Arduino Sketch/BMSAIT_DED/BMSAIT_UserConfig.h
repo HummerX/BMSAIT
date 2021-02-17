@@ -1,28 +1,28 @@
-// Version: 1.3    14.01.2020
+// Version: 1.3.1    26.01.2021
 
 //MODULE SELECTION - uncomment the modules you want to use.
-//#define LED               //drive LEDs
-//#define LEDMatrix         //drive LED Matrix using a MAX7219 controller
-//#define LCD               //drive LCD display
-//#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
-//#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
-//#define ServoMotor        //drive servo motors directly connected to the arduino
-//#define ServoPWM          //drive multiple servo motors via pwm shield
-//#define StepperBYJ        //drive stepper motor 28BYJ-48
-//#define StepperX27        //drive stepper motor X27.168
-//#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
-//#define MotorPoti         //motor-driven poti control
-#define DED_PFL           //Enable DED or PFL on an 254x64 OLED display 
-//#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display
-//#define Switches          //use the arduino to read switch positions and send keyboard commands
-//#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
-//#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
-//#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
-//#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
+   
+  //#define LED               //drive LEDs
+  //#define LEDMatrix         //drive LED Matrix using a MAX7219 controller
+  //#define LCD               //drive LCD display
+  //#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
+  //#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
+  //#define ServoMotor        //drive servo motors directly connected to the arduino
+  //#define ServoPWM          //drive multiple servo motors via pwm shield
+  //#define StepperBYJ        //drive stepper motor 28BYJ-48
+  //#define StepperX27        //drive stepper motor X27.168
+  //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
+  //#define MotorPoti         //motor-driven poti control
+  //#define OLED              //display data on an OLED display
+  //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)
+  //#define FuelFlowIndicator //Enable display of the FuelFlow indicator on an 128x64 OLED display (DEDunino)
+  #define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display (DEDunino)
+  //#define Switches          //use the arduino to read switch positions and send keyboard commands
+  //#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
+  //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
+  //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
+  //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
-//End if device definitions
-
-    
 
 //Basic program definitions
   #define BAUDRATE 115200         // serial connection speed
@@ -34,10 +34,10 @@
 //BOARD SELECTION
 
   //#define UNO         //uncomment this if this sketch will be loaded on an UNO
-  #define NANO        //uncomment this if this sketch will be loaded on an NANO
+  //#define NANO        //uncomment this if this sketch will be loaded on an NANO
   //#define MICRO       //uncomment this if this sketch will be loaded on an MICRO
   //#define LEONARDO    //uncomment this if this sketch will be loaded on an LEONARDO
-  //#define MEGA        //uncomment this if this sketch will be loaded on an MEGA
+  #define MEGA        //uncomment this if this sketch will be loaded on an MEGA
   //#define DUE         //uncomment this if this sketch will be loaded on an DUE
   //#define DUE_NATIVE  //uncomment this if this sketch will be loaded on an DUE
 
@@ -61,6 +61,7 @@ Datenfeld datenfeld[]=
   {
     //Description ID    DT    OT    IV
      {"In3D",  "1651", 'b',  99,     "F"}           //Variable 0 - Player is in 3D
+    ,{"xxxx",  "9999", 'b',  99,     "T"}           //Variable 1 - dummy (slot reserved for power check when displaying the PFL)
     ,{"DED1",  "0231", 's',  72,     "         "}   //DED Line 1 
     ,{"DED2",  "0232", 's',  72,     ""}            //DED Line 2
     ,{"DED3",  "0233", 's',  72,     "      DED"}   //DED Line 3
@@ -68,3 +69,19 @@ Datenfeld datenfeld[]=
     ,{"DED5",  "0235", 's',  72,     ""}            //DED Line 5
   }; 
 const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]);
+
+/*
+ //use this container to show PFL instead of DED
+Datenfeld datenfeld[]=
+  {
+    //Description ID    DT    OT    IV
+     {"In3D",  "1651", 'b',  99,     "F"}           //Variable 0 - Player is in 3D
+    ,{"APWR",  "1248", 'b',  99,     "F"}           //Variable 1 - UFC Power is turned on 
+    ,{"PFL1",  "1101", 's',  72,     "         "}   //DED Line 1 
+    ,{"PFL2",  "1102", 's',  72,     ""}            //DED Line 2
+    ,{"PFL3",  "1103", 's',  72,     "      DED"}   //DED Line 3
+    ,{"PFL4",  "1104", 's',  72,     ""}            //DED Line 4
+    ,{"PFL5",  "1105", 's',  72,     ""}            //DED Line 5
+  }; 
+const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]);
+*/
