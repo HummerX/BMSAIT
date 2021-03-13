@@ -14,11 +14,11 @@
     U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI displaySBI(U8G2_R0, 2/*clock (D0) */, 3/*data (D1) */, 6/*cs*/,5/*dc*/, 4/*reset*/);
   #endif
 
-
-//Layout settings
   #define SB_SCREEN_W 128 //set the width of your display
   #define SB_SCREEN_H 64  //set the height of your display
-  
+
+
+///Layout settings
                                                           //Rotation: U8G2_R0  U8G2_R1  U8G2_R2  U8G2_R3
                                                           //           (0°)    (90°CW)  (180°)   (270°CW) 
   #define OFFSETX 0         //increase this to move CLOSED graphic     right     down     left      up
@@ -26,9 +26,9 @@
   #define OFFSETY 0         //increase this to move CLOSED graphic     down     right     up       left
                             //decrease this to move CLOSED graphic      up      left      down     right 
   
-  #define SBIDELAY 250  //time the off-flaw will remain on after movement of the SBI
-  //#define ANIMATION   //if set, the display will show an animation of the scale movement; if not, the off flag will show during movement
-  #define OFFSET_FRAMES 6 //speed of movement animation (increase to slow animation) 
+  #define SBIDELAY 500    //time (ms) the off-flag will show up when the SBI moves from closed to open or vice versa
+  #define ANIMATION      //if set, the display will show an animation of the scale movement; if not, the off flag will show during movement
+  #define OFFSET_FRAMES 6  //speed of movement animation (increase to slow animation) 
 
 
 ///presets - don't change
@@ -68,40 +68,48 @@ void UpdateSBI(byte pos)
 {
   if ((millis()-lastInput)>10000) 
   {
-    if (!testmode)            //display remains on in testmode
+    if (!testmode)         //if not in testmode and no data was recieved within 10 seconds,the display will shut down
     {
-      ClearDisplaySBI();    //if no data was recieved within 10 seconds, display shuts down
+      ClearDisplaySBI();    
+      sb[0]=3;
       return;
     }
   }  
   unsigned short sBPos=atoi(datenfeld[pos].wert);
-  if (sBPos!=sBILast)
-  {
-    sBImovement=millis();
-    sBILast=sBPos;  
-  }
-  
+ 
   sb[1] = sb[0];
   
   if ((datenfeld[0].wert[0]=='F') || (datenfeld[1].wert[0]=='F'))  
     {sb[0]=1;}      //player is either not in 3D or the a/c power is still off
+  
   #ifndef ANIMATION   
-  else if ((millis()-sBImovement)<SBIDELAY) //in non-animation mode, the off flag will show when the SBI is being moved  
-    {sb[0]=1;}     
+  else if ( ((sBPos>600)&&(sBILast<600)) || ((sBPos<600)&&(sBILast>600)) ) //in non-animation mode, the off flag will show when the SBI is being moved from closed to open and vice versa
+    {
+      sb[0]=1;
+      sBImovement=millis();
+    }     
   #endif
-  else if (sBPos>600) 
-    {sb[0]=2;}      // SB less than 1% open
+  else if ( (sBPos>600) && (millis()-sBImovement>SBIDELAY) )    // SB more than 1% open
+    {
+      sb[0]=2;
+    }      
+  else if ( (sBPos<600) && (millis()-sBImovement>SBIDELAY) )    // SB less than 1% open
+    {
+      sb[0]=0;
+    }      
   else
-    {sb[0]=0;}      // SB more than 1% open
+    {}
+  
+sBILast=sBPos; 
 
 if ( sb[0] != sb[1] ) 
-  { // if speedbreak value has changed (no need to re-render frame if it hadn't
+  { // if speedbreak value has changed (no need to re-render frame if it hadn't)
     float offsetDelta = -1*((SRC_OFFSET) - (DST_OFFSET)) / OFFSET_FRAMES;
 
     #ifdef ANIMATION      //animated SBI movement
       for (short i = 0; i < OFFSET_FRAMES; i++) 
       {
-        if (i == 6 || i ==7 ) 
+        if (i == 3 || i ==4 ) 
         {
           break;
         }
@@ -117,12 +125,10 @@ if ( sb[0] != sb[1] )
         displaySBI.drawXBMP(OFFSETX+DST_OFFSET, OFFSETY, SB_IMG_W, SB_IMG_H, SB_IMG);
       } while ( displaySBI.nextPage() );
     #else           //non-animated SBI movement
-          
       displaySBI.firstPage(); //show open/closed flag
       do {
         displaySBI.drawXBMP(OFFSETX+DST_OFFSET, OFFSETY, SB_IMG_W, SB_IMG_H, SB_IMG);
       } while ( displaySBI.nextPage() );
-      
     #endif
   }
 }
