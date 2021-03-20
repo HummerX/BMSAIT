@@ -22,7 +22,7 @@ typedef struct
 Struc_MotorPoti motorPoti[]=
 {
 	  	//  PIN1	 PIN2	  pWM	    dir	   poti 	intP	 extP   command
-		 {     5,     6,	  200,	  true,	  A0,  	500,	 500,    1}
+		 {     5,     6,	  200,	  true,	  A1,  	500,	 500,    1}
 
 };
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
@@ -41,6 +41,8 @@ void SetupMotorPoti()
     digitalWrite( motorPoti[mp].pIN1, LOW );
     pinMode( motorPoti[mp].pIN2, OUTPUT );
     digitalWrite( motorPoti[mp].pIN2, LOW );
+    motorPoti[mp].trimPos_int=512;
+    motorPoti[mp].trimPos_ext=512;
   }
   time_status=0;
   time_pause=0;
@@ -94,18 +96,24 @@ bool CheckDirection(byte motor,bool richtung,bool recursive)
     tmp=analogRead(motorPoti[motor].poti);
 
     if (tmp>oldPos+BUFFER) 
-      {motorPoti[motor].dir=true;} 
+    {
+      motorPoti[motor].dir=true;
+      return false;
+    } 
     else if (tmp<oldPos-BUFFER) 
-      {motorPoti[motor].dir=false;} 
+    {
+      motorPoti[motor].dir=false;
+      return false;
+    } 
     else
     {  
-      if (recursive) return false;
+      if (recursive) return true; //error in second attempt
       
       //no good signal so far. Lets try the other direction
-      if (CheckDirection(motor,false,true))   
-        {return true;} //motor recovered
+      if (CheckDirection(motor,!richtung,true))   
+        {return true;}  //motor didn`t move or poti readout is faulty 
       else  
-        {return false;} //motor didn`t move or poti readout is faulty  
+        {return false;} //motor recovered 
     }
   }
   else
@@ -118,21 +126,26 @@ bool CheckDirection(byte motor,bool richtung,bool recursive)
     //motor moved CCW for 1.5 seconds. Now check if the poti readout decreased
     tmp=analogRead(motorPoti[motor].poti);
     if (tmp>oldPos+BUFFER) 
-        {motorPoti[motor].dir=false;}  
+    {
+      motorPoti[motor].dir=false;
+      return false;
+    }  
     else if (tmp<oldPos-BUFFER) 
-        {motorPoti[motor].dir=true;} 
+    {
+      motorPoti[motor].dir=true;
+      return false;
+    }
     else
     {
-      if (recursive) return false;
+      if (recursive) return true;
     
       //no good signal so far. Lets try the other direction
-      if (CheckDirection(motor,true,true))   
-        {return true;} //motor recovered
+      if (CheckDirection(motor,!richtung,true))   
+        {return true;} //motor didn`t move or poti readout is faulty
       else  
-        {return false;} //motor didn`t move or poti readout is faulty  
+        {return false;} //motor recovered  
     }
   }
-  return true;
 }
 
 
@@ -154,22 +167,57 @@ void MotorPoti_Zeroize()
     SendMessage("CheckDir complete",1);  
     if (!error)
     {
+      unsigned short counter=0;
       initialPos=analogRead(motorPoti[mp].poti);
       //move motor to center position
       if (initialPos>(512+BUFFER))
       {
         if (motorPoti[mp].dir) MotorMoveCCW(mp); else MotorMoveCW(mp);
-        while((analogRead(motorPoti[mp].poti)>=512))
-          {delay(1);}
+        motorPoti[mp].trimPos_ext=motorPoti[mp].trimPos_int;
+        while(motorPoti[mp].trimPos_int>=512)
+          {
+            delay(1);
+            motorPoti[mp].trimPos_int=analogRead(motorPoti[mp].poti);
+            counter++;
+            if (counter==1000)
+            {
+              counter=0;
+              if (motorPoti[mp].trimPos_int-512>motorPoti[mp].trimPos_ext) //check new distance to center. It's supposed to decrease
+              {
+                error=true;           //distance increased or stagnated
+                motorPoti[mp].trimPos_int=512+BUFFER;
+              }
+              else
+              {
+                motorPoti[mp].trimPos_ext=motorPoti[mp].trimPos_int-512;
+              }
+            }         
+          }
         MotorStop(mp);
       }
       else if (initialPos<(512-BUFFER))
       {
         if (motorPoti[mp].dir) MotorMoveCW(mp); else MotorMoveCCW(mp);
-        while((analogRead(motorPoti[mp].poti)<=512))
-          {delay(1);}
+        while(motorPoti[mp].trimPos_int<=512)
+        {
+          delay(1);
+          motorPoti[mp].trimPos_int=analogRead(motorPoti[mp].poti); //value is supposed to increase
+          counter++;
+          if (counter==1000)
+          {
+            counter=0;
+            if (512-motorPoti[mp].trimPos_int>motorPoti[mp].trimPos_ext) //check new distance to center. It's supposed to decrease
+            {
+              error=true;           //distance increased or stagnated
+              motorPoti[mp].trimPos_int=512-BUFFER;
+            }
+            else
+            {
+              motorPoti[mp].trimPos_ext=512-motorPoti[mp].trimPos_int;
+            }
+          }
+        }
         MotorStop(mp);
-
       }
       else
       {} //motor already is in center position
