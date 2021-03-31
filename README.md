@@ -7,7 +7,7 @@ BMSAIT also allows to register input commands from digital and analog sources li
 joystick commands that will be send to Falcon BMS.</p>
 
 In order to establish a data transfer via BMSAIT a specific arduino sketch needs to be customized and loaded on an arduino compatible board. A windows app will 
-orchestrate the communication between then arduino boards and the flight simulation.</p>
+orchestrate the communication between the arduino boards and the flight simulation.</p>
 
 The folder "01 Dokumentation" contains a documentation of the softeare suite (so far only available in german language)</p>
 The folder "02 Windows App" contains the needed files to run the windows application of BMSAIT</p>
