@@ -12,9 +12,9 @@ LedControl Max7219_display[]={
 };
 const byte max7219anz = sizeof(Max7219_display)/sizeof(Max7219_display[0]); 
 
-#define MAX_CLK 2   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
-#define MAX_CS  3   //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
-#define MAX_DIN 4   //PIN "Data In" for the SPI connection of the 7-Segment Tube 
+#define MAX_CLK A1   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
+#define MAX_CS  A2    //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
+#define MAX_DIN A3  //PIN "Data In" for the SPI connection of the 7-Segment Tube 
 #define MAX_BRIGHTNESS 5
   
 void SetupMax7219()
@@ -57,7 +57,7 @@ void UpdateMAX7219(byte p)
   for (byte x=0 ; x<datenfeld[p].ref3 ; x++)
   {
     if (dp){dp=false;}
-    if (x==datenfeld[p].ref5-1){dp=true;}    //set decimal point 
+    if ((x==datenfeld[p].ref5-1)&&(Wert[x]!=' ')){dp=true;}    //set decimal point 
     Max7219_display[datenfeld[p].target].setChar(0,stelle,Wert[x],dp);
     stelle--;
   }          

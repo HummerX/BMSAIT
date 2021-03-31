@@ -57,7 +57,7 @@ void UpdateMAX7219(byte p)
   for (byte x=0 ; x<datenfeld[p].ref3 ; x++)
   {
     if (dp){dp=false;}
-    if (x==datenfeld[p].ref5-1){dp=true;}    //set decimal point 
+    if ((x==datenfeld[p].ref5-1)&&(Wert[x]!=' ')){dp=true;}    //set decimal point 
     Max7219_display[datenfeld[p].target].setChar(0,stelle,Wert[x],dp);
     stelle--;
   }          

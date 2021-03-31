@@ -74,7 +74,7 @@
   ,{  "NOGO",   "1548", 'b',  10,    11,    0,   0,   0,    0, "F"}     //Variable 3 - NOGO Status
   ,{  "DEGR",   "1549", 'b',  10,    12,    0,   0,   0,    0, "F"}     //Variable 4 - DEGRADE Status
   ,{  "RDY",    "1549", 'b',  10,    13,    0,   0,   0,    0, "F"}     //Variable 5 - DISPENSER RDY Status
-  ,{  "POWER",  "1242", 'b',   0,     0,    0,   0,   0,    0, "T"}     //Variable 6 - Status of electrical system of the a/c
+  ,{  "POWER",  "1243", 'b',   0,     0,    0,   0,   0,    0, "T"}     //Variable 6 - Status of electrical system of the a/c
   ,{  "CHLOW",  "1551", 'b',  30,     0,    0,   2,   4,   99, "T"}     //Variable 7 - Chaff Lo warning
   ,{  "FLLOW",  "1552", 'b',  30,     0,    0,   2,   0,   99, "T"}     //Variable 8 - Flare Lo warning
   }; 

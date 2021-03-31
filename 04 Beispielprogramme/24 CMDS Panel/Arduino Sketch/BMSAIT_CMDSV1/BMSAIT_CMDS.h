@@ -18,7 +18,7 @@ void SetupCMDS()
   
   for (int lauf=0;lauf<VARIABLENANZAHL;lauf++)
   {
-    if (strcmp(datenfeld[lauf].ID, "1242")==0)  //memorize the position of the MainPower variable
+    if (strcmp(datenfeld[lauf].ID, "1243")==0)  //memorize the position of the MainPower variable
     {
       mainPwr = lauf;
       gefunden[0]=true;

@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.2   29.01.2021
+// Version: 1.3.4   30.03.2021
 // Robin "Hummer" Bruns
 
 
@@ -10,6 +10,7 @@
   #define MESSAGEBEGIN 255    // this byte marks the beginning of a new message from the Windows app
   #define HANDSHAKE 128       // this byte marks an identification request from the Windows app
   #define CALIBRATE 160       // this byte marks a request to reset motors to inital position
+  #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
   #define TESTON  190         // activates testmode
@@ -81,7 +82,7 @@
 #ifdef Switches                
   #include "BMSAIT_Switches.h" 
 #endif  
- 
+
 //mod 
 #ifdef CMDS
   #include "BMSAIT_CMDS.h"
@@ -270,13 +271,6 @@ void setup()
   #ifdef NewDevice                      //Example. Use this placeholder to activate your own projects
     SetupNewDevice();
   #endif                                //Example end
-
-    //modification for CMDS
-#ifdef CMDS
-  SetupCMDS();
-#endif
-  //modification for CMDS
-  
 }
 
 
@@ -297,33 +291,32 @@ void loop()
 //********************
 
 /// reset motor positions to default values
-void ResetMotors()
+void ResetMotors(bool full)
 {
 #ifdef ServoMotor                       
-  Servo_Zeroize();            
+  Servo_Zeroize(full);            
 #endif                            
 
 #ifdef ServoPWM                       
-  ServoPWM_Zeroize();              
+  ServoPWM_Zeroize(full);              
 #endif  
 
 #ifdef StepperVID
-  StepperVID_Zeroize();   
+  StepperVID_Zeroize(full);   
 #endif
  
 #ifdef StepperX27
-  StepperX27_Zeroize();  
+  StepperX27_Zeroize(full);  
 #endif
  
 #ifdef Stepper28BYJ48
-  Stepper28BYJ48_Zeroize();  
+  Stepper28BYJ48_Zeroize(full);  
 #endif
  
 #ifdef MotorPoti
-  MotorPoti_Zeroize(); 
+  MotorPoti_Zeroize(full); 
 #endif
 }
-
 
 ///check for fresh sharedMem data 
 void ReadData()
@@ -490,7 +483,7 @@ void UpdateInput()
 void PullRequest(byte var)
 {
   //build message string <pos>,<vartype>,<varID>
-  char nachricht[11]={0};
+  char nachricht[10]={0};
   char pos[2]={0,0};
   if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
     itoa(var,pos,10);  //write data container position as character
@@ -507,29 +500,27 @@ void PullRequest(byte var)
     nachricht[2]=',';
     nachricht[3]=datenfeld[var].format;  //add the variable type
     nachricht[4]=',';
-    for (byte lauf=0;lauf<5;lauf++)
+    for (byte lauf=0;lauf<4;lauf++)
       {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
-    nachricht[10]='\0';
+    nachricht[9]='\0';
     SendMessage(nachricht,2);
     byte x=0;
-    while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
+    while ((SERIALCOM.available()<3) && (x<30)) //wait for answer, but no longer than 30ms
     {
       #ifdef PRIORITIZE_OUTPUT
         UpdateOutput(); //throw in another update if outputs are priorized
-        x+=15;
+        x+=10;
       #endif
       #ifdef PRIORITIZE_INPUT
         UpdateInput();   //throw in another update if inputs are priorized
-        x+=15;
+        x+=10;
       #endif
-      #if !defined PRIORITIZE_OUTPUT && !defined PRIORITIZE_INPUT
-        delay(1);
-        x++;  
-      #endif
+      delay(1);
+      x++;  
     }
     while(SERIALCOM.available()>1)  //read incoming data     
     {
-      delay(5);
+      delay(1);
       ReadResponse();
     }
 }
@@ -591,9 +582,17 @@ void ReadResponse()
         //reset motor position to zero
         SERIALCOM.flush();
         SendSysCommand("ok");
-        ResetMotors();
+        ResetMotors(true);
         Reset();
-      }       
+      }    
+      else if (inputByte_1 == ZEROIZE)
+      {
+        //reset motor position to zero
+        SERIALCOM.flush();
+        SendSysCommand("ok");
+        ResetMotors(false);
+        Reset();
+      }          
       else if (inputByte_1 == TESTON)
       {
         //confirm testmode
@@ -665,7 +664,7 @@ void ReadResponse()
             // end of data found. Validate the buffer before writing the new data into the data container
         
             int laenge=sizeof(neuer_wert.wert);            
-            if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
+            if (neuer_wert.varNr<100)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
               if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
               {
@@ -674,7 +673,7 @@ void ReadResponse()
                 memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
               }
               lastInput=millis(); //store last transmission time
-              if (testmode){DebugReadback(neuer_wert.varNr);}
+              //if (testmode){DebugReadback(neuer_wert.varNr);}
             }  
             state=0;
           }
@@ -729,7 +728,7 @@ void DebugReadback(byte posID)
 void SendSysCommand(const char text[])  
 { 
   SERIALCOM.println(text);
-  delay(10);
+  delay(5);
 }
 
 ///Send a message to the BMSAIT App
@@ -763,3 +762,4 @@ void SendMessage(const char message[], byte option)
   SERIALCOM.print(message) ;
   SERIALCOM.println(VAR_ENDE);
 }
+ 

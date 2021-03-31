@@ -17,7 +17,7 @@ void SetupCMDS()
   
   for (int lauf=0;lauf<VARIABLENANZAHL;lauf++)
   {
-    if (strcmp(datenfeld[lauf].ID, "1260")==0)  //memorize the position of the MainPower variable
+    if (strcmp(datenfeld[lauf].ID, "1243")==0)  //memorize the position of the MainPower variable
     {
       mainPwr = lauf;
       gefunden[0]=true;
@@ -90,7 +90,7 @@ void CheckSwitchesCMDS()
 ///check if a display is supposed to be illuminated
 bool checkPowerOn(byte disp)
 {
-  if (datenfeld[mainPwr].wert[0]=='0') return false; //turn off displays if a/c power is off
+  if (datenfeld[mainPwr].wert[0]=='F') return false; //turn off displays if a/c power is off
   
   if (!CMDSMain) return false;                       //turn off both displays if CMDS Power is off
   
