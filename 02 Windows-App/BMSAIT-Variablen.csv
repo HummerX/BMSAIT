@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.8.4   17.02.2021 (BMS 4.35)
+0;F4SM;bool;F4SMVar;Version of this file: 1.9  10.04.2021 (BMS 4.35)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -238,8 +238,8 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1472;HSI/ADI/TACAN;bool;vvi;VVI OFF Flag
 1473;HSI/ADI/TACAN;bool;aoa;AOA OFF Flag
 1474;HSI/ADI/TACAN;bool;avtr;AVTR Light
-1475;HSI/ADI/TACAN;bool;outerMarker ;MARKER beacon light for outer marker
-1476;HSI/ADI/TACAN;bool;middleMarker ;MARKER beacon light for middle marker
+1475;HSI/ADI/TACAN;byte;outerMarker ;MARKER beacon light for outer marker
+1476;HSI/ADI/TACAN;byte;middleMarker ;MARKER beacon light for middle marker
 1477;HSI/ADI/TACAN;bool;fromTrue ;HSI_FLAG_TO_TRUE
 1478;HSI/ADI/TACAN;bool;flying ;True if player is attached to an aircraft (i.e. not in UI state). 
 1480;LIGHTS;uint;blinkBits;Cockpit indicator lights blink status, see BlinkBits enum for details. Value is 1 if lamp is blinking
@@ -258,7 +258,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1500;LIGHTS;uint;lightBits;Cockpit Indicator Lights, one bit per bulb. See enum
 1501;CAUTION;bool;masterCaution ;Left eyebrow
 1502;CAUTION;bool;tf;Left eyebrow
-1503;CAUTION;bool;oxy_BROW ;Repurposed for eyebrow OXY LOW (was OBS, unused)
+1503;CAUTION;byte;oxy_BROW ;Repurposed for eyebrow OXY LOW (was OBS, unused)
 1504;CAUTION;bool;equip_HOT ;"Caution light; repurposed for cooling fault (was: not used)"
 1505;LIGHTS;bool;onGround ;True if on ground: this is not a lamp bit!
 1506;CAUTION;bool;eng_FIRE ;"Right eyebrow; upper half of split face lamp"
@@ -290,10 +290,10 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1532;SYSTEMS;bool;tfr_STBY ;"MISC panel; lower half of split face TFR lamp"
 1540;LIGHTS;uint;lightBits2;Cockpit Indicator Lights, one bit per bulb. See enum
 1541;CMDS/RWR;bool;handOff ;Threat Warning Prime
-1542;CMDS/RWR;bool;launch ;Threat Warning Prime
-1543;CMDS/RWR;bool;priMode ;Threat Warning Prime
+1542;CMDS/RWR;byte;launch ;Threat Warning Prime
+1543;CMDS/RWR;byte;priMode ;Threat Warning Prime
 1544;CMDS/RWR;bool;naval ;Threat Warning Prime
-1545;CMDS/RWR;bool;unk ;Threat Warning Prime
+1545;CMDS/RWR;byte;unk ;Threat Warning Prime
 1546;CMDS/RWR;bool;tgtSep ;Threat Warning Prime
 1547;CMDS/RWR;bool;go ;EWS on and operating normally
 1548;CMDS/RWR;bool;noGo ;EWS on but malfunction present
@@ -301,7 +301,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1550;CMDS/RWR;bool;rdy ;EWS Status message: DISPENSE RDY
 1551;CMDS/RWR;bool;chaffLo ;EWS Bingo chaff quantity reached
 1552;CMDS/RWR;bool;flareLo ;EWS Bingo flare quantity reached
-1553;CMDS/RWR;bool;auxSrch ;Aux Threat Warning
+1553;CMDS/RWR;byte;auxSrch ;Aux Threat Warning
 1554;CMDS/RWR;bool;auxAct ;Aux Threat Warning
 1555;CMDS/RWR;bool;auxLow ;Aux Threat Warning
 1556;CMDS/RWR;bool;auxPwr ;Aux Threat Warning
@@ -309,11 +309,11 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1558;CMDS/RWR;bool;ecmFail ;ECM
 1559;CAUTION;bool;fwdFuelLow ;Caution lights
 1560;CAUTION;bool;aftFuelLow ;Caution lights
-1561;ENGINE;bool;epuOn ;"EPU panel; run light"
-1562;ENGINE;bool;jfsOn ;"Eng Jet Start panel; run light"
+1561;ENGINE;byte;epuOn ;"EPU panel; run light"
+1562;ENGINE;byte;jfsOn ;"Eng Jet Start panel; run light"
 1563;CAUTION;bool;sec ;Caution panel
 1564;CAUTION;bool;oxy_Low;Caution panel
-1565;CAUTION;bool;probeHeat;Caution panel
+1565;CAUTION;byte;probeHeat;Caution panel
 1566;CAUTION;bool;seat_Arm;Caution panel
 1567;CAUTION;bool;buc;Caution panel
 1568;CAUTION;bool;fuel_Oil_Hot ;Caution panel
