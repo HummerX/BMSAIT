@@ -1,4 +1,4 @@
-// Version: 1.3    14.01.2021
+// Version: 1.3.4    5.4.2021
 
 
 
@@ -24,6 +24,7 @@
   //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
   //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
+
 
 
 
@@ -65,10 +66,10 @@
   
   Datenfeld datenfeld[]=
   {
-    //Description ID    DT    OT   target  Ref2 Ref3 Ref4 Ref5  IV
-     {"RGear",  "1599", 'b',  10,     2,    0,   0,   0,  0, "False"}     //Example Variable 0 - Right Gear Safe
-    ,{"NGear",  "1597", 'b',  10,     3,    0,   0,   0,  0, "False"}     //Example Variable 1 - Nose Gear Safe
-    ,{"LGear",  "1598", 'b',  10,     4,    0,   0,   0,  0, "False"}     //Example Variable 2 - Left Gear Safe
-    ,{"UGear",  "1571", 'b',  10,     5,    0,   0,   0,  0, "False"}     //Example Variable 3 - Gear Unsafe
+    //Description ID    DT    OT   target  Ref2 Ref3 Ref4 Ref5 RQ  IV
+     {"RGear",  "1599", 'b',  10,     2,    0,   0,   0,  0,   "", "False"}     //Example Variable 0 - Right Gear Safe
+    ,{"NGear",  "1597", 'b',  10,     3,    128, 0,   0,  0,   "", "False"}     //Example Variable 1 - Nose Gear Safe (brightness 50%)
+    ,{"LGear",  "1598", 'b',  10,     4,    0,   0,   0,  0,   "", "False"}     //Example Variable 2 - Left Gear Safe
+    ,{"UGear",  "1571", 'b',  10,     5,    178, 0,   0,  0,   "", "False"}     //Example Variable 3 - Gear Unsafe (brightness 75%)
   };      
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

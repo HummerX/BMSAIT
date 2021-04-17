@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.2   29.01.2021
+// Version: 1.3.6   10.4.2021
 // Robin "Hummer" Bruns
 
 
@@ -10,9 +10,11 @@
   #define MESSAGEBEGIN 255    // this byte marks the beginning of a new message from the Windows app
   #define HANDSHAKE 128       // this byte marks an identification request from the Windows app
   #define CALIBRATE 160       // this byte marks a request to reset motors to inital position
+  #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
   #define TESTON  190         // activates testmode
+  #define READBACKON 191      // activates testmode with readback of data variables
   #define TESTOFF 200         // deactivates testmode
   #define VAR_BEGIN '<'       // char to mark the begin of the actual data
   #define VAR_ENDE '>'        // char to mark the end of the actual data
@@ -42,6 +44,7 @@
     byte ref3;                      //the use of reference byte depends on the output type. Ref3 can set the length if a data value to display on LCD or 7-segment displays
     byte ref4;                      //the use of reference byte depends on the output type. Ref4 can set the position of data on LCD / 7Segment displays. if set, the data will be offset by this number of characters
     byte ref5;                      //the use of reference byte depends on the output type. Ref5 can mark the position of the decimal point on 7-Segment displays
+    char request[10];               //precompiled pull request message
     char wert[DATENLAENGE];         //contains the current value
   } Datenfeld;
 
@@ -62,6 +65,7 @@
   byte state =0;              //marker to memorize the current position in a message string
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
   bool testmode=false;        //Testmode on/off
+  bool readbackmode=false;    //Readbackmode on/off
   unsigned long lastInput =0; //last successful transmission
   
   #ifdef DUE_NATIVE
@@ -80,8 +84,8 @@
 //switch and signal settings
 #ifdef Switches                
   #include "BMSAIT_Switches.h" 
-#endif   
-
+#endif  
+ 
 //button matrix settings
 #ifdef ButtonMatrix               
   #include "BMSAIT_Buttonmatrix.h"
@@ -284,41 +288,44 @@ void loop()
 //********************
 
 /// reset motor positions to default values
-void ResetMotors()
+void ResetMotors(bool full)
 {
 #ifdef ServoMotor                       
-  Servo_Zeroize();            
+  Servo_Zeroize(full);            
 #endif                            
 
 #ifdef ServoPWM                       
-  ServoPWM_Zeroize();              
+  ServoPWM_Zeroize(full);              
 #endif  
 
 #ifdef StepperVID
-  StepperVID_Zeroize();   
+  StepperVID_Zeroize(full);   
 #endif
  
 #ifdef StepperX27
-  StepperX27_Zeroize();  
+  StepperX27_Zeroize(full);  
 #endif
  
 #ifdef Stepper28BYJ48
-  Stepper28BYJ48_Zeroize();  
+  Stepper28BYJ48_Zeroize(full);  
 #endif
  
 #ifdef MotorPoti
-  MotorPoti_Zeroize(); 
+  MotorPoti_Zeroize(full); 
 #endif
 }
-
 
 ///check for fresh sharedMem data 
 void ReadData()
 {
   if (pull)  //send data requests if PULL mode is active
   {
-    for (byte v=0;v<VARIABLENANZAHL;v++)
-      {PullRequest(v);}
+    if (millis()-POLLTIME>lastPoll) //reduce the time between data request to prevent spamming (default POLLTIME 200 --> max of 5 attempts per second)
+    {
+      for (byte v=0;v<VARIABLENANZAHL;v++)  //request update of each data variable
+        {PullRequest(v);}
+      lastPoll=millis();
+    }
   }   
   else  
   {
@@ -332,7 +339,7 @@ void ReadData()
       #endif
       ReadResponse();   //check for new data from the windows app
     }   
-    if (millis()>lastPoll+500) //do not ask for new data for more than twice per second if no data is recieved
+    if (millis()-POLLTIME>lastPoll) //reduce the number of attempts to get new data (default POLLTIME 200 --> max of 5 attempts per second)
     {
       SendMessage("",5); // reqest new data
       lastPoll=millis();
@@ -354,10 +361,10 @@ void UpdateOutput()
     {
       #ifdef LED
         case 10: //LED (PIN is wired to GND)
-          UpdateLED_PINHIGH(x); 
+          UpdateLED(x, true); 
           break;
         case 11: //LED (PIN is wired to Vcc)
-          UpdateLED_PINLOW(x); 
+          UpdateLED(x, false); 
           break;
       #endif 
             
@@ -473,11 +480,17 @@ void UpdateInput()
 }
 
 
-///Loop through the data container and send a message to the BMSAIT App to request data update for each entry
+///Send a message to the BMSAIT App to request an update for a data variable
 void PullRequest(byte var)
 {
+  if(SERIALCOM.available())  //make sure input buffer is empty   
+  {
+    delay(1);
+    ReadResponse();
+  }
+    
   //build message string <pos>,<vartype>,<varID>
-  char nachricht[11]={0};
+  char nachricht[10]={0};
   char pos[2]={0,0};
   if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
     itoa(var,pos,10);  //write data container position as character
@@ -494,29 +507,27 @@ void PullRequest(byte var)
     nachricht[2]=',';
     nachricht[3]=datenfeld[var].format;  //add the variable type
     nachricht[4]=',';
-    for (byte lauf=0;lauf<5;lauf++)
+    for (byte lauf=0;lauf<4;lauf++)
       {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
-    nachricht[10]='\0';
+    nachricht[9]='\0';
     SendMessage(nachricht,2);
     byte x=0;
-    while ((SERIALCOM.available()<6) && (x<40)) //wait for answer, but no longer than 40ms
+    while ((SERIALCOM.available()<3) && (x<30)) //wait for answer, but no longer than 30ms
     {
       #ifdef PRIORITIZE_OUTPUT
         UpdateOutput(); //throw in another update if outputs are priorized
-        x+=15;
+        x+=10;
       #endif
       #ifdef PRIORITIZE_INPUT
         UpdateInput();   //throw in another update if inputs are priorized
-        x+=15;
+        x+=10;
       #endif
-      #if !defined PRIORITIZE_OUTPUT && !defined PRIORITIZE_INPUT
-        delay(1);
-        x++;  
-      #endif
+      delay(1);
+      x++;  
     }
     while(SERIALCOM.available()>1)  //read incoming data     
     {
-      delay(5);
+      delay(1);
       ReadResponse();
     }
 }
@@ -578,9 +589,17 @@ void ReadResponse()
         //reset motor position to zero
         SERIALCOM.flush();
         SendSysCommand("ok");
-        ResetMotors();
+        ResetMotors(true);
         Reset();
-      }       
+      }    
+      else if (inputByte_1 == ZEROIZE)
+      {
+        //reset motor position to zero
+        SERIALCOM.flush();
+        SendSysCommand("ok");
+        ResetMotors(false);
+        Reset();
+      }          
       else if (inputByte_1 == TESTON)
       {
         //confirm testmode
@@ -588,7 +607,15 @@ void ReadResponse()
         SERIALCOM.flush();
         SendSysCommand("on");
         Reset();
-      }  
+      } 
+      else if (inputByte_1 == READBACKON)
+      {
+        //confirm testmode
+        readbackmode=true;
+        SERIALCOM.flush();
+        SendSysCommand("on");
+        Reset();
+      }   
       else if (inputByte_1 == TESTOFF)
       {
         //confirm end of testmode
@@ -652,7 +679,7 @@ void ReadResponse()
             // end of data found. Validate the buffer before writing the new data into the data container
         
             int laenge=sizeof(neuer_wert.wert);            
-            if (neuer_wert.varNr<99)     //only compute the data if a valid data position is found (everything above 99 is invalid)
+            if (neuer_wert.varNr<100)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
               if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
               {
@@ -661,7 +688,7 @@ void ReadResponse()
                 memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
               }
               lastInput=millis(); //store last transmission time
-              if (testmode){DebugReadback(neuer_wert.varNr);}
+              //if (testmode){DebugReadback(neuer_wert.varNr);}
             }  
             state=0;
           }
@@ -716,7 +743,7 @@ void DebugReadback(byte posID)
 void SendSysCommand(const char text[])  
 { 
   SERIALCOM.println(text);
-  delay(10);
+  delay(5);
 }
 
 ///Send a message to the BMSAIT App
