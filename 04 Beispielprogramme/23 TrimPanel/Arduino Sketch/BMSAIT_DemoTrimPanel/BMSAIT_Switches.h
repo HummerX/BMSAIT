@@ -2,6 +2,7 @@
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
 
 
+
 typedef struct //data field structure for switches and buttons
 {
   byte pIN;                       //sets the PIN the switch is connected to
@@ -27,12 +28,12 @@ typedef struct //data field structure to define commands for rotary switches wit
 //Switch definition. If you add a switch, add a line to the following list 
 Switch schalter[]=
 {
-// <PIN>,<description>,<type>,<rotarySwitchID>,  0, <commandID when pressed>,<commandID when released>,<internal command>
-    {A3,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0}          //Example switch (Master Caution pushbutton) on PIN A0
-   ,{A4,     "Reset",       1,         0,           0,           "04",                     "00",                   1}          //Example switch (Master Caution pushbutton) on PIN A0
+// <PIN>,<description>,<type>,<rotarySwitchID>,    0, <commandID when pressed>,<commandID when released>,<internal command>
+    {2,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0}          //Example switch (Master Caution pushbutton) on PIN A0
+   ,{3,     "Reset",       1,         0,           0,           "04",                     "00",                   1}          //Example switch (Master Caution pushbutton) on PIN A0
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
-    
+
 //define commands for analog readings of a rotary switch or poti. This is an example for a 10-position switch
 //{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
 
@@ -40,7 +41,7 @@ const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);
 Rotary analogSchalter[][STATES]=
 {
  {
-  {"04",true,0,64}       //send command 04 if analog read is between 0 and 64 (of 1024)
+   {"04",true,0,64}       //send command 04 if analog read is between 0 and 64 (of 1024)
   ,{"05",true,65,177}     //send command 05 if analog read is between 65 and 177 (of 1024)
   ,{"06",true,178,291}    //send command 06 if analog read is between 178 and 291 (of 1024)
   ,{"07",true,292,405}    //send command 07 if analog read is between 292 and 405 (of 1024)

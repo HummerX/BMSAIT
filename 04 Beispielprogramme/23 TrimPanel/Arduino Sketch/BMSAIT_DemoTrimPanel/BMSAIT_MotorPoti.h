@@ -20,17 +20,22 @@ typedef struct
   int command;       //ID of the command line in BMS Windows App that links a vjoy analog axis
 }  Struc_MotorPoti;
 
+//mod
+bool reSet=false;
+//mod
+
 
 Struc_MotorPoti motorPoti[]=
 {
 	  //  PIN1	 PIN2	  pWM	  dir	   poti  	intP	 extP   command
-     {   4,     5,   254,   true,   A0,   500,   500,    1} //Motor B // Roll
-    ,{   2,     3,   254,   true,   A1,   500,   500,    2} //Motor A // Pitch
+     {   9,    10,   254,   true,   A0,   500,   500,    1} //Motor B // Roll
+    ,{   6,     5,   254,   true,   A1,   500,   500,    2} //Motor A // Pitch
 
 };
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
 
 bool error=false;
+
 
 long time_status=0; //time for new status message
 long time_pause=0; //pause when poti was moved
@@ -153,6 +158,17 @@ bool CheckDirection(byte motor,bool richtung,bool recursive)
 }
 
 
+void SignalSenden(byte mp)
+{
+  //send current analog value to BMSAIT Win App
+  char buf[9]="        ";
+  sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
+  SendMessage(buf,4);
+  delay(5);
+}
+
+
+
 void MotorPoti_Zeroize()
 {
   error=false;
@@ -234,21 +250,16 @@ void MotorPoti_Zeroize()
   }
 }
 
-void SignalSenden(byte mp)
+void ReadNewValue(byte pos)
 {
-  //send current analog value to BMSAIT Win App
-  char buf[9]="        ";
-  sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
-  SendMessage(buf,4);
-  delay(5);
-}
-
-void CheckBMS(byte pos, byte mp)
-{
+  byte mp=datenfeld[pos].target;
   //conversion of the trim axis value from BMS (-0.5..0.5) into an analog axis value (0..1024)
   float newVal=atof(datenfeld[pos].wert);
   motorPoti[mp].trimPos_ext= map((newVal*1000),-500,500,1,1023);
+}
   
+void CheckExternalMovement(byte mp)
+{
   //check if the internal trim pos matches the position in BMS
   if (motorPoti[mp].trimPos_ext>(motorPoti[mp].trimPos_int+BUFFER))
   {
@@ -279,14 +290,21 @@ void CheckInternalMovement(byte mp)
   
   if ((trimPos_Motor>(motorPoti[mp].trimPos_int+BUFFER)) || (trimPos_Motor<(motorPoti[mp].trimPos_int-BUFFER)))
   {
-    //Poti got moved. Send new value to BMSAIT Win App
-      //int difference=motorPoti[mp].trimPos_int-trimPos_Motor;
-      //if (difference<0)difference=difference*(-1);
-    
+    //Poti got moved. Send new value to BMSAIT Win App  
     motorPoti[mp].trimPos_int=trimPos_Motor;
     SignalSenden(mp);
     time_pause=(millis()+2000);  //pause check for BMS data if poti was recently moved
   }
+}
+
+//reset Trim internal/external pos to center
+void TrimReset(byte pos)
+{
+  motorPoti[pos].trimPos_int=512;
+  SignalSenden(pos);
+  
+  motorPoti[pos].trimPos_ext=512;
+  CheckExternalMovement(pos);
 }
 
 void UpdateMotorPoti(byte pos) 
@@ -309,11 +327,19 @@ void UpdateMotorPoti(byte pos)
   
   if (!error) //only continue if no error occured
   {  
+    if (reSet)
+    {
+      for (byte x=0;x<motorPotiAnz;x++)
+      { TrimReset(x);}  
+      reSet=false;
+    }
     //check external movement
     if ((curr_time>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
-      {//CheckBMS(pos,datenfeld[pos].target);
-        } 
-
+      {
+        ReadNewValue(pos);
+        CheckExternalMovement(datenfeld[pos].target);
+      } 
+      
     //check internal movement
     CheckInternalMovement(datenfeld[pos].target);
   }
