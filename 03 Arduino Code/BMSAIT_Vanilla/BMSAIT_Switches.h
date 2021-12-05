@@ -1,6 +1,6 @@
 // This module provides functions to read switches and send commands to the BMSAIT windows application
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
-
+// V1.3.7 26.09.2021
 
 typedef struct //data field structure for switches and buttons
 {
@@ -107,58 +107,96 @@ void SetupSwitches()
   }  
 }
 
-void CheckSwitches() 
+void CheckSwitches(bool all)
 {
-  //Check all buttons/switches for changes and send signals to Windows
-  for (byte index = 0; index < anzSchalter; index++)
-  {
-    if ((schalter[index].typ==1) || (schalter[index].typ==2))  //Digitaler Taster, Kippschalter, Drehschalter
+    //Check all buttons/switches for changes and send signals to Windows
+    for (byte index = 0; index < anzSchalter; index++)
     {
-      int currentPINState = digitalRead(schalter[index].pIN);
-      if (currentPINState != schalter[index].lastPINState)
-      { 
-        delay(5);        
-        schalter[index].lastPINState= currentPINState;
-        if (currentPINState==0)
+        if ((schalter[index].typ == 1) || (schalter[index].typ == 2))  //Digitaler Taster, Kippschalter, Drehschalter
         {
-          if (!(schalter[index].signalOn[0]=='0') || !(schalter[index].signalOn[1]=='0'))
-          {
-            SendMessage(schalter[index].signalOn , 3);
-          }
-        }
-        else
-        {
-          if (!(schalter[index].signalOff[0]=='0') || !(schalter[index].signalOff[1]=='0'))
-          {
-            SendMessage(schalter[index].signalOff , 3);
-          }          
-        }
-      }
-    }
-    else if (schalter[index].typ==3)  //analoger Drehschalter
-    {
-     // analog read of rotary switches 
-      uint16_t currentPINState = analogRead(schalter[index].pIN);
-      
-      if (((currentPINState > schalter[index].lastPINState+50) || (currentPINState < schalter[index].lastPINState-50) ))     //rotary switch got moved
-      { 
-        delay(20); 
-        currentPINState= analogRead(schalter[index].pIN);   
-        schalter[index].lastPINState = currentPINState;
-        for (byte lauf=0;lauf<STATES;lauf++)
-        {
-          if ((currentPINState>=analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState<analogSchalter[schalter[index].switchID][lauf].obergrenze))
-          {
-            SendMessage(analogSchalter[schalter[index].switchID][lauf].command ,3);
-            if (testmode)
+            int currentPINState = digitalRead(schalter[index].pIN);
+            if ((currentPINState != schalter[index].lastPINState) || all)
             {
-              char buf[5];
-              itoa(currentPINState,buf,10);
-              SendMessage(buf,1);
+                delay(5);
+                schalter[index].lastPINState = currentPINState;
+                if (currentPINState == 0)
+                {
+                    if (!(schalter[index].signalOn[0] == '0') || !(schalter[index].signalOn[1] == '0'))
+                    {
+                        SendMessage(schalter[index].signalOn, 3);
+                        if (debugmode)
+                        {
+                            char buf1[6];
+                            byte offset = 0;
+                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(schalter[index].pIN, buf1, 10);
+                            buf1[1 + offset] = ',';
+                            buf1[2 + offset] = 'O';
+                            buf1[3 + offset] = 'n';
+                            buf1[4 + offset] = ' ';
+                            SendMessage(buf1, 1);
+                        }
+                        if ((schalter[index].intCommand==253) && !all)
+                          {SendMessage("1", 7);} //send internal command to BMSAIT to initiate switch sync
+                        if ((schalter[index].intCommand==254) && !all)
+                          {SendMessage("2", 7);} //send internal command to BMSAIT to fast calibrate motors
+                        if ((schalter[index].intCommand==255) && !all)
+                          {SendMessage("3", 7);} //send internal command to BMSAIT for full motor calibration
+                    }
+                }
+                else
+                {
+                    if (!(schalter[index].signalOff[0] == '0') || !(schalter[index].signalOff[1] == '0'))
+                    {
+                        SendMessage(schalter[index].signalOff, 3);
+                        if (debugmode)
+                        {
+                            char buf1[6];
+                            byte offset = 0;
+                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(schalter[index].pIN, buf1, 10);
+                            buf1[1 + offset] = ',';
+                            buf1[2 + offset] = 'O';
+                            buf1[3 + offset] = 'f';
+                            buf1[4 + offset] = 'f';
+                            SendMessage(buf1, 1);
+                        }
+                    }
+                }
             }
-          }
         }
-      } 
+        else if (schalter[index].typ == 3)  //analoger Drehschalter
+        {
+            uint16_t currentPINState = analogRead(schalter[index].pIN);
+
+            if (((currentPINState > schalter[index].lastPINState + 50) || ((schalter[index].lastPINState > 50) && (currentPINState < schalter[index].lastPINState - 50))) || all)     //rotary switch got moved
+            {
+                delay(20);
+                currentPINState = analogRead(schalter[index].pIN);
+                schalter[index].lastPINState = currentPINState;
+                for (byte lauf = 0; lauf < STATES; lauf++)
+                {
+                    if ((currentPINState >= analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState <= analogSchalter[schalter[index].switchID][lauf].obergrenze))
+                    {
+                        SendMessage(analogSchalter[schalter[index].switchID][lauf].command, 3);
+                        if (debugmode)
+                        {
+                            char buf1[4];
+                            byte offset = 0;
+                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(schalter[index].pIN, buf1, 10);
+                            buf1[1 + offset] = ',';
+                            buf1[2 + offset] = '\0';
+                            char buf2[5];
+                            itoa(currentPINState, buf2, 10);
+                            char buf3[9] = "";
+                            strcpy(buf3, buf1);
+                            strcat(buf3, buf2);
+                            SendMessage(buf3, 1);
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
 }

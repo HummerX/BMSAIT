@@ -1,4 +1,6 @@
 // settings and functions to drive servo motors (via pwm motor shield)
+// V1.3.7 26.09.2021
+
 //target= reference link to the line of the servodataPWM table of this module
 //ref2= not used
 //ref3= not used
@@ -48,7 +50,7 @@ void SetupServoPWM()
   delay(1000);
 }
 
-void ServoPWM_Zeroize(void)
+void ServoPWM_Zeroize(bool mode)
 {
   for (byte x=0;x<servozahlPWM;x++) //move all servos to min position
   {  
@@ -56,19 +58,22 @@ void ServoPWM_Zeroize(void)
     pwm.setPWM(x, 0, pulselength);
     delay(10);
   }
-  delay(1000);
-  for (byte x=0;x<servozahlPWM;x++) //move all servos to max position
-  {  
-    int pulselength = map(180, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
-    pwm.setPWM(x, 0, pulselength);
-    delay(10);
-  }
-  delay(1000);
-  for (byte x=0;x<servozahlPWM;x++) //move all servos to center position
-  {  
-    int pulselength = map(90, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
-    pwm.setPWM(x, 0, pulselength);
-    delay(10);
+  if (mode)
+  {
+    delay(1000);
+    for (byte x=0;x<servozahlPWM;x++) //move all servos to max position
+    {  
+      int pulselength = map(180, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
+      pwm.setPWM(x, 0, pulselength);
+      delay(10);
+    }
+    delay(1000);
+    for (byte x=0;x<servozahlPWM;x++) //move all servos to center position
+    {  
+      int pulselength = map(90, 0, 180, servodataPWM[x].minPulse, servodataPWM[x].maxPulse);
+      pwm.setPWM(x, 0, pulselength);
+      delay(10);
+    }
   }
 }
 
@@ -79,7 +84,7 @@ void UpdateServoPWM(int d)
   if (servodataPWM[servoID].lu+5000<millis())
   {
     pwm.sleep();         //set servo to sleep mode if no new signal arrived since 5 seconds
-    if (testmode){SendMessage("PWM went to sleep",1);}
+    if (debugmode){SendMessage("PWM went to sleep",1);}
   }  
     
   if (servodataPWM[servoID].lu + SERVODELAYPWM < millis())

@@ -1,4 +1,6 @@
 // settings and functions to display numbers on 7-segment-displays
+// V1.3.7 26.09.2021
+
 //target= device ID (if multiple displays are connected
 //ref2= not used
 //ref3= number of figures to display

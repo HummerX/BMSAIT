@@ -1,7 +1,7 @@
-
 // This LEDDisplayDriver.h library is used to drive a TM1637 module with 6 digits
 // Manual for library: http://lygte-info.dk/project/DisplayDriver%20UK.html
 // By HKJ from lygte-info.dk
+// V1.3.7 26.09.2021
 
 // settings and functions to display numbers on 7-segment-displays
 //target= device ID (if multiple displays are connected

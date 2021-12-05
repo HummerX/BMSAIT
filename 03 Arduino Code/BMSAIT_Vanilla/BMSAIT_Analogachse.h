@@ -1,4 +1,5 @@
 // This module allows to read analog inputs and send changes to the BMSAIT App 
+// V1.3.7 26.09.2021
 
 #define ATH 3   //Analog Threshold. A change of the analog value will only be considered as a movement if a change in readings is above the threshold value
 
@@ -26,7 +27,7 @@ void SetupAnalog()
     }
 }
 
-void ReadAnalogAxis()
+void ReadAnalogAxis(bool all)
 {
 
     for (int axisIndex=0; axisIndex < axisCount; axisIndex++) //run through all axis
@@ -34,14 +35,14 @@ void ReadAnalogAxis()
 
       int currAxisVal = analogRead(analogaxis[axisIndex].pIN);
 
-      if (((currAxisVal+ATH)<analogaxis[axisIndex].val) || ((currAxisVal-ATH)>analogaxis[axisIndex].val)) //check if axis got moved
+      if ((((currAxisVal+ATH)<analogaxis[axisIndex].val) || ((currAxisVal-ATH)>analogaxis[axisIndex].val)) || all) //check if axis got moved
       {
         // send new value to the BMSAIT App
         char buf[9]="        ";
         sprintf (buf, "%03u,%04u",analogaxis[axisIndex].command,currAxisVal);
         SendMessage(buf,4);
         
-        if (testmode){SendMessage(buf,1);}
+        if (debugmode){SendMessage(buf,1);}
                 
         //memorize new value
         analogaxis[axisIndex].val=currAxisVal;

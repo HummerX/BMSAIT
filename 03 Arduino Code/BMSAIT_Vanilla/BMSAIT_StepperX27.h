@@ -34,7 +34,7 @@ SwitecX25 stepperX27[stepperzahlX27]=
 }; 
 
 
-void StepperX27_Zeroize()
+void StepperX27_Zeroize(bool mode)
 {
   unsigned long now=0;
   for (byte x=0;x<stepperzahlX27;x++)
@@ -45,36 +45,39 @@ void StepperX27_Zeroize()
     {
       stepperX27[x].setPosition(1);
     }
-    now=millis();
-    while (now>(millis()-2000))
+    if (mode)
     {
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
+      delay(1000);
       for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
-    }
-    delay(1000);
-    for (byte x=0;x<stepperzahlX27;x++)
-    {
-      stepperX27[x].setPosition(stepperdataX27[x].arc-1);
-    }
-    now=millis();
-    while (now>(millis()-2000))
-    {
+      {
+        stepperX27[x].setPosition(stepperdataX27[x].arc-1);
+      }
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
+      delay(1000);
       for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
-    }
-    delay(1000);
-    for (byte x=0;x<stepperzahlX27;x++)
-    {
-      stepperX27[x].setPosition(1);
-    }
-    now=millis();
-    while (now>(millis()-2000))
-    {
-      for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
+      {
+        stepperX27[x].setPosition(1);
+      }
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
     }
   }
 }

@@ -1,4 +1,6 @@
 // settings and functions to drive servo motors (directly connected to the arduino)
+// V1.3.7 26.09.2021
+
 //target= reference link to the line of the servodata table of this module
 //ref2= not used
 //ref3= not used
@@ -43,18 +45,21 @@ void SetupServo()
   }
 }
 
-void Servo_Zeroize(void)
+void Servo_Zeroize(bool mode)
 {
   for (byte lauf=0;lauf<SERVOZAHL;lauf++)
   {
     if (!servo[lauf].attached())
         {servo[lauf].attach(servodata[lauf].pIN);}  //reactivate servo
     servo[lauf].write(servodata[lauf].p_ug);
-    delay(1000);
-    servo[lauf].write(servodata[lauf].p_og);
-    delay(1000);
-    servo[lauf].write(servodata[lauf].p_og - servodata[lauf].p_ug);
-    delay(200);
+    if (mode)
+    {
+      delay(1000);
+      servo[lauf].write(servodata[lauf].p_og);
+      delay(1000);
+      servo[lauf].write(servodata[lauf].p_og - servodata[lauf].p_ug);
+      delay(200);
+    }
     servo[lauf].detach();
   }
 }

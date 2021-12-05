@@ -1,5 +1,7 @@
 // settings and functions to drive multiple stepper motors (x27-168 recommended) using a VID6606 controller chip
 // The VID6606 allows to drive the X25.168 at its range of 315 degrees with 12 steps per degree (3780 steps total).
+// V1.3.7 26.09.2021
+
 //target= reference link to the line of the stepperdataVID table of this module
 //ref2= not used
 //ref3= not used
@@ -34,7 +36,7 @@ int prevVID=1;
 
 
 
-void StepperVID_Zeroize(void)
+void StepperVID_Zeroize(bool mode)
 {
   unsigned long now=0;
   for (byte x=0;x<STEPPERZAHLVID;x++)
@@ -43,36 +45,38 @@ void StepperVID_Zeroize(void)
     stepperVID[x].zero();
   }
   delay(1000);
-  
-  //Set target position of all steppers to max
-  //3 seconds to allow steppers to move to new position
-  for (byte x=0;x<STEPPERZAHLVID;x++)
-  { stepperVID[x].setPosition(stepperdataVID[x].arc-1);}
-  now=millis();
-  while (now>(millis()-3000))
+  if (mode)
   {
+    //Set target position of all steppers to max
+    //3 seconds to allow steppers to move to new position
     for (byte x=0;x<STEPPERZAHLVID;x++)
+    { stepperVID[x].setPosition(stepperdataVID[x].arc-1);}
+    now=millis();
+    while (now>(millis()-3000))
+    {
+      for (byte x=0;x<STEPPERZAHLVID;x++)
+        {
+          stepperVID[x].update();
+          delayMicroseconds(100);
+        } 
+    }
+  
+    //bring Steppers back down to 0
+    //3 seconds to allow steppers to move to new position
+    for (byte x=0;x<STEPPERZAHLVID;x++)
+        {
+          stepperVID[x].setPosition(1);
+        }
+    now=millis();
+    while (now>(millis()-3000))
+    {
+      for (byte x=0;x<STEPPERZAHLVID;x++)
       {
         stepperVID[x].update();
         delayMicroseconds(100);
-      } 
-  }
-
-  //bring Steppers back down to 0
-  //3 seconds to allow steppers to move to new position
-  for (byte x=0;x<STEPPERZAHLVID;x++)
-      {
-        stepperVID[x].setPosition(1);
       }
-  now=millis();
-  while (now>(millis()-3000))
-  {
-    for (byte x=0;x<STEPPERZAHLVID;x++)
-    {
-      stepperVID[x].update();
-      delayMicroseconds(100);
-    }
-  }  
+    }  
+  }
 }
 
 

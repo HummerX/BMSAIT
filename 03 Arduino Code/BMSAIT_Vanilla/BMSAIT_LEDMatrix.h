@@ -1,4 +1,6 @@
 // settings and functions to display numbers on 7-segment-displays
+// V1.3.7 26.09.2021
+
 // datenfeld.target defines the Max7219 device
 // datenfeld.ref2 defines the row of a LED
 // datenfeld.ref3 defines the column of a LED

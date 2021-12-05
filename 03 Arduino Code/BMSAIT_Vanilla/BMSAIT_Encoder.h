@@ -1,6 +1,6 @@
 // This module provides functions to read rotary encoders and sends commands to the BMSAIT windows application
 // Encoder coding by https://www.nikolaus-lueneburg.de/2016/02/rotary-encoder/
-
+// V1.3.7 26.09.2021
 void doEncoderA();
 void doEncoderB();
 

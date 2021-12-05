@@ -1,5 +1,6 @@
  // Display of the DED or the PFL on a 256x64 OLED display
  // inspired by the DEDuino coding by Uri_ba (https://pit.uriba.org/tag/deduino/)
+ // V1.3.7 26.09.2021
 
   #include <U8g2lib.h>
   #include "FalconDEDFont.h"   //load font
@@ -88,7 +89,7 @@ void UpdateDED()
 { 
   if ((millis()-lastInput)>10000) //if no data was recieved within 10 seconds, shut down display
   {
-    if (!testmode) //in testmode, display remains on regardless of data transfer status
+    if (!debugmode) //in debugmode, display remains on regardless of data transfer status
     {
       ClearDED();
       displayDED.setPowerSave(1);

@@ -1,3 +1,5 @@
+// V1.3.7 26.09.2021
+
 #include <U8g2lib.h>
 
 //constructor of U8G2 Lib
@@ -72,7 +74,7 @@ void UpdateOLED(byte pos)
 {
   if ((millis()-lastInput)>10000) //if no data was recieved within 10 seconds, shut down display
   {
-    if (!testmode) //display remains on in testmode
+    if (!debugmode) //display remains on in debugmode
     {
       ClearDisplayOLED();
       delay(1);

@@ -1,29 +1,30 @@
-// Version: 1.3.2    29.01.2021
+// Version: 1.3.7    5.12.2021
 
 
 
 //MODULE SELECTION - uncomment the modules you want to use.
    
-  //#define LED               //drive LEDs
-  //#define LEDMatrix         //drive LED Matrix using a MAX7219 controller
-  //#define LCD               //drive LCD display
-  //#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
-  //#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
-  //#define ServoMotor        //drive servo motors directly connected to the arduino
-  //#define ServoPWM          //drive multiple servo motors via pwm shield
-  //#define StepperBYJ        //drive stepper motor 28BYJ-48
-  //#define StepperX27        //drive stepper motor X27.168
-  //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
-  //#define MotorPoti         //motor-driven poti control
-  //#define OLED              //display data on an OLED display
-  //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)
-  //#define FuelFlowIndicator //Enable display of the FuelFlow indicator on an 128x64 OLED display (DEDunino)
-  //#define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display (DEDunino)
-  //#define Switches          //use the arduino to read switch positions and send keyboard commands
-  //#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
-  //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
-  //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
-  //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
+  #define LED               //drive LEDs
+  #define LEDMatrix         //drive LED Matrix using a MAX7219 controller
+  #define LCD               //drive LCD display
+  #define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
+  #define SSegTM1637        //drive 7-Segment displays via TM1367 controller
+  #define SLx2016           //drive 4-digit 5x7 dotmatrix modules
+  #define ServoMotor        //drive servo motors directly connected to the arduino
+  #define ServoPWM          //drive multiple servo motors via pwm shield
+  #define StepperBYJ        //drive stepper motor 28BYJ-48
+  #define StepperX27        //drive stepper motor X27.168
+  #define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
+  #define MotorPoti         //motor-driven poti control
+  #define OLED              //display data on an OLED display
+  #define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)
+  #define FuelFlowIndicator //Enable display of the FuelFlow indicator on an 128x64 OLED display (DEDunino)
+  #define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display (DEDunino)
+  #define Switches          //use the arduino to read switch positions and send keyboard commands
+  #define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
+  #define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
+  #define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
+  #define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
 
 
@@ -64,7 +65,7 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description ID    DT    OT    target Ref2 Ref3 Ref4 Ref5  IV
-       {"ENGFI",  "1506", 'b',  12,    1,     2,   4,   0,   0,   "F"}     //Example Variable 0 - Right Eyebrow Engine Fire
+      //Description ID    DT    OT    target Ref2 Ref3 Ref4 Ref5  RQ   IV
+       {"ENGFI",  "1506", 'b',  12,    1,     2,   4,   0,   0,   "",  "F"}     //Example Variable 0 - Right Eyebrow Engine Fire
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

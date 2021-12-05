@@ -1,10 +1,11 @@
 // settings and functions to drive a motor driven potentiometer
+// V1.3.7 26.09.2021
 
 #define DIR_DELAY 50 // brief delay for abrupt motor changes
 #define BUFFER 10     // threshold that needs to be crossed to consider a change on the analog value as a movement
 
 //function declaration
-void MotorPoti_Zeroize();
+void MotorPoti_Zeroize(bool mode);
 
 typedef struct 
 {
@@ -31,23 +32,6 @@ bool error=false;
 long time_status=0; //time for new status message
 long time_pause=0; //pause when poti was moved
 
-void SetupMotorPoti() 
-{
-  for (byte x=0;x<motorPotiAnz;x++)
-  {
-    byte mp=x;
-    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
-    pinMode( motorPoti[mp].pIN1, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN1, LOW );
-    pinMode( motorPoti[mp].pIN2, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN2, LOW );
-  }
-  time_status=0;
-  time_pause=0;
-  SendMessage("Setup complete",1);
-  MotorPoti_Zeroize();
-  SendMessage("Zeroize complete",1);
-}
 
 void MotorMoveCW(byte mp)
 {
@@ -136,7 +120,7 @@ bool CheckDirection(byte motor,bool richtung,bool recursive)
 }
 
 
-void MotorPoti_Zeroize()
+void MotorPoti_Zeroize(bool mode)
 {
   error=false;
   byte result;
@@ -180,6 +164,24 @@ void MotorPoti_Zeroize()
       SendMessage("Fehler beim Initalisieren der MotorPotis",1);
     }
   }
+}
+
+void SetupMotorPoti() 
+{
+  for (byte x=0;x<motorPotiAnz;x++)
+  {
+    byte mp=x;
+    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
+    pinMode( motorPoti[mp].pIN1, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN1, LOW );
+    pinMode( motorPoti[mp].pIN2, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN2, LOW );
+  }
+  time_status=0;
+  time_pause=0;
+  SendMessage("Setup complete",1);
+  MotorPoti_Zeroize(false);
+  SendMessage("Zeroize complete",1);
 }
 
 void SignalSenden(byte mp)
@@ -245,7 +247,7 @@ void UpdateMotorPoti(byte pos)
     time_status=curr_time;
     if (error)
       {SendMessage("Motorpotis deaktiviert",1);}
-    else if (testmode)
+    else if (debugmode)
     {
       char buf[9]="        ";
       sprintf (buf, "%03u,%04u", motorPoti[datenfeld[pos].target].command, motorPoti[datenfeld[pos].target].trimPos_int);
@@ -258,7 +260,7 @@ void UpdateMotorPoti(byte pos)
   if (!error) //only continue if no error occured
   {  
     //check external movement
-    if ((curr_time>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
+    if ((curr_time>time_pause)&&(!debugmode))   //pause check for BMS data if poti was recently moved
       {//CheckBMS(pos,datenfeld[pos].target);
         } 
 

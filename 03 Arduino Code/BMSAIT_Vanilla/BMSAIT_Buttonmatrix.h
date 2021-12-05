@@ -1,5 +1,5 @@
 // This module allows to read button states in a matrix configuration
-
+// V1.3.7 26.09.2021
 
 byte rows[] = {2,3,4};
 const int rowCount = sizeof(rows)/sizeof(rows[0]);
@@ -30,16 +30,16 @@ void SetupButtonMatrix()
     }    
 }
  
-void ButtonmatrixRead() 
+void ButtonMatrixRead() 
 {
     for (int colIndex=0; colIndex < colCount; colIndex++) 
     {
-        // interate through the columns
+        // run through the columns
         byte curCol = cols[colIndex];
         pinMode(curCol, OUTPUT);
         digitalWrite(curCol, LOW);
  
-        // interate through the rows
+        // run through the rows
         for (int rowIndex=0; rowIndex < rowCount; rowIndex++) 
         {
             byte rowCol = rows[rowIndex];

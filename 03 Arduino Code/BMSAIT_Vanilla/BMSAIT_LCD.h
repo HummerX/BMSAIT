@@ -1,4 +1,6 @@
 // settings and functions to display data on a LCD screen (16x2 / 20x4)
+// V1.3.7 26.09.2021
+
 // datenfeld.target defines the LCD device
 // datenfeld.ref2 defines the line of the LCD display
 // datenfeld.ref3 defines the number of characters of the variable to be displayed
