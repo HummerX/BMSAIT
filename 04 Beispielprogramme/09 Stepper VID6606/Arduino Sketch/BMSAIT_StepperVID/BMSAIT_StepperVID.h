@@ -12,7 +12,7 @@ typedef struct
 {
 byte pIN[2];    //PINs the motor is connected to (PIN1:on/off ; PIN2: direction)
 uint16_t arc;   //max steps for the motor
-float last;     //current target
+uint16_t last;     //current target
 }StepperdataVID;
 
 unsigned long lastUpdateVID=0;
@@ -34,7 +34,7 @@ int prevVID=1;
 
 
 
-void StepperVID_Zeroize(void)
+void StepperVID_Zeroize(bool full)
 {
   unsigned long now=0;
   for (byte x=0;x<STEPPERZAHLVID;x++)
@@ -42,37 +42,41 @@ void StepperVID_Zeroize(void)
     // bring steppers to 0 position
     stepperVID[x].zero();
   }
-  delay(1000);
   
-  //Set target position of all steppers to max
-  //3 seconds to allow steppers to move to new position
-  for (byte x=0;x<STEPPERZAHLVID;x++)
-  { stepperVID[x].setPosition(stepperdataVID[x].arc-1);}
-  now=millis();
-  while (now>(millis()-3000))
+
+  if (full)  //check full range of motors
   {
+    delay(1000);
+    //Set target position of all steppers to max
+    //3 seconds to allow steppers to move to new position
     for (byte x=0;x<STEPPERZAHLVID;x++)
+    { stepperVID[x].setPosition(stepperdataVID[x].arc-1);}
+    now=millis();
+    while (now>(millis()-3000))
+    {
+      for (byte x=0;x<STEPPERZAHLVID;x++)
+        {
+          stepperVID[x].update();
+          delayMicroseconds(100);
+        } 
+    }
+  
+    //bring Steppers back down to 0
+    //3 seconds to allow steppers to move to new position
+    for (byte x=0;x<STEPPERZAHLVID;x++)
+        {
+          stepperVID[x].setPosition(1);
+        }
+    now=millis();
+    while (now>(millis()-3000))
+    {
+      for (byte x=0;x<STEPPERZAHLVID;x++)
       {
         stepperVID[x].update();
         delayMicroseconds(100);
-      } 
-  }
-
-  //bring Steppers back down to 0
-  //3 seconds to allow steppers to move to new position
-  for (byte x=0;x<STEPPERZAHLVID;x++)
-      {
-        stepperVID[x].setPosition(1);
       }
-  now=millis();
-  while (now>(millis()-3000))
-  {
-    for (byte x=0;x<STEPPERZAHLVID;x++)
-    {
-      stepperVID[x].update();
-      delayMicroseconds(100);
-    }
-  }  
+    } 
+  } 
 }
 
 
@@ -87,7 +91,7 @@ void SetupStepperVID(void)
 ///iniate a single step movement 
 void UpdateStepperVID(byte pos)
 {
-  float newVal=atof(datenfeld[pos].wert);
+  uint16_t newVal=atoi(datenfeld[pos].wert);
   if (newVal!=stepperdataVID[datenfeld[pos].target].last)
   {
     unsigned short NewStepperPos=map(newVal,0,65535,0,stepperdataVID[datenfeld[pos].target].arc);

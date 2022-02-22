@@ -1,4 +1,4 @@
-// Version: 1.3.2    29.01.2021
+// Version: 1.3.7    5.12.2021
 
 
 
@@ -30,7 +30,7 @@
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
-  //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
+  #define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_DemoStepperVID"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
 
@@ -64,7 +64,7 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description ID       DT      OT    target Ref2 Ref3 Ref4 Ref5  IV
-      {   "RPM",   "0340",   'f',    52,      0,   0,   0,   0,   0,   "0.0"}     //Example Variable 0 - RPM
+      //Description ID       DT      OT    target Ref2 Ref3 Ref4 Ref5 RQ  IV
+      {   "RPM",   "0341",   'i',    52,      0,   0,   0,   0,   0,  "", "0"}     //Example Variable 0 - RPM
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
