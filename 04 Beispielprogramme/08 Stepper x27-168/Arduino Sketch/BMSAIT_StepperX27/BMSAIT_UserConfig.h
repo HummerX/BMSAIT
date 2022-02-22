@@ -1,4 +1,4 @@
-// Version: 1.3.2    29.01.2021
+// Version: 1.3.7    5.12.2021
 
 
 
@@ -9,6 +9,7 @@
   //#define LCD               //drive LCD display
   //#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
   //#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
+  //#define SLx2016           //drive 4-digit 5x7 dotmatrix modules
   //#define ServoMotor        //drive servo motors directly connected to the arduino
   //#define ServoPWM          //drive multiple servo motors via pwm shield
   //#define StepperBYJ        //drive stepper motor 28BYJ-48
@@ -64,8 +65,8 @@
   
   Datenfeld datenfeld[]=
     {
-      //Description   ID     DT    OT    target Ref2 Ref3 Ref4 Ref5  IV
-       {  "RPM",   "0340",  'f',   50,     0,    0,   0,   0,   0,   "0.0"}     //Example Variable - RPM
+      //Description   ID     DT    OT    target Ref2 Ref3 Ref4 Ref5  RQ  IV
+       {  "RPM",   "0341",  'i',   51,     0,    0,   0,   0,   0,   "", "0"}     //Example Variable - RPM
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
 

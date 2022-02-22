@@ -12,9 +12,6 @@ typedef struct
 {
 byte pIN[4];     //PINs the motor is connected to
 uint16_t arc;    //max steps for the motor
-byte arctable;   //reference to a separate function to calibrate nonlinear movements
-int minVal;      //minimum value of gauge
-int maxVal;      //maximum value of gauge
 float last;      //current target
 } StepperdataX27;
 
@@ -22,8 +19,8 @@ unsigned long lastUpdateX27=0;
 
 StepperdataX27 stepperdataX27[] =
 {
-  //  {PIN1 PIN2 PIN3 PIN4}    arc         last
-    { {  2,   3,   4,   5   }, 315*3 ,      0   }  // example: FTIT
+  //  {PIN1 PIN2 PIN3 PIN4}    arc      last
+    { {  2,   3,   4,   5   }, 315*3 ,   0   }  // example: RPM
 };
 
 const int stepperzahlX27 = sizeof(stepperdataX27)/sizeof(stepperdataX27[0]);
@@ -34,7 +31,7 @@ SwitecX25 stepperX27[stepperzahlX27]=
 }; 
 
 
-void StepperX27_Zeroize()
+void StepperX27_Zeroize(bool mode)
 {
   unsigned long now=0;
   for (byte x=0;x<stepperzahlX27;x++)
@@ -45,36 +42,39 @@ void StepperX27_Zeroize()
     {
       stepperX27[x].setPosition(1);
     }
-    now=millis();
-    while (now>(millis()-2000))
+    if (mode)
     {
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
+      delay(1000);
       for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
-    }
-    delay(1000);
-    for (byte x=0;x<stepperzahlX27;x++)
-    {
-      stepperX27[x].setPosition(stepperdataX27[x].arc-1);
-    }
-    now=millis();
-    while (now>(millis()-2000))
-    {
+      {
+        stepperX27[x].setPosition(stepperdataX27[x].arc-1);
+      }
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
+      delay(1000);
       for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
-    }
-    delay(1000);
-    for (byte x=0;x<stepperzahlX27;x++)
-    {
-      stepperX27[x].setPosition(1);
-    }
-    now=millis();
-    while (now>(millis()-2000))
-    {
-      for (byte x=0;x<stepperzahlX27;x++)
-        {stepperX27[x].update();}
-      delay(1);
+      {
+        stepperX27[x].setPosition(1);
+      }
+      now=millis();
+      while (now>(millis()-2000))
+      {
+        for (byte x=0;x<stepperzahlX27;x++)
+          {stepperX27[x].update();}
+        delay(1);
+      }
     }
   }
 }
@@ -102,5 +102,4 @@ void UpdateStepperX27(byte pos)
   }
   if (millis()-lastUpdateX27<5000)  //sleep if no new data since 5 seconds
    {stepperX27[datenfeld[pos].target].update();}
-  
 }
