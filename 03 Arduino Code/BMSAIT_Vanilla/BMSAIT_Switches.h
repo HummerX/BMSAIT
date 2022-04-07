@@ -1,6 +1,7 @@
+// V1.3.7 26.09.2021
 // This module provides functions to read switches and send commands to the BMSAIT windows application
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
-// V1.3.7 26.09.2021
+
 
 typedef struct //data field structure for switches and buttons
 {
@@ -98,12 +99,20 @@ void SetupSwitches()
     pinMode(schalter[index].pIN, INPUT_PULLUP);
     schalter[index].lastPINState=digitalRead(schalter[index].pIN);
     }
-    else
+    else if (schalter[index].typ==3)
     {
     //setup for analog reading of PIN x
-    pinMode(schalter[index].pIN, INPUT);
+    pinMode(schalter[index].pIN, INPUT_PULLUP);
     schalter[index].lastPINState=analogRead(schalter[index].pIN);  
     }
+    else if (schalter[index].typ==4)
+    {
+    //setup rotary encoders
+    
+    
+    }    
+    else
+    {}
   }  
 }
 

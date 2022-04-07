@@ -5,6 +5,9 @@
 // datenfeld.ref2 sets LED brightness (0..255) -->works on pwm PINs only!
 // datenfeld.ref2 sets a timemark for fast blink (2 switches per second)
 // datenfeld.ref3 sets a timemark for slow blink (1 switch per second)
+#ifdef ESP  
+  #include <analogWrite.h>
+#endif
 
 #define BLINKSPEED 500  //pause (in ms) between on/off for fast blinking. Slow blinking will be 50%
 

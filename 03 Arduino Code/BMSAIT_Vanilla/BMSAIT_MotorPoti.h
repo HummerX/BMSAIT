@@ -4,6 +4,10 @@
 #define DIR_DELAY 50 // brief delay for abrupt motor changes
 #define BUFFER 10     // threshold that needs to be crossed to consider a change on the analog value as a movement
 
+#ifdef ESP  
+  #include <analogWrite.h>
+#endif
+
 //function declaration
 void MotorPoti_Zeroize(bool mode);
 
@@ -183,6 +187,9 @@ void SetupMotorPoti()
   MotorPoti_Zeroize(false);
   SendMessage("Zeroize complete",1);
 }
+
+void MotorPoti_FastUpdate()
+{}
 
 void SignalSenden(byte mp)
 {

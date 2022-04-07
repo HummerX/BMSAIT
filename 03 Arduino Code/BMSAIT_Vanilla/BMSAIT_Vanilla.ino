@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.8   5.12.2021
+// Version: 1.3.13   30.3.22
 // Robin "Hummer" Bruns
 
 
@@ -14,9 +14,9 @@
   #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
-  #define TESTON  190         // activates debugmode
-  #define READBACKON 191      // activates debugmode with readback of data variables
-  #define TESTOFF 200         // deactivates debugmode
+  #define TESTON  190         // activates testmode
+  #define READBACKON 191      // activates testmode with readback of data variables
+  #define TESTOFF 200         // deactivates testmode
   #define VAR_BEGIN '<'       // char to mark the begin of the actual data
   #define VAR_ENDE '>'        // char to mark the end of the actual data
   #define TYP_ANFANG '{'      // char to mark the begin of the type definition in a message string
@@ -24,7 +24,7 @@
   
 //Function headers
   void ReadData();
-  void UpdateInput(bool all);
+  void UpdateInput();
   void UpdateOutput();
   void PullRequest(byte v);
   void ReadResponse();     
@@ -32,7 +32,9 @@
   void SendSysCommand(const char text[]); 
   void SendMessage(const char message[], byte option);
   void ResetMotors();
-
+  void FastUpdate();
+  bool CheckForSysCommand(byte SysCmd);
+  
 //Struct definitions
   typedef struct //data field structure for storage of data variables
   {
@@ -66,7 +68,7 @@
   byte state =0;              //marker to memorize the current position in a message string
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
   bool debugmode=false;        //debugmode on/off
-  bool readbackmode=false;    //Readbackmode on/off
+  bool readbackmode=false;        //Readbackmode on/off
   unsigned long lastInput =0; //last successful transmission
   
   #ifdef DUE_NATIVE
@@ -157,6 +159,11 @@
   #include "BMSAIT_StepperVID.h"
 #endif  
 
+//Compass setting
+#ifdef CompassX27                  
+  #include "BMSAIT_CompassX27.h"
+#endif  
+
 //motor poti settings
 #ifdef MotorPoti 
   #include "BMSAIT_MotorPoti.h"
@@ -176,6 +183,10 @@
 
 #ifdef DED_PFL                             
   #include "BMSAIT_DED_PFL.h"
+#endif
+
+#ifdef Lighting                             
+  #include "BMSAIT_Lighting.h"
 #endif
 
 //example how to add your own project to this sketch. 
@@ -216,7 +227,7 @@ void setup()
   #ifdef SLx2016                        //Dotmatrix-display SLx2016 setup begin
    SetupSLx2016();
   #endif                                //Dotmatrix-display SLx2016 setup end
-                      
+                              
   #ifdef ServoMotor                     //servo setup begin
    SetupServo();
   #endif                                //servo setup end
@@ -236,7 +247,11 @@ void setup()
   #ifdef StepperVID                     //stepper on controller board setup begin
    SetupStepperVID();
   #endif                                //stepper setup end
-  
+
+  #ifdef CompassX27                     //Compass setup start
+   SetupCompassX27();
+  #endif                                //Compass setup end
+
   #ifdef MotorPoti                      //MotorPoti setup begin
     SetupMotorPoti();
   #endif                                //MotorPoti setup end
@@ -272,11 +287,14 @@ void setup()
   #ifdef AnalogAxis                     //Analog axis setup begin
    SetupAnalog();
   #endif                                //Analog axis setup end  
-  
+
+  #ifdef Lighting                       //Lighting axis setup begin     
+   SetupLighting();
+  #endif                                //Lighting axis setup end 
+
   #ifdef NewDevice                      //Example. Use this placeholder to activate your own projects
     SetupNewDevice();
   #endif                                //Example end
-
 
  //precompile pull messages
   char pos[2]={0,0};
@@ -304,17 +322,18 @@ void setup()
   }
 }
 
-
 /// Main loop
 void loop()              
 {
+  FastUpdate();
   delay(1);
-  
+  FastUpdate();
   ReadData();  //get new data from PC
-
+  FastUpdate();
   UpdateInput(false); //check input devices (switches, buttons)
-  
+  FastUpdate();
   UpdateOutput(); //update outputs (LEDs, motors, displays)
+  FastUpdate();
 }
 
 //********************
@@ -343,10 +362,46 @@ void ResetMotors(bool full)
 #ifdef Stepper28BYJ48
   Stepper28BYJ48_Zeroize(full);  
 #endif
- 
+
+#ifdef CompassX27
+  CompassX27_Zeroize(full);
+#endif 
+
 #ifdef MotorPoti
   MotorPoti_Zeroize(full); 
 #endif
+}
+
+///Call for another update of the motors to allow for fast, fluent movement
+void FastUpdate()
+{
+#ifdef ServoMotor                       
+  Servo_FastUpdate();            
+#endif                            
+
+#ifdef ServoPWM                       
+  ServoPWM_FastUpdate();              
+#endif 
+
+#ifdef StepperVID
+  StepperVID_FastUpdate();   
+#endif
+ 
+#ifdef StepperX27
+  StepperX27_FastUpdate();  
+#endif
+ 
+#ifdef Stepper28BYJ48
+  Stepper28BYJ48_FastUpdate();  
+#endif 
+
+#ifdef CompassX27
+  CompassX27_FastUpdate();
+#endif      
+
+#ifdef MotorPoti
+  MotorPoti_FastUpdate(); 
+#endif  
 }
 
 ///check for fresh sharedMem data 
@@ -356,11 +411,8 @@ void ReadData()
   {
     if (millis()-POLLTIME>lastPoll) //reduce the time between data request to prevent spamming (default POLLTIME 200 --> max of 5 attempts per second)
     {
-      for (byte v=0;v<VARIABLENANZAHL;v++) //request update of each data variable
-        {
-          PullRequest(v);
-          delay(1);
-        }
+      for (byte v=0;v<VARIABLENANZAHL;v++)  //request update of each data variable
+        {PullRequest(v);}
       lastPoll=millis();
     }
   }   
@@ -434,7 +486,7 @@ void UpdateOutput()
           UpdateSLx2016(x);
           break;
       #endif
-      
+
       #ifdef ServoMotor
         case 40: //standard Servos (i.e. SG90)
           UpdateServo(x);
@@ -464,6 +516,12 @@ void UpdateOutput()
           UpdateStepperVID(x);
           break;
       #endif
+
+      #ifdef CompassX27
+        case 53: //compass driven by X-class stepper motor
+          UpdateCompassX27(x);
+          break;
+      #endif
       
       #ifdef MotorPoti
         case 60: //MotorPoti
@@ -489,6 +547,12 @@ void UpdateOutput()
           break;      
       #endif
       
+      #ifdef Lighting
+        case 80: //Backlighting
+          UpdateLighting(x);
+          break;      
+      #endif
+      
       #ifdef NewDevice  //define this flag in the top of BMSAIT_UserConfig.h to activate this block ("#define newDevice")
         case 69: //assign this type to a variable in the data container to call a new method
           UpdateNewDevice(x);  //program a new method void Update_newDevice(int p){command1;command2;...}to enable your device 
@@ -506,19 +570,19 @@ void UpdateOutput()
 void UpdateInput(bool all)
 {
   #ifdef Switches              
-   CheckSwitches(all);       //check switch positions and initiate commands if switches were moved
+   CheckSwitches(all);            //check switch positions and initiate commands if switches were moved
   #endif
                                  
   #ifdef ButtonMatrix         
-   ButtonMatrixRead();       //check button matrix for changes and initiate commands if switches were moved 
+   ButtonMatrixRead();         //check button matrix for changes and initiate commands if switches were moved 
   #endif
   
   #ifdef RotEncoder              
-   CheckEncoder();           //check encoders and initiate commands if they were moved
+   CheckEncoder();            //check encoders and initiate commands if they were moved
   #endif
   
   #ifdef AnalogAxis      
-   ReadAnalogAxis(all);      //check analog axis for changes and initiate commands if switches were moved
+   ReadAnalogAxis(all);           //check analog axis for changes and initiate commands if switches were moved
   #endif
 }
 
@@ -529,39 +593,13 @@ void PullRequest(byte var)
   if(SERIALCOM.available())  //make sure input buffer is empty   
   {
     delay(1);
+    FastUpdate();
     ReadResponse();
   }
     
-    //build message string <pos>,<vartype>,<varID>
-  //mod
-  /*
-  char nachricht[10]={0};
-  char pos[2]={0,0};
-  if (strcmp(datenfeld[var].ID,"9999")==0) return;  //don't update dummy variables                                            
-    itoa(var,pos,10);  //write data container position as character
-    if (var<10) 
-    {
-      nachricht[0]='0'; 
-      nachricht[1]=pos[0];
-    }
-    else 
-    {
-      nachricht[0]=pos[0]; 
-      nachricht[1]=pos[1];
-    }
-    nachricht[2]=',';
-    nachricht[3]=datenfeld[var].format;  //add the variable type
-    nachricht[4]=',';
-    for (byte lauf=0;lauf<4;lauf++)
-      {nachricht[5+lauf]=datenfeld[var].ID[lauf];} //add the variable ID
-    nachricht[9]='\0';
-    SendMessage(nachricht,2);
-    */
     SendMessage(datenfeld[var].request,2);
-    //mod
-    
     byte x=0;
-    while ((SERIALCOM.available()<3) && (x<30)) //wait for answer, but no longer than 30ms
+    while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
     {
       #ifdef PRIORITIZE_OUTPUT
         UpdateOutput(); //throw in another update if outputs are priorized
@@ -572,11 +610,13 @@ void PullRequest(byte var)
         x+=10;
       #endif
       delay(1);
+      FastUpdate();
       x++;  
     }
     while(SERIALCOM.available()>1)  //read incoming data     
     {
       delay(1);
+      FastUpdate();
       ReadResponse();
     }
 }
@@ -589,6 +629,89 @@ void Reset()
   state=0;
 }
 
+
+bool CheckForSysCommand(byte SysCmd)
+{
+  bool SysCmdFound=false;
+  if (SysCmd == HANDSHAKE)
+  {
+    SERIALCOM.flush();
+    SendSysCommand(ID); //Send ID to idendify this board
+    SysCmdFound=true;
+  }
+  else if (SysCmd == STARTPULL)
+  {
+    //confirm start of PULL requests
+    pull=true;
+    SERIALCOM.flush();
+    SendSysCommand("on");
+    SysCmdFound=true;
+  }  
+  else if (SysCmd == ENDPULL)
+  {
+    //confirm termination of PULL requests
+    pull=false;
+    SERIALCOM.flush();
+    SendSysCommand("off");
+    SysCmdFound=true;
+  } 
+  else if (SysCmd == CALIBRATE)
+  {
+    //reset motor position to zero
+    SERIALCOM.flush();
+    SendSysCommand("ok");
+    ResetMotors(true);
+    SysCmdFound=true;
+  }    
+  else if (SysCmd == ZEROIZE)
+  {
+    //reset motor position to zero
+    SERIALCOM.flush();
+    SendSysCommand("ok");
+    ResetMotors(false);
+    SysCmdFound=true;
+  }          
+  else if (SysCmd == TESTON)
+  {
+    //confirm debugmode
+    debugmode=true;
+    SERIALCOM.flush();
+    SendSysCommand("on");
+    SysCmdFound=true;
+  } 
+  else if (SysCmd == READBACKON)
+  {
+    //confirm debugmode
+    readbackmode=true;
+    SERIALCOM.flush();
+    SendSysCommand("on");
+    SysCmdFound=true;
+  }   
+  else if (SysCmd == TESTOFF)
+  {
+    //confirm end of debugmode
+    debugmode=false;
+    readbackmode=false;
+    SERIALCOM.flush();
+    SendSysCommand("off");
+    SysCmdFound=true;
+  }
+  else if (SysCmd == SWITCHPOSITION)
+  {
+    //send current switch positions
+    SERIALCOM.flush();
+    UpdateInput(true);
+    SysCmdFound=true;
+  }
+  
+  if (SysCmdFound==true)
+  {
+    Reset();
+    return true;
+  }
+  else
+  {return false;}
+}
 
 /// Check incoming serial data for data. Expects structured messages --> CommandBit VariableID {VariableType}<Data>
 void ReadResponse()       
@@ -605,99 +728,35 @@ void ReadResponse()
         inputByte_0=SERIALCOM.read();
         if (inputByte_0 == MESSAGEBEGIN) //Check for start of Message - byte (255)
          {state=1;}
+        FastUpdate();
       }
     }
      
     if ((state==1) && SERIALCOM.available())
     {
       inputByte_1=SERIALCOM.read();
-      if (inputByte_1 == HANDSHAKE)
+      if (!CheckForSysCommand(inputByte_1))  //check if a system command was recieved. If not, continue to check if valid data was recieved
       {
-        SERIALCOM.flush();
-        SendSysCommand(ID); //Send ID to idendify this board
-        Reset();
+        if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
+        {
+          neuer_wert.varNr=(int)inputByte_1;
+          state=2;
+          FastUpdate();
+        }
+        else 
+        { 
+          state=0;    //unexpected value. discard data and start over.  
+          if (debugmode){SendMessage("Fehler State 1",1);}
+        }
       }
-      else if (inputByte_1 == STARTPULL)
-      {
-         //confirm start of PULL requests
-        pull=true;
-        SERIALCOM.flush();
-        SendSysCommand("on");
-        Reset();
-      }  
-      else if (inputByte_1 == ENDPULL)
-      {
-        //confirm termination of PULL requests
-        pull=false;
-        SERIALCOM.flush();
-        SendSysCommand("off");
-        Reset();
-      } 
-      else if (inputByte_1 == CALIBRATE)
-      {
-        //reset motor position to zero
-        SERIALCOM.flush();
-        SendSysCommand("ok");
-        ResetMotors(true);
-        Reset();
-      }    
-      else if (inputByte_1 == ZEROIZE)
-      {
-        //reset motor position to zero
-        SERIALCOM.flush();
-        SendSysCommand("ok");
-        ResetMotors(false);
-        Reset();
-      }          
-      else if (inputByte_1 == TESTON)
-      {
-        //confirm debugmode
-        debugmode=true;
-        SERIALCOM.flush();
-        SendSysCommand("on");
-        Reset();
-      } 
-      else if (inputByte_1 == READBACKON)
-      {
-        //confirm debugmode
-        readbackmode=true;
-        SERIALCOM.flush();
-        SendSysCommand("on");
-        Reset();
-      }   
-      else if (inputByte_1 == TESTOFF)
-      {
-        //confirm end of debugmode
-        debugmode=false;
-        readbackmode=false;
-        SERIALCOM.flush();
-        SendSysCommand("off");
-        Reset();
-      }
-      else if (inputByte_1 == SWITCHPOSITION)
-      {
-        //send current switch positions
-        SERIALCOM.flush();
-        UpdateInput(true);
-        Reset();
-      }
-      else if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
-      {
-        neuer_wert.varNr=(int)inputByte_1;
-        state=2;
-      }
-      else 
-      { 
-        state=0;    //unexpected value. discard data and start over.  
-        if (debugmode){SendMessage("Fehler State 1",1);}
-      }
-    }
-          
+    }  
+       
     if (state==2) 
     {
       if (!SERIALCOM.available())
       {
         delay(1);
+        FastUpdate();
         if (!SERIALCOM.available()) 
         {state=0;}
       }
@@ -722,6 +781,7 @@ void ReadResponse()
       if (!SERIALCOM.available())
       {
         delay(1);
+        FastUpdate();
         if (!SERIALCOM.available())
           {state=0;}
       }
@@ -730,6 +790,7 @@ void ReadResponse()
         while (SERIALCOM.available() && (state==3))
         {
           byte c = SERIALCOM.read();
+          FastUpdate();
           if (c==VAR_ENDE)  //the termination character arrived. Save the data.
           {
             // end of data found. Validate the buffer before writing the new data into the data container
@@ -744,7 +805,6 @@ void ReadResponse()
                 memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
               }
               lastInput=millis(); //store last transmission time
-              if (readbackmode){DebugReadback(neuer_wert.varNr);}
             }  
             state=0;
           }
@@ -825,8 +885,8 @@ void SendMessage(const char message[], byte option)
   else if (option==5) //report empty input buffer
   {
     SERIALCOM.print('g');
-  } 
-  else if (option==6) //request DED/PFL Data
+  }  
+    else if (option==6) //request DED/PFL Data
   {
     SERIALCOM.print('u');
   }  

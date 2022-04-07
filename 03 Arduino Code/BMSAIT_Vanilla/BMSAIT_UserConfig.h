@@ -1,4 +1,4 @@
-// Version: 1.3.7    5.12.2021
+// Version: 1.3.11    29.3.22
 
 
 
@@ -14,6 +14,7 @@
   #define ServoPWM          //drive multiple servo motors via pwm shield
   #define StepperBYJ        //drive stepper motor 28BYJ-48
   #define StepperX27        //drive stepper motor X27.168
+  #define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
   #define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
   #define MotorPoti         //motor-driven poti control
   #define OLED              //display data on an OLED display
@@ -24,13 +25,15 @@
   #define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
   #define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
   #define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
+  #define Lighting          //software controlled backlighting
   #define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
 
 
 //BASIC SETTINGS
-  #define BAUDRATE 57600      // serial connection speed
+  #define BAUDRATE 57600         // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
+  #define PULLTIMEOUT 30         // set time to wait for a requested data update defaut: 30ms
   //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_VANILLA"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
@@ -45,7 +48,8 @@
   //#define MEGA        //uncomment this if this sketch will be loaded on an MEGA
   //#define DUE         //uncomment this if this sketch will be loaded on an DUE (connected via programming port)
   //#define DUE_NATIVE  //uncomment this if this sketch will be loaded on an DUE (connected via native port)
-
+  //#define ESP         //uncomment this if this sketch will be loaded on an ESP32 or ESP8266
+  
 //DATA VARIABLES
   
   // This is the most important part of this sketch. You need to set the data that the Arduino will have to handle
@@ -67,5 +71,6 @@
     {
       //Description ID    DT    OT    target Ref2 Ref3 Ref4 Ref5  RQ   IV
        {"ENGFI",  "1506", 'b',  12,    1,     2,   4,   0,   0,   "",  "F"}     //Example Variable 0 - Right Eyebrow Engine Fire
+       ,{"ENGFI",  "1506", 'b',  12,    1,     2,   4,   0,   0,   "",  "F"}     //Example Variable 0 - Right Eyebrow Engine Fire
     }; 
   const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

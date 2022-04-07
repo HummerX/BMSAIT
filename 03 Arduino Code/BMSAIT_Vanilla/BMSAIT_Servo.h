@@ -45,6 +45,9 @@ void SetupServo()
   }
 }
 
+void Servo_FastUpdate()
+{}
+
 void Servo_Zeroize(bool mode)
 {
   for (byte lauf=0;lauf<SERVOZAHL;lauf++)

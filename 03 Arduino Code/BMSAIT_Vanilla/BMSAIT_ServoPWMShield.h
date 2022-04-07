@@ -50,6 +50,9 @@ void SetupServoPWM()
   delay(1000);
 }
 
+void ServoPWM_FastUpdate()
+{}
+
 void ServoPWM_Zeroize(bool mode)
 {
   for (byte x=0;x<servozahlPWM;x++) //move all servos to min position
