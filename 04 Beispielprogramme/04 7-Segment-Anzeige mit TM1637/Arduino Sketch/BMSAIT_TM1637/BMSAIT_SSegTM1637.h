@@ -28,13 +28,13 @@
   LEDDisplayDriver TM1637_display[] = 
   {
       LEDDisplayDriver(TM1637_SDA_PIN, TM1637_SCL_PIN,true, TM1637_DIGITS)
-      //LCDDisplayDriver(/*SDA_PIN*/,/* SCL_PIN*/,true, /*num of digits*/)
+      ,LEDDisplayDriver(A1/*SDA_PIN*/,A2/* SCL_PIN*/,true, 6/*num of digits*/)
   };
 #else
   LEDDisplayDriver TM1637_display[] = 
   {
       LEDDisplayDriver(TM1637_SDA_PIN, TM1637_SCL_PIN)
-      //LCDDisplayDriver(/*SDA_PIN*/,/* SCL_PIN*/)
+      ,LEDDisplayDriver(A1/*SDA_PIN*/,A2/* SCL_PIN*/)
   };
 #endif
 
@@ -43,56 +43,51 @@ void SetupTM1637()
 {
   TM1637_display[0].setBrightness(TM1637_BRIGHTNESS);
   TM1637_display[0].clear();
-  //TM1637_display[1].setBrightness(TM1637_BRIGHTNESS);
-  //TM1637_display[1].clear();
+  TM1637_display[1].setBrightness(TM1637_BRIGHTNESS);
+  TM1637_display[1].clear();
 }
 
 
 void UpdateTM1637(int p)
 {
-  byte disp[6] ={0,0,0,0,0,0};
+  #if TM1637_DIGITS==6
+    byte disp[6] ={0,0,0,0,0,0};
+  #else
+    byte disp[4] ={0,0,0,0};
+  #endif
   memcpy(disp,datenfeld[p].wert,datenfeld[p].ref3);
-
-
   
   byte pos=0;
+  //write digits
   for (byte x=0;x<datenfeld[p].ref3;x++)
   {
-    
-    #if TM1637_DIGITS==6
-    
-    //correct digit order
-    switch (5-x-datenfeld[p].ref4)
-    {
-      case 0: 
-        pos=3; 
-        break;
-      case 1: 
-        pos=4; 
-        break;
-      case 2: 
-        pos=5; 
-        break;
-      case 3: 
-        pos=0; 
-        break;
-      case 4: 
-        pos=1; 
-        break;
-      case 5: 
-        pos=2; 
-        break;
-    }
+    #if TM1637_DIGITS == 6
+      //correct digit order
+      pos=TM1637_TransformPos(5-x-datenfeld[p].ref4);
     #else
       //no correction required
       pos=x;
     #endif
+        
+    TM1637_display[datenfeld[p].target].showChar(pos,disp[x]);
+  }
   
 
-    if ((datenfeld[p].ref5-1==x)&&(disp[x]!=' '))
-      TM1637_display[datenfeld[p].target].showNumWithPoint(disp[x]-48,0,pos,1);
-    else 
-      TM1637_display[datenfeld[p].target].showNum(disp[x]-48,pos,1);
-
+ //paint decimal point
+  if(datenfeld[p].ref5<=datenfeld[p].ref3)  
+  {
+    if (disp[datenfeld[p].ref5]==' ')
+      { TM1637_display[datenfeld[p].target].removeDp();}
+    else
+    {  
+      #if TM1637_DIGITS == 6
+        //correct digit order
+        TM1637_display[datenfeld[p].target].setDp(TM1637_TransformPos(5-datenfeld[p].ref5-datenfeld[p].ref4+1));
+      #else
+        //no correction required
+        TM1637_display[datenfeld[p].target].setDp(5-datenfeld[p].ref5-datenfeld[p].ref4+1);
+      #endif
+    }
   }
+  
 }
