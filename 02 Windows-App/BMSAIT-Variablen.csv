@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.9  10.04.2021 (BMS 4.35)
+0;F4SM;bool;F4SMVar;Version of this file: 1.12  from 17.03.2022 (BMS 4.35u3)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -10,6 +10,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 80;AIRCRAFT;float;yaw;Ownship Yaw (Radians)
 90;ALTIMETER;float;aauz;AAU altimeter indicated altitude (new in BMS4)
 100;ALTIMETER;float;cabinAlt;Ownship cabin altitude
+101;ALTIMETER;int;cabinAlt(s);Ownship cabin altitude (0..65535)
 110;ALTIMETER;float;caraAlow;Cara alow setting
 120;ALTIMETER;float;RALT;"Radar altitude (only valid/ reliable if MiscBit ""RALT_Valid"" is set)"
 130;ALTIMETER;string;AltCalReading;Altimeter setting (e.g. 1013/2992)
@@ -74,6 +75,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 460;F4SM;string;StringAreaSize;The overall size of the StringData/FalconSharedMemoryAreaString shared memory area
 470;F4SM;string;StringAreaTime;Last time the StringData/FalconSharedMemoryAreaString shared memory area has been changed - you only need to re-read the string shared mem if this changes
 480;FUEL;float;aft;Fuel quantity in aft tank in lbs
+481;FUEL;int;aft(g);Fuel quantity in aft tank in lbs (Gauge position)
 490;FUEL;float;bingoFuel;Bingo fuel level
 500;FUEL;float;externalFuel;Ownship external fuel (Lbs)
 510;FUEL;float;fuelFlow;Ownship fuel flow (Lbs/Hour)
@@ -81,6 +83,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 520;FUEL;float;fuelFlow2;Ownship fuel flow2 (Lbs/Hour)
 521;GFUEL;string;fuelFlow2(s);Fuelflow2 as string value
 530;FUEL;float;fwd;Fuel quantity in forward tank in lbs
+531;FUEL;int;fwd(g);Fuel quantity in forward tank in lbs (Gauge position)
 540;FUEL;float;internalFuel;Ownship internal fuel (Lbs)
 550;FUEL;float;total;Total fuel in lbs
 551;FUEL;string;total(s);Total Fuel (as 5 digit string)
@@ -104,6 +107,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 730;HSI/ADI/TACAN;float;bearingToBeacon;HSI_VAL_BEARING_TO_BEACON
 740;HSI/ADI/TACAN;float;courseDeviation;HSI_VAL_CRS_DEVIATION
 750;HSI/ADI/TACAN;float;currentHeading;HSI_VAL_CURRENT_HEADING
+751;HSI/ADI/TACAN;int;currentHeading(s);Current Heading in a 0..65535 value format
 760;HSI/ADI/TACAN;float;desiredCourse;HSI_VAL_DESIRED_CRS
 770;HSI/ADI/TACAN;float;desiredHeading;HSI_VAL_DESIRED_HEADING
 780;HSI/ADI/TACAN;float;deviationLimit;HSI_VAL_DEV_LIMIT
