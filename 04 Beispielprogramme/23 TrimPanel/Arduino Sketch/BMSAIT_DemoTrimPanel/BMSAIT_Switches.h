@@ -28,9 +28,9 @@ typedef struct //data field structure to define commands for rotary switches wit
 //Switch definition. If you add a switch, add a line to the following list 
 Switch schalter[]=
 {
-// <PIN>,<description>,<type>,<rotarySwitchID>,    0, <commandID when pressed>,<commandID when released>,<internal command>
-    {2,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0}          //Example switch (Master Caution pushbutton) on PIN A0
-   ,{3,     "Reset",       1,         0,           0,           "04",                     "00",                   1}          //Example switch (Master Caution pushbutton) on PIN A0
+// <PIN>,<description>,<type>,<rotarySwitchID>,     0, <commandID when pressed>,<commandID when released>,<internal command>
+    {A3,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0}          //Example switch (Master Caution pushbutton) on PIN A0
+   ,{A4,     "Reset",       1,         0,           0,           "04",                     "00",                   1}          //Example switch (Master Caution pushbutton) on PIN A0
 };
 const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
 

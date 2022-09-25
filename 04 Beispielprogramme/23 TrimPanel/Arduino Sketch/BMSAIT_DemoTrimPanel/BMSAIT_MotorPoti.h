@@ -28,8 +28,8 @@ bool reSet=false;
 Struc_MotorPoti motorPoti[]=
 {
 	  //  PIN1	 PIN2	  pWM	  dir	   poti  	intP	 extP   command
-     {   9,    10,   254,   true,   A0,   500,   500,    1} //Motor B // Roll
-    ,{   6,     5,   254,   true,   A1,   500,   500,    2} //Motor A // Pitch
+     {   4,     5,   254,   true,   A0,   500,   500,    1} //Motor B // Roll
+    ,{   2,     3,   254,   true,   A1,   500,   500,    2} //Motor A // Pitch
 
 };
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
