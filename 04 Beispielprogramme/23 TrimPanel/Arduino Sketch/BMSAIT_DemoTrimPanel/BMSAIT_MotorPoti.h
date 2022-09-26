@@ -1,11 +1,12 @@
+//V1.0  2.5.2021
 // settings and functions to drive a motor driven potentiometer
 
-#define DIR_DELAY 50 // brief delay for abrupt motor changes
+#define DIR_DELAY 50  // brief delay to prevent abrupt motor changes
 #define BUFFER 20     // threshold that needs to be crossed to consider a change on the analog value as a movement
 
 
 //function declaration
-void MotorPoti_Zeroize();
+void MotorPoti_Zeroize(bool full);
 
 
 typedef struct 
@@ -20,10 +21,6 @@ typedef struct
   int command;       //ID of the command line in BMS Windows App that links a vjoy analog axis
 }  Struc_MotorPoti;
 
-//mod
-bool reSet=false;
-//mod
-
 
 Struc_MotorPoti motorPoti[]=
 {
@@ -36,6 +33,9 @@ const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]);
 
 bool error=false;
 
+#ifdef Switches
+byte TrimResetButton=99;
+#endif
 
 long time_status=0; //time for new status message
 long time_pause=0; //pause when poti was moved
@@ -55,10 +55,21 @@ void SetupMotorPoti()
   }
   time_status=0;
   time_pause=0;
-  SendMessage("Setup complete",1);
-  MotorPoti_Zeroize();
-  SendMessage("Zeroize complete",1);
+  if (debugmode){SendMessage("Setup complete",1);}
+  MotorPoti_Zeroize(false);
+  if (debugmode){SendMessage("Zeroize complete",1);}
+  #ifdef Switches
+    for (byte x=0;x<numSwitches;x++)
+    {
+      if (switches[x].intCommand==10) //search TrimReset button PIN
+      { TrimResetButton=x; }
+    }
+  #endif
+  
 }
+
+void MotorPoti_FastUpdate()
+{}
 
 void MotorMoveCW(byte mp)
 {
@@ -73,7 +84,6 @@ void MotorMoveCW(byte mp)
 
 void MotorMoveCCW(byte mp)
 {
-  
   // always stop motors briefly before abrupt changes
   digitalWrite( motorPoti[mp].pIN1, LOW );
   digitalWrite( motorPoti[mp].pIN2, LOW );
@@ -168,8 +178,7 @@ void SignalSenden(byte mp)
 }
 
 
-
-void MotorPoti_Zeroize()
+void MotorPoti_Zeroize(bool full)
 {
   error=false;
   byte result;
@@ -245,7 +254,7 @@ void MotorPoti_Zeroize()
     }
     else 
     {
-      SendMessage("Fehler beim Initalisieren der MotorPotis",1);
+      SendMessage("MotorPot initialization failed",1);
     }
   }
 }
@@ -310,12 +319,12 @@ void TrimReset(byte pos)
 void UpdateMotorPoti(byte pos) 
 {
   long curr_time=millis();
-  if (time_status<(curr_time-10000))
+  if (time_status>(curr_time+10000))
   {
     time_status=curr_time;
     if (error)
       {SendMessage("Motorpotis deaktiviert",1);}
-    else if (testmode)
+    else if (debugmode)
     {
       char buf[9]="        ";
       sprintf (buf, "%03u,%04u", motorPoti[datenfeld[pos].target].command, motorPoti[datenfeld[pos].target].trimPos_int);
@@ -326,15 +335,19 @@ void UpdateMotorPoti(byte pos)
   }
   
   if (!error) //only continue if no error occured
-  {  
-    if (reSet)
-    {
-      for (byte x=0;x<motorPotiAnz;x++)
-      { TrimReset(x);}  
-      reSet=false;
-    }
+  { 
+    #ifdef Switches
+      if (TrimResetButton!=99)
+      {
+        if (digitalRead(switches[TrimResetButton].pIN)==LOW)
+        {
+          for (byte x=0;x<motorPotiAnz;x++)
+          { TrimReset(x);}  
+        }
+      }
+    #endif
     //check external movement
-    if ((curr_time>time_pause)&&(!testmode))   //pause check for BMS data if poti was recently moved
+    if ((curr_time>time_pause)&&(!debugmode))   //pause check for BMS data if poti was recently moved
       {
         ReadNewValue(pos);
         CheckExternalMovement(datenfeld[pos].target);
