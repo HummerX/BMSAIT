@@ -1,12 +1,15 @@
-//V1.0  2.5.2021
 // settings and functions to drive a motor driven potentiometer
+// V1.3.7 26.09.2022
 
 #define DIR_DELAY 50  // brief delay to prevent abrupt motor changes
 #define BUFFER 20     // threshold that needs to be crossed to consider a change on the analog value as a movement
 
+#ifdef ESP  
+  #include <analogWrite.h>
+#endif
 
 //function declaration
-void MotorPoti_Zeroize(bool full);
+void MotorPoti_Zeroize(bool mode);
 
 
 typedef struct 
@@ -32,44 +35,13 @@ Struc_MotorPoti motorPoti[]=
 const byte motorPotiAnz = sizeof(motorPoti)/sizeof(motorPoti[0]); 
 
 bool error=false;
+long time_status=0; //time for new status message
+long time_pause=0; //pause when poti was moved
 
 #ifdef Switches
 byte TrimResetButton=99;
 #endif
 
-long time_status=0; //time for new status message
-long time_pause=0; //pause when poti was moved
-
-void SetupMotorPoti() 
-{
-  for (byte x=0;x<motorPotiAnz;x++)
-  {
-    byte mp=x;
-    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
-    pinMode( motorPoti[mp].pIN1, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN1, LOW );
-    pinMode( motorPoti[mp].pIN2, OUTPUT );
-    digitalWrite( motorPoti[mp].pIN2, LOW );
-    motorPoti[mp].trimPos_int=512;
-    motorPoti[mp].trimPos_ext=512;
-  }
-  time_status=0;
-  time_pause=0;
-  if (debugmode){SendMessage("Setup complete",1);}
-  MotorPoti_Zeroize(false);
-  if (debugmode){SendMessage("Zeroize complete",1);}
-  #ifdef Switches
-    for (byte x=0;x<numSwitches;x++)
-    {
-      if (switches[x].intCommand==10) //search TrimReset button PIN
-      { TrimResetButton=x; }
-    }
-  #endif
-  
-}
-
-void MotorPoti_FastUpdate()
-{}
 
 void MotorMoveCW(byte mp)
 {
@@ -99,6 +71,7 @@ void MotorStop(byte mp)
   digitalWrite( motorPoti[mp].pIN2, LOW );
   delay(10);
 }
+
 
 bool CheckDirection(byte motor,bool richtung,bool recursive)
 {
@@ -167,15 +140,6 @@ bool CheckDirection(byte motor,bool richtung,bool recursive)
   }
 }
 
-
-void SignalSenden(byte mp)
-{
-  //send current analog value to BMSAIT Win App
-  char buf[9]="        ";
-  sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
-  SendMessage(buf,4);
-  delay(5);
-}
 
 
 void MotorPoti_Zeroize(bool full)
@@ -259,6 +223,33 @@ void MotorPoti_Zeroize(bool full)
   }
 }
 
+void SetupMotorPoti() 
+{
+  for (byte x=0;x<motorPotiAnz;x++)
+  {
+    byte mp=x;
+    if ((motorPoti[mp].pIN1==0) || (motorPoti[mp].pIN2==0)) continue;  //skip loop if no Pins were assigned
+    pinMode( motorPoti[mp].pIN1, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN1, LOW );
+    pinMode( motorPoti[mp].pIN2, OUTPUT );
+    digitalWrite( motorPoti[mp].pIN2, LOW );
+    motorPoti[mp].trimPos_int=512;
+    motorPoti[mp].trimPos_ext=512;
+  }
+  time_status=0;
+  time_pause=0;
+  if (debugmode){SendMessage("Setup complete",1);}
+  MotorPoti_Zeroize(false);
+  if (debugmode){SendMessage("Zeroize complete",1);}
+  #ifdef Switches
+    for (byte x=0;x<numSwitches;x++)
+    {
+      if (switches[x].intCommand==10) //search TrimReset button PIN
+      { TrimResetButton=x; }
+    }
+  #endif
+}
+
 void ReadNewValue(byte pos)
 {
   byte mp=datenfeld[pos].target;
@@ -266,8 +257,18 @@ void ReadNewValue(byte pos)
   float newVal=atof(datenfeld[pos].wert);
   motorPoti[mp].trimPos_ext= map((newVal*1000),-500,500,1,1023);
 }
+
   
-void CheckExternalMovement(byte mp)
+void SignalSenden(byte mp)
+{
+  //send current analog value to BMSAIT Win App
+  char buf[9]="        ";
+  sprintf (buf, "%03u,%04u", motorPoti[mp].command, motorPoti[mp].trimPos_int);
+  SendMessage(buf,4);
+  delay(5);
+}
+
+void CheckBMS(byte mp)
 {
   //check if the internal trim pos matches the position in BMS
   if (motorPoti[mp].trimPos_ext>(motorPoti[mp].trimPos_int+BUFFER))
@@ -313,8 +314,11 @@ void TrimReset(byte pos)
   SignalSenden(pos);
   
   motorPoti[pos].trimPos_ext=512;
-  CheckExternalMovement(pos);
+  CheckBMS(pos);
 }
+
+void MotorPoti_FastUpdate()
+{}
 
 void UpdateMotorPoti(byte pos) 
 {
@@ -350,7 +354,7 @@ void UpdateMotorPoti(byte pos)
     if ((curr_time>time_pause)&&(!debugmode))   //pause check for BMS data if poti was recently moved
       {
         ReadNewValue(pos);
-        CheckExternalMovement(datenfeld[pos].target);
+        CheckBMS(datenfeld[pos].target);
       } 
       
     //check internal movement
