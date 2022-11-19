@@ -13,6 +13,8 @@ typedef struct //data field structure for storage of data variables
 AAchse analogaxis[] = {
    // PIN  Command   Value
     { A2,    3,        0   } //YawTrim
+
+    
 };
 const int axisCount = sizeof(analogaxis)/sizeof(analogaxis[0]);
 

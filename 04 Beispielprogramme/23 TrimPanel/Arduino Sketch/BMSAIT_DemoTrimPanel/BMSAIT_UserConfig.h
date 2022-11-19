@@ -1,5 +1,6 @@
 // Version: 1.3.11    30.3.22
 
+
 //MODULE SELECTION - uncomment the modules you want to use.
    
   //#define LED               //drive LEDs
@@ -27,17 +28,17 @@
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 
 
-
-
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
-  #define POLLTIME 100           // set time between PULL data requests
+  #define POLLTIME 200           // set time between PULL data requests
   #define PULLTIMEOUT 30      // set time to wait for a requested data update defaut: 30ms
   //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
-  //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons)
-  const char ID[]= "BMSAIT_TrimP";      
+  //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
+  const char ID[]= "BMSAIT_DemoTrimPanel";      
+
 
 //BOARD SELECTION
+
   #define UNO         //uncomment this if this sketch will be loaded on an UNO
   //#define NANO        //uncomment this if this sketch will be loaded on an NANO
   //#define MICRO       //uncomment this if this sketch will be loaded on an MICRO
@@ -56,7 +57,7 @@
   // 1. Short description (max 5 characters)
   // 2. Flightdata ID (check BMSAIT Variablen.csv)  as a 4-digit string (needed for PULL mode)
   // 3. data type (check BMSAIT Variablen.csv: b=bool, y=byte, 1=byte[], i=integer, f=float, s=string, 2=string[]))  (needed for PULL mode)
-  // 4. Output type (10-LED, 20-LCD, 30-MAX7219, 31-TM1637, 40-Servo, 41-ServoPWM, 50-Stepper 28BYJ, 51-Stepper X27-168, 52-StepperBoard VID6606, 60-MotorPoti, 7x-OLED)
+  // 4. Output type (10-LED, 20-LCD, 30-MAX7219, 31-TM1637, 40-Servo, 41-ServoPWM, 50-Stepper 28BYJ, 51-Stepper X27-168, 52-StepperBoard VID6606, 60-MotorPoti)
   // 5. Target - i.e. Output PIN of LEDs, a reference to an entry in a module specific data table (i.e. motors)
   // 6. Reference2 - i.e. the line on LCD displays or a link to an entry in container in motor modules
   // 7. Reference3 - i.e. number of characters to display (control display length on 7-segment or LCD displays)
@@ -66,8 +67,8 @@
   
 Datenfeld datenfeld[]=
   {
-    //Description ID    DT    OT    Target Ref2 Ref3 Ref4 Ref5  RQ  IV
-      {"RTRIM",  "1370", 'f',  60,     0,    0,   0,   0,    0,  "", "0.0"}     //Example Variable 1 - RollTrim
-     ,{"PTRIM",  "1360", 'f',  60,     1,    0,   0,   0,    0,  "", "0.0"}     //Example Variable 0 - PitchTrim
+      //Description ID     DT    OT    target  Ref2 Ref3 Ref4 Ref5  RQ  IV
+     {  "RTRIM",  "1370", 'f',   60,     0,     0,   0,   0,   0,  "", "0.0"}     //Example Variable 0 - Roll Trim
+     ,{ "PTRIM",  "1360", 'f',   60,     1,     0,   0,   0,   0,  "", "0.0"}     //Example Variable 1 - Pitch Trim
   }; 
 const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

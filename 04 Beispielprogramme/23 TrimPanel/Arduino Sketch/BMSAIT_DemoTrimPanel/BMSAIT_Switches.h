@@ -29,8 +29,8 @@ typedef struct //data field structure to define commands for rotary switches wit
 Switch switches[]=
 {
 // <PIN>,<description>,<type>,<rotarySwitchID>,    0, <commandID when pressed>,<commandID when released>,<internal command>
-    {A3,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0 }          //Example switch (Master Caution pushbutton) on PIN A0
-   ,{A4,     "Reset",       1,         0,           0,           "04",                     "00",                   10}          //Example switch (Master Caution pushbutton) on PIN A0
+    {A3,     "AP-DC",       2,         0,           0,           "05",                     "06",                   0 }          //Trim AP/DISC
+    {A4,     "RESET",       1,         0,           0,           "07",                     "00",                   0 }          //Trim Reset
 };
 const byte numSwitches = sizeof(switches)/sizeof(switches[0]);    
     
