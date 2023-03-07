@@ -26,26 +26,26 @@ long channel_got_changed=0;      //memorize the last time the UHF channel switch
 Datenfeld BUPRadioFreq[21]=
   {
    {"LEER ","0000",'s',99,0,0,0,0,0,"000000"}
-  ,{"UHFP1","1611",'s',99,0,0,0,0,0,"000000"}  //Variable  1 - BUP UHF Ch1 
-  ,{"UHFP2","1612",'s',99,0,0,0,0,0,"000000"}  //Variable  2 - BUP UHF Ch2 
-  ,{"UHFP3","1613",'s',99,0,0,0,0,0,"000000"}  //Variable  3 - BUP UHF Ch3 
-  ,{"UHFP4","1614",'s',99,0,0,0,0,0,"000000"}  //Variable  4 - BUP UHF Ch4 
-  ,{"UHFP5","1615",'s',99,0,0,0,0,0,"000000"}  //Variable  5 - BUP UHF Ch5 
-  ,{"UHFP6","1616",'s',99,0,0,0,0,0,"000000"}  //Variable  6 - BUP UHF Ch6 
-  ,{"UHFP7","1617",'s',99,0,0,0,0,0,"000000"}  //Variable  7 - BUP UHF Ch7 
-  ,{"UHFP8","1618",'s',99,0,0,0,0,0,"000000"}  //Variable  8 - BUP UHF Ch8 
-  ,{"UHFP9","1619",'s',99,0,0,0,0,0,"000000"}  //Variable  9 - BUP UHF Ch9 
-  ,{"UHF10","1620",'s',99,0,0,0,0,0,"000000"}  //Variable 10 - BUP UHF Ch10 
-  ,{"UHF11","1621",'s',99,0,0,0,0,0,"000000"}  //Variable 11 - BUP UHF Ch11 
-  ,{"UHF12","1622",'s',99,0,0,0,0,0,"000000"}  //Variable 12 - BUP UHF Ch12 
-  ,{"UHF13","1623",'s',99,0,0,0,0,0,"000000"}  //Variable 13 - BUP UHF Ch13 
-  ,{"UHF14","1624",'s',99,0,0,0,0,0,"000000"}  //Variable 14 - BUP UHF Ch14 
-  ,{"UHF15","1625",'s',99,0,0,0,0,0,"000000"}  //Variable 15 - BUP UHF Ch15 
-  ,{"UHF16","1626",'s',99,0,0,0,0,0,"000000"}  //Variable 16 - BUP UHF Ch16 
-  ,{"UHF17","1627",'s',99,0,0,0,0,0,"000000"}  //Variable 17 - BUP UHF Ch17 
-  ,{"UHF18","1628",'s',99,0,0,0,0,0,"000000"}  //Variable 18 - BUP UHF Ch18 
-  ,{"UHF19","1629",'s',99,0,0,0,0,0,"000000"}  //Variable 19 - BUP UHF Ch19 
-  ,{"UHF20","1630",'s',99,0,0,0,0,0,"000000"}  //Variable 20 - BUP UHF Ch20  
+  ,{"UHFP1","2000",'s',99,0,0,0,0,0,"000000"}  //Variable  1 - BUP UHF Ch1 
+  ,{"UHFP2","2001",'s',99,0,0,0,0,0,"000000"}  //Variable  2 - BUP UHF Ch2 
+  ,{"UHFP3","2002",'s',99,0,0,0,0,0,"000000"}  //Variable  3 - BUP UHF Ch3 
+  ,{"UHFP4","2003",'s',99,0,0,0,0,0,"000000"}  //Variable  4 - BUP UHF Ch4 
+  ,{"UHFP5","2004",'s',99,0,0,0,0,0,"000000"}  //Variable  5 - BUP UHF Ch5 
+  ,{"UHFP6","2005",'s',99,0,0,0,0,0,"000000"}  //Variable  6 - BUP UHF Ch6 
+  ,{"UHFP7","2006",'s',99,0,0,0,0,0,"000000"}  //Variable  7 - BUP UHF Ch7 
+  ,{"UHFP8","2007",'s',99,0,0,0,0,0,"000000"}  //Variable  8 - BUP UHF Ch8 
+  ,{"UHFP9","2008",'s',99,0,0,0,0,0,"000000"}  //Variable  9 - BUP UHF Ch9 
+  ,{"UHF10","2009",'s',99,0,0,0,0,0,"000000"}  //Variable 10 - BUP UHF Ch10 
+  ,{"UHF11","2010",'s',99,0,0,0,0,0,"000000"}  //Variable 11 - BUP UHF Ch11 
+  ,{"UHF12","2011",'s',99,0,0,0,0,0,"000000"}  //Variable 12 - BUP UHF Ch12 
+  ,{"UHF13","2012",'s',99,0,0,0,0,0,"000000"}  //Variable 13 - BUP UHF Ch13 
+  ,{"UHF14","2013",'s',99,0,0,0,0,0,"000000"}  //Variable 14 - BUP UHF Ch14 
+  ,{"UHF15","2014",'s',99,0,0,0,0,0,"000000"}  //Variable 15 - BUP UHF Ch15 
+  ,{"UHF16","2015",'s',99,0,0,0,0,0,"000000"}  //Variable 16 - BUP UHF Ch16 
+  ,{"UHF17","2016",'s',99,0,0,0,0,0,"000000"}  //Variable 17 - BUP UHF Ch17 
+  ,{"UHF18","2017",'s',99,0,0,0,0,0,"000000"}  //Variable 18 - BUP UHF Ch18 
+  ,{"UHF19","2018",'s',99,0,0,0,0,0,"000000"}  //Variable 19 - BUP UHF Ch19 
+  ,{"UHF20","2019",'s',99,0,0,0,0,0,"000000"}  //Variable 20 - BUP UHF Ch20  
   };  
     
 
@@ -163,18 +163,18 @@ void CheckSwitchesBUPRadio()
   UHFTestMode=false;    //disable test mode on bupradio (unless the button is being pressed) 
   UHFVolumeOff=true;   //assume the UHF volume is turned up
   
-  for (byte index=0;index<anzSchalter;index++)
+  for (byte index=0;index<numSwitches;index++)
   {
     //check for commands
-    if (schalter[index].lastPINState==0)  //switch is set / button is being pressed
+    if (switches[index].lastPINState==0)  //switch is set / button is being pressed
     {
-      if (schalter[index].intCommand==1) {UHFMain=false;}  //set a mark that UHF Main switch is in off position
-      if (schalter[index].intCommand==2) {UHFMain=true;}   //set a mark that UHF Main switch is in main or both position
-      if (schalter[index].intCommand==3) {UHFMode=0;}      //set a mark that UHF Mode switch is in MNL position  
-      if (schalter[index].intCommand==5) {UHFMode=2;}      //set a mark that UHF Mode switch is in GRD position
-      if (schalter[index].intCommand==6) {UHFStatusMode=true;} //activate status mode on bupradio
-      if (schalter[index].intCommand==7) {UHFTestMode=true;}   //activate test mode on bupradio
-      if (schalter[index].intCommand==8) {UHFVolumeOff=false;}   //UHF Volume is turned off
+      if (switches[index].intCommand==1) {UHFMain=false;}  //set a mark that UHF Main switch is in off position
+      if (switches[index].intCommand==2) {UHFMain=true;}   //set a mark that UHF Main switch is in main or both position
+      if (switches[index].intCommand==3) {UHFMode=0;}      //set a mark that UHF Mode switch is in MNL position  
+      if (switches[index].intCommand==5) {UHFMode=2;}      //set a mark that UHF Mode switch is in GRD position
+      if (switches[index].intCommand==6) {UHFStatusMode=true;} //activate status mode on bupradio
+      if (switches[index].intCommand==7) {UHFTestMode=true;}   //activate test mode on bupradio
+      if (switches[index].intCommand==8) {UHFVolumeOff=false;}   //UHF Volume is turned off
     }
   }
 }
