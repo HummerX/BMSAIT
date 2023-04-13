@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.12  from 17.03.2022 (BMS 4.35u3)
+0;F4SM;bool;F4SMVar;Version of this file: 1.13  from 5.01.2023 (BMS 4.37)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -259,6 +259,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1490;ENGINE;bool;blink_EPUOn ;abnormal EPU operation.  Value is 1 if lamp is blinking
 1491;ENGINE;bool;blink_JFSOn_Slow ;Non-critical failure.  Value is 1 if lamp is blinking slow
 1492;ENGINE;bool;blink_JFSOn_Fast ;Critical failure.  Value is 1 if lamp is blinking fast
+1493;CMDS/RWR;bool;blink_ECM_Oper;defined in EcmOperStates - system warming up
 1500;LIGHTS;uint;lightBits;Cockpit Indicator Lights, one bit per bulb. See enum
 1501;CAUTION;bool;masterCaution ;Left eyebrow
 1502;CAUTION;bool;tf;Left eyebrow
@@ -353,93 +354,80 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1605;CAUTION;bool;mcAnnounced ;"Master Caution WILL come up in 3sec; turns off when MC light is on"
 1606;AIRCRAFT;bool;mlgWow ;MLGWOW is only for AFM , it means WOW switches on MLG are triggered 
 1607;AIRCRAFT;bool;nlgWow ;NLGWOW is only for AFM , it means WOW switches on MLG are triggered 
-1608;AIRCRAFT;bool;atf_Not_Engaged;Autopilot status TFR
+1608;CAUTION;bool;atf_Not_Engaged;Autopilot status TFR
 1609;CAUTION;bool;Inlet_Icing;Caution Panel 
-1610;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio
-1611;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1
-1612;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2
-1613;RADIO;string;bupUhfFreqCh3;Manuel UHF Freqs for BUP Radio Channel3
-1614;RADIO;string;bupUhfFreqCh4;Manuel UHF Freqs for BUP Radio Channel4
-1615;RADIO;string;bupUhfFreqCh5;Manuel UHF Freqs for BUP Radio Channel5
-1616;RADIO;string;bupUhfFreqCh6;Manuel UHF Freqs for BUP Radio Channel6
-1617;RADIO;string;bupUhfFreqCh7;Manuel UHF Freqs for BUP Radio Channel7
-1618;RADIO;string;bupUhfFreqCh8;Manuel UHF Freqs for BUP Radio Channel8
-1619;RADIO;string;bupUhfFreqCh9;Manuel UHF Freqs for BUP Radio Channel9
-1620;RADIO;string;bupUhfFreqCh10;Manuel UHF Freqs for BUP Radio Channel10
-1621;RADIO;string;bupUhfFreqCh11;Manuel UHF Freqs for BUP Radio Channel11
-1622;RADIO;string;bupUhfFreqCh12;Manuel UHF Freqs for BUP Radio Channel12
-1623;RADIO;string;bupUhfFreqCh13;Manuel UHF Freqs for BUP Radio Channel13
-1624;RADIO;string;bupUhfFreqCh14;Manuel UHF Freqs for BUP Radio Channel14
-1625;RADIO;string;bupUhfFreqCh15;Manuel UHF Freqs for BUP Radio Channel15
-1626;RADIO;string;bupUhfFreqCh16;Manuel UHF Freqs for BUP Radio Channel16
-1627;RADIO;string;bupUhfFreqCh17;Manuel UHF Freqs for BUP Radio Channel17
-1628;RADIO;string;bupUhfFreqCh18;Manuel UHF Freqs for BUP Radio Channel18
-1629;RADIO;string;bupUhfFreqCh19;Manuel UHF Freqs for BUP Radio Channel19
-1630;RADIO;string;bupUhfFreqCh20;Manuel UHF Freqs for BUP Radio Channel20
-1641;AIRCRAFT;byte;aaMissileFired;How many AA missiles fired.
-1642;AIRCRAFT;byte;agMissileFired;How many maverick/rockets fired
-1643;AIRCRAFT;byte;bombDropped;How many bombs dropped
-1644;AIRCRAFT;byte;flareDropped;How many flares dropped
-1645;AIRCRAFT;byte;chaffDropped;How many chaff dropped
-1646;AIRCRAFT;byte;bulletsFired;How many bullets shot
-1647;AIRCRAFT;int;collisionCounter;Collisions
-1648;AIRCRAFT;bool;isFiringGun;True if gun is firing
-1649;AIRCRAFT;bool;isEndFlight;True if player is ending the flight from 3D
-1650;AIRCRAFT;bool;isEjecting;True if player has ejected
-1651;AIRCRAFT;bool;in3D;True if player is in3D
-1652;AIRCRAFT;bool;isPaused;True if Sim is paused
-1653;AIRCRAFT;bool;isFrozen;True if Sim is frozen
-1654;AIRCRAFT;bool;isOverG;True if G limits are being exceeded
-1655;AIRCRAFT;bool;isOnGround;True if player a/c is on the ground
-1656;AIRCRAFT;bool;isExitGame;True if player exits the game (2D)
-1657;AIRCRAFT;float ;gForce;Current G force
-1658;AIRCRAFT;float ;eyex;Where the eye is in relationship to the plane
-1659;AIRCRAFT;float ;eyey;Where the eye is in relationship to the plane
-1660;AIRCRAFT;float ;eyez;Where the eye is in relationship to the plane
-1661;AIRCRAFT;int ;lastdamage;1 to 8 depending on quadrant. 
-1662;AIRCRAFT;float ;damageforce;How big the hit was.
-1663;AIRCRAFT;int;whendamage;???
-1670;F4SM;string[];StringData;various strings, see stringdata for details
-1671;F4SM;string;BMS.exe;path to BMS.exe
-1672;F4SM;string;KeyFile;path top keyfile in use
-1673;F4SM;string;BMSBasedir;reference to BMS directory
-1674;F4SM;string;BMSBinDirectory;reference to BMS directory
-1675;F4SM;string;BMSDataDirectory;reference to BMS directory
-1676;F4SM;string;BMSUIArtDirectory;reference to BMS directory
-1677;F4SM;string;BMSUserDirectory;reference to BMS directory
-1678;F4SM;string;BMSAcmiDirectory;reference to BMS directory
-1679;F4SM;string;BMSBriefingsDirectory;reference to BMS directory
-1680;F4SM;string;BMSConfigDirectory;reference to BMS directory
-1681;F4SM;string;BMSLogsDirectory;reference to BMS directory
-1682;F4SM;string;BMSPatchDirectory;reference to BMS directory
-1683;F4SM;string;BMSPictureDirectory;reference to BMS directory
-1684;F4SM;string;ThrName;reference to BMS directory
-1685;F4SM;string;ThrCampaigndir;reference to BMS directory
-1686;F4SM;string;ThrTerraindir;reference to BMS directory
-1687;F4SM;string;ThrArtdir;reference to BMS directory
-1688;F4SM;string;ThrMoviedir;reference to BMS directory
-1689;F4SM;string;ThrUisounddir;reference to BMS directory
-1690;F4SM;string;ThrObjectdir;reference to BMS directory
-1691;F4SM;string;Thr3ddatadir;reference to BMS directory
-1692;F4SM;string;ThrMisctexdir;reference to BMS directory
-1693;F4SM;string;ThrSounddir;reference to BMS directory
-1694;F4SM;string;ThrTacrefdir;reference to BMS directory
-1695;F4SM;string;ThrSplashdir;reference to BMS directory
-1696;F4SM;string;ThrCockpitdir;reference to BMS directory
-1697;F4SM;string;ThrSimdatadir;reference to BMS directory
-1698;F4SM;string;ThrSubtitlesdir;reference to BMS directory
-1699;F4SM;string;ThrTacrefpicsdir;reference to BMS directory
-1700;F4SM;string;AcName;aircraft name
-1701;F4SM;string;AcNCTR;aircraft type
-1702;F4SM;string;ButtonsFile;path to 3dbuttons.dat file
-1703;F4SM;string;CockpitFile;path to 3dckpt.dat file
-1710;F4SM;int;VersionNum;Version of the DrawingData shared memory area
-1720;HUD/HMCS;int;HUD_length;"The length of the string in ""HUD_commands"" (1730)"
-1730;HUD/HMCS;string;HUD_commands;2D drawing commands für HUD
-1740;HUD/HMCS;int;HMS_length;"The length of the string in ""HMS_commands"" (1750)"
-1750;HUD/HMCS;string;HMS_commands;2D drawing commands für HMCS
-1760;CMDS/RWR;int;RWR_length;"The length of the string in ""RWR_commands"" (1770)"
-1770;CMDS/RWR;string;RWR_commands;2D drawing commands für RWR
+1610;CAUTION;bool;Nuclear;Not implemented in BMS
+1611;CAUTION;bool;EEC;Not implemented in BMS
+1620;CMDS/RWR;byte;EcmOperStates;see enum EcmOperStates for details
+1630;CMDS/RWR;byte[];JammingStates;see enum JammingStates for details
+1640;CMDS/RWR;int[];ecmBits;see EcmBits enum for details - Note: these are currently not combinable bits, but mutually exclusive states!
+1641;CMDS/RWR;bool;ECM1_Standby;
+1642;CMDS/RWR;bool;ECM1_Active;
+1643;CMDS/RWR;bool;ECM1_Transmit;
+1644;CMDS/RWR;bool;ECM1_Fail;
+1645;CMDS/RWR;bool;ECM2_Standby;
+1646;CMDS/RWR;bool;ECM2_Active;
+1647;CMDS/RWR;bool;ECM2_Transmit;
+1648;CMDS/RWR;bool;ECM2_Fail;
+1649;CMDS/RWR;bool;ECM3_Standby;
+1650;CMDS/RWR;bool;ECM3_Active;
+1651;CMDS/RWR;bool;ECM3_Transmit;
+1652;CMDS/RWR;bool;ECM3_Fail;
+1653;CMDS/RWR;bool;ECM4_Standby;
+1654;CMDS/RWR;bool;ECM4_Active;
+1655;CMDS/RWR;bool;ECM4_Transmit;
+1656;CMDS/RWR;bool;ECM4_Fail;
+1657;CMDS/RWR;bool;ECM5_Standby;
+1658;CMDS/RWR;bool;ECM5_Active;
+1659;CMDS/RWR;bool;ECM5_Transmit;
+1660;CMDS/RWR;bool;ECM5_Fail;
+1670;AIRCRAFT;float;magDeviationSystem;current mag deviation of the system
+1680;AIRCRAFT;float;magDeviationReal;current mag deviation of the system
+1690;LIGHTS;byte;Flood Console;current floodconsole brightness setting, see FloodConsole enum for details
+1700;AIRCRAFT;byte;aaMissileFired;How many AA missiles fired.
+1710;AIRCRAFT;byte;agMissileFired;How many maverick/rockets fired
+1720;AIRCRAFT;byte;bombDropped;How many bombs dropped
+1730;AIRCRAFT;byte;flareDropped;How many flares dropped
+1740;AIRCRAFT;byte;chaffDropped;How many chaff dropped
+1750;AIRCRAFT;byte;bulletsFired;How many bullets shot
+1760;AIRCRAFT;int;collisionCounter;Collisions
+1770;AIRCRAFT;bool;isFiringGun;True if gun is firing
+1780;AIRCRAFT;bool;isEndFlight;True if player is ending the flight from 3D
+1790;AIRCRAFT;bool;isEjecting;True if player has ejected
+1800;AIRCRAFT;bool;in3D;True if player is in3D
+1810;AIRCRAFT;bool;isPaused;True if Sim is paused
+1820;AIRCRAFT;bool;isFrozen;True if Sim is frozen
+1830;AIRCRAFT;bool;isOverG;True if G limits are being exceeded
+1840;AIRCRAFT;bool;isOnGround;True if player a/c is on the ground
+1850;AIRCRAFT;bool;isExitGame;True if player exits the game (2D)
+1860;AIRCRAFT;float ;gForce;Current G force
+1870;AIRCRAFT;float ;eyex;Where the eye is in relationship to the plane
+1880;AIRCRAFT;float ;eyey;Where the eye is in relationship to the plane
+1890;AIRCRAFT;float ;eyez;Where the eye is in relationship to the plane
+1900;AIRCRAFT;int ;lastdamage;1 to 8 depending on quadrant. 
+1910;AIRCRAFT;float ;damageforce;How big the hit was.
+1920;AIRCRAFT;int;whendamage;???
+2000;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio
+2001;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1
+2002;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2
+2003;RADIO;string;bupUhfFreqCh3;Manuel UHF Freqs for BUP Radio Channel3
+2004;RADIO;string;bupUhfFreqCh4;Manuel UHF Freqs for BUP Radio Channel4
+2005;RADIO;string;bupUhfFreqCh5;Manuel UHF Freqs for BUP Radio Channel5
+2006;RADIO;string;bupUhfFreqCh6;Manuel UHF Freqs for BUP Radio Channel6
+2007;RADIO;string;bupUhfFreqCh7;Manuel UHF Freqs for BUP Radio Channel7
+2008;RADIO;string;bupUhfFreqCh8;Manuel UHF Freqs for BUP Radio Channel8
+2009;RADIO;string;bupUhfFreqCh9;Manuel UHF Freqs for BUP Radio Channel9
+2010;RADIO;string;bupUhfFreqCh10;Manuel UHF Freqs for BUP Radio Channel10
+2011;RADIO;string;bupUhfFreqCh11;Manuel UHF Freqs for BUP Radio Channel11
+2012;RADIO;string;bupUhfFreqCh12;Manuel UHF Freqs for BUP Radio Channel12
+2013;RADIO;string;bupUhfFreqCh13;Manuel UHF Freqs for BUP Radio Channel13
+2014;RADIO;string;bupUhfFreqCh14;Manuel UHF Freqs for BUP Radio Channel14
+2015;RADIO;string;bupUhfFreqCh15;Manuel UHF Freqs for BUP Radio Channel15
+2016;RADIO;string;bupUhfFreqCh16;Manuel UHF Freqs for BUP Radio Channel16
+2017;RADIO;string;bupUhfFreqCh17;Manuel UHF Freqs for BUP Radio Channel17
+2018;RADIO;string;bupUhfFreqCh18;Manuel UHF Freqs for BUP Radio Channel18
+2019;RADIO;string;bupUhfFreqCh19;Manuel UHF Freqs for BUP Radio Channel19
+2020;RADIO;string;bupUhfFreqCh20;Manuel UHF Freqs for BUP Radio Channel20
 5000;DCSCommon;string;DCSBIOSVer;Version of DCSBIOS
 5010;DCS_GFS;int;SpeedbrakeLeft;Position of left speedbrake
 5020;DCS_GFS;int;SpeedbrakeRight;Position of right speedbrake
