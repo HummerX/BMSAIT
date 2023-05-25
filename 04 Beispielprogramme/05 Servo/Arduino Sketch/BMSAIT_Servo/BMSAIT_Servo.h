@@ -1,3 +1,5 @@
+// Version: 1.2  25.5.23
+
 // settings and functions to drive servo motors (directly connected to the arduino)
 //target= reference link to the line of the servodata table of this module
 //ref2= not used
@@ -15,7 +17,7 @@ byte pIN;           //PIN the motor is connected to
 byte p_ug;          //min arc for the motor (must not be less than 0!)
 byte p_og;          //max arc for the motor (must not be more than 180!)
 int a_ug;           //min absolut value that might be displayed (i.e.   0 for a speed indicator)
-int a_og;           //max absolut value that might be displayed (i.e. 800 for a speed indicator)
+unsigned int a_og;           //max absolut value that might be displayed (i.e. 800 for a speed indicator)
 int last;           //previous value
 unsigned long lu;   //last update
 } Servodata;
@@ -23,7 +25,7 @@ unsigned long lu;   //last update
 
 Servodata servodata[] =
 {// pIN  p_ug  p_og  a_ug  a_og  last  lu
-    {8,   0,   180,   0,   800,    0,   0},  // example speed indicator: {Servo on PIN=9, min arc =0, max arc=180, lowest possible value=0, highest value=800, past value=0, lastUpdate=0}
+    {3,   40,   140,   0,   65535,    0,   0},  // Speedbrake: {Servo on PIN=2, min arc =0, max arc=180, lowest possible value=0, highest value=65535, past value=0, lastUpdate=0}
 };
 const int SERVOZAHL = sizeof(servodata)/sizeof(servodata[0]);
 Servo servo[SERVOZAHL];
@@ -43,22 +45,27 @@ void SetupServo()
   }
 }
 
-void Servo_Zeroize(void)
+void Servo_Zeroize(bool full)
 {
   for (byte lauf=0;lauf<SERVOZAHL;lauf++)
   {
     if (!servo[lauf].attached())
         {servo[lauf].attach(servodata[lauf].pIN);}  //reactivate servo
     servo[lauf].write(servodata[lauf].p_ug);
-    delay(1000);
-    servo[lauf].write(servodata[lauf].p_og);
-    delay(1000);
-    servo[lauf].write(servodata[lauf].p_og - servodata[lauf].p_ug);
-    delay(200);
-    servo[lauf].detach();
+    if (full)
+    {
+      delay(1000);
+      servo[lauf].write(servodata[lauf].p_og);
+      delay(1000);
+      servo[lauf].write(90);
+      delay(200);
+      servo[lauf].detach();
+    }
   }
 }
 
+void Servo_FastUpdate()
+{}
 
 void UpdateServo(byte id)
 {
