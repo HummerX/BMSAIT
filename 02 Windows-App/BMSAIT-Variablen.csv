@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.13  from 5.01.2023 (BMS 4.37)
+0;F4SM;bool;F4SMVar;Version of this file: 1.14  from 25.5.2023 (BMS 4.37)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -99,6 +99,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 650;HeadPosition;float;headY;Head Y offset from design eye (feet)
 660;HeadPosition;float;headZ;Head Z offset from design eye (feet)
 670;HSI/ADI/TACAN;float;kias;Ownship Indicated Airspeed (Knots)
+671;HSI/ADI/TACAN;int;kias (g);Ownship Indicated Airspeed (needle postion 0..65355)
 680;HSI/ADI/TACAN;float;mach;Ownship Mach number
 690;HSI/ADI/TACAN;float;vt;Ownship True Airspeed (Ft/Sec)
 700;HSI/ADI/TACAN;byte;navMode;HSI nav mode (new in BMS4)
