@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.14  from 25.5.2023 (BMS 4.37)
+0;F4SM;bool;F4SMVar;Version of this file: 1.15  from 26.9.2023 (BMS 4.37)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -359,6 +359,8 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1609;CAUTION;bool;Inlet_Icing;Caution Panel 
 1610;CAUTION;bool;Nuclear;Not implemented in BMS
 1611;CAUTION;bool;EEC;Not implemented in BMS
+1612;CAUTION;bool;---;Unused spaces  of the Caution Panel. Not implemented in BMS
+1619;CAUTION;bool;AllCPLightsOn;true if all caution panel lights are on
 1620;CMDS/RWR;byte;EcmOperStates;see enum EcmOperStates for details
 1630;CMDS/RWR;byte[];JammingStates;see enum JammingStates for details
 1640;CMDS/RWR;int[];ecmBits;see EcmBits enum for details - Note: these are currently not combinable bits, but mutually exclusive states!
