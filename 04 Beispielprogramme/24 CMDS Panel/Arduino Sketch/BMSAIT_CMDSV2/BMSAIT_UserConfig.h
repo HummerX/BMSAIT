@@ -1,5 +1,4 @@
-// Version: 1.3.2    29.01.2021
-
+// Version: 1.3.11    29.3.22
 
 //MODULE SELECTION - uncomment the modules you want to use.
    
@@ -8,10 +7,12 @@
   #define LCD               //drive LCD display
   //#define SSegMAX7219       //drive 7-Segment displays via MAX7219 controller
   //#define SSegTM1637        //drive 7-Segment displays via TM1367 controller
+  //#define SLx2016           //drive 4-digit 5x7 dotmatrix modules
   //#define ServoMotor        //drive servo motors directly connected to the arduino
   //#define ServoPWM          //drive multiple servo motors via pwm shield
   //#define StepperBYJ        //drive stepper motor 28BYJ-48
   //#define StepperX27        //drive stepper motor X27.168
+  //#define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
   //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
   //#define MotorPoti         //motor-driven poti control
   //#define OLED              //display data on an OLED display
@@ -22,6 +23,7 @@
   //#define ButtonMatrix      //use the arduino to read switch positions and send keyboard commands
   //#define RotEncoder        //use the arduino to read rotary encoders and send keyboard commands
   //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
+  //#define Lighting          //software controlled backlighting  
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
 //mod
 #define CMDS           //activate special procedures to drive the CMDS Panel
@@ -32,6 +34,7 @@
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
+  #define PULLTIMEOUT 30         // set time to wait for a requested data update defaut: 30ms
   //#define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_CMDS"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
@@ -46,7 +49,8 @@
   //#define MEGA        //uncomment this if this sketch will be loaded on an MEGA
   //#define DUE         //uncomment this if this sketch will be loaded on an DUE (connected via programming port)
   //#define DUE_NATIVE  //uncomment this if this sketch will be loaded on an DUE (connected via native port)
-
+  //#define ESP         //uncomment this if this sketch will be loaded on an ESP32 or ESP8622
+  
 
 //DATA VARIABLES
   
@@ -63,20 +67,21 @@
   // 8  Reference4 - i.e. start position (control position of data on 7-segment or LCD displays) 
   // 9. Reference5 - i.e. decimal point (will add a decimal point on 7-segment displays after the given position)
   // 10. Initial value as string (i.e. "00")
-
-Datenfeld datenfeld[]=
+  
+  
+  Datenfeld datenfeld[]=
   {
-   //Description  ID     DT    OT    target Ref2 Ref3 Ref4 Ref5  IV
-   {  "CHAFF",  "0150", 'f',  20,     0,      2,  6,  99,   0,  "12"}    //Variable 0 - Chaff Count
-  ,{  "FLARE",  "0160", 'f',  20,     1,      2,  2,  99,   0,   "89"}    //Variable 1 - Flare Count
-  ,{  "GO",     "1547", 'b',  10,    10,      0,  0,   0,   0,   "F"}     //Variable 2 - GO Status
-  ,{  "NOGO",   "1548", 'b',  10,    11,      0,  0,   0,   0,   "F"}     //Variable 3 - NOGO Status
-  ,{  "DEGR",   "1549", 'b',  10,    12,      0,  0,   0,   0,   "F"}     //Variable 4 - DEGRADE Status
-  ,{  "RDY",    "1549", 'b',  10,    13,      0,  0,   0,   0,   "F"}     //Variable 5 - DISPENSER RDY Status
-  ,{  "POWER",  "1243", 'b',   0,     0,      0,  0,   0,   0,   "T"}     //Variable 6 - Status of electrical system of the A/C
-  ,{  "CHLOW",  "1551", 'b',  20,     0,      2,  4,  99,   0,   "F"}     //Variable 7 - Chaff Lo warning
-  ,{  "FLLOW",  "1552", 'b',  20,     1,      2,  0,  99,   0,   "F"}     //Variable 8 - Flare Lo warning
-  ,{  "Chtxt",  "9999", 's',  20,     0,      6,  0,  99,   0,   "Chaff:"}     //Variable 9 - dummy variable for text to be displayed on LCD
-  ,{  "Fltxt",  "9999", 's',  20,     1,      6,  0,  99,   0,   "Flare:"}     //Variable10 - dummy variable for text to be displayed on LCD
-  };  
-const int VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 
+   //Description ID     DT    OT    target Ref2 Ref3 Ref4 Ref5 RQ,  IV
+   {  "CHAFF",  "0150", 'f',  20,     0,    0,   2,   8,   99, "",  "12"}    //Variable 0 - Chaff Count
+  ,{  "FLARE",  "0160", 'f',  20,     0,    1,   2,   8,   99, "",  "89"}    //Variable 1 - Flare Count
+  ,{  "GO",     "1547", 'b',  10,    10,    0,   0,   0,    0, "",  "F"}     //Variable 2 - GO Status
+  ,{  "NOGO",   "1548", 'b',  10,    11,    0,   0,   0,    0, "",  "F"}     //Variable 3 - NOGO Status
+  ,{  "DEGR",   "1549", 'b',  10,    12,    0,   0,   0,    0, "",  "F"}     //Variable 4 - DEGRADE Status
+  ,{  "RDY",    "1549", 'b',  10,    13,    0,   0,   0,    0, "",  "F"}     //Variable 5 - DISPENSER RDY Status
+  ,{  "POWER",  "1243", 'b',  99,     0,    0,   0,   0,    0, "",  "T"}     //Variable 6 - Status of electrical system of the a/c
+  ,{  "CHLOW",  "1551", 'b',  20,     0,    0,   2,   6,   99, "",  "T"}     //Variable 7 - Chaff Lo warning
+  ,{  "FLLOW",  "1552", 'b',  20,     0,    1,   2,   6,   99, "",  "T"}     //Variable 8 - Flare Lo warning
+  ,{  "CH",     "9999", 's',  20,     0,    0,   5,   0,   99, "",  "Chaff"}     //Variable  9 - Chaff caption
+  ,{  "FL",     "9999", 's',  20,     0,    1,   5,   0,   99, "",  "Flare"}     //Variable 10 - Flare caption
+  }; 
+  const byte VARIABLENANZAHL = sizeof(datenfeld)/sizeof(datenfeld[0]); 

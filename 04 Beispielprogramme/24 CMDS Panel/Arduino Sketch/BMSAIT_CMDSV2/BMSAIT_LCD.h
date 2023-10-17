@@ -1,4 +1,6 @@
 // settings and functions to display data on a LCD screen (16x2 / 20x4)
+// V1.3.7 26.09.2021
+
 // datenfeld.target defines the LCD device
 // datenfeld.ref2 defines the line of the LCD display
 // datenfeld.ref3 defines the number of characters of the variable to be displayed
@@ -43,14 +45,7 @@ int charused(const char *data) {
 
 void Update_LCD(byte d)
 {
-  //mod
-  CMDSUpdate(d);
-  if (CMDSMain)
-    {lcd[0].display();}
-  else
-    {lcd[0].noDisplay();}
-  //mod
-  
+
    //make sure that the size of the data variable does not exceed the display length of the LCD if you don't want to run into weired issues.
    
     if (datenfeld[d].ref2<LCD_LINES)  //only write data if row is valid
@@ -67,10 +62,7 @@ void Update_LCD(byte d)
       //display the variable value  
       lcd[datenfeld[d].target].setCursor(datenfeld[d].ref3+tab, datenfeld[d].target);  
       char ergebnis[datenfeld[d].ref2]="";
-      //memcpy(ergebnis, datenfeld[d].wert, datenfeld[d].ref2); 
-      //mod
-      memcpy(ergebnis, Wert, datenfeld[d].ref2); 
-      //mod
+      memcpy(ergebnis, datenfeld[d].wert, datenfeld[d].ref2); 
       ergebnis[datenfeld[d].ref2]='\0';
       lcd[datenfeld[d].target].print(ergebnis);     
     }

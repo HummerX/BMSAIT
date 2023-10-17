@@ -1,9 +1,11 @@
-//modification for CMDS Panel
-byte mainPwr = 99;               //stores the status of the main power of the a/c
-byte ChaffID = 99;               //memorizes the line in the data container that contains the chaff count
-byte FlareID = 99;               //memorizes the line in the data container that contains the flare count
-byte ChLoID = 99;               //memorizes the line in the data container that contains the chaff LOW warning
-byte FlLoID = 99;               //memorizes the line in the data container that contains the flare LOW warning
+//modifications for CMDS Panel
+//V1.1 16.10.2023
+
+byte mainPwr = 6;               //memorizes the line in the data container that contains the a/c power status
+byte ChaffID = 0;               //memorizes the line in the data container that contains the chaff count
+byte FlareID = 1;               //memorizes the line in the data container that contains the flare count
+byte ChLoID = 7;               //memorizes the line in the data container that contains the chaff LOW warning
+byte FlLoID = 8;               //memorizes the line in the data container that contains the flare LOW warning
 
 byte ChaffON = false;            //memorizes the position of the chaff switch
 byte FlareON = false;            //memorizes the position of the flare switch
@@ -17,27 +19,28 @@ void SetupCMDS()
   
   for (int lauf=0;lauf<VARIABLENANZAHL;lauf++)
   {
+    
     if (strcmp(datenfeld[lauf].ID, "1243")==0)  //memorize the position of the MainPower variable
     {
       mainPwr = lauf;
       gefunden[0]=true;
     }
-    if (strcmp(datenfeld[lauf].ID, "0150")==0)  //memorize the position of the preset channel variable
+    if (strcmp(datenfeld[lauf].ID, "0150")==0)  //memorize the position of the chaff quantity variable
     {
       ChaffID = lauf;
       gefunden[1]=true;
     }                      
-    if (strcmp(datenfeld[lauf].ID, "0160")==0)  //memorize the position of the BUP freq variable
+    if (strcmp(datenfeld[lauf].ID, "0160")==0)  //memorize the position of the flare quantity variable
     {
       FlareID = lauf;
       gefunden[2]=true;
     }  
-    if (strcmp(datenfeld[lauf].ID, "1551")==0)  //memorize the position of the BUP freq variable
+    if (strcmp(datenfeld[lauf].ID, "1551")==0)  //memorize the position of the chaff low warning  variable
     {
       ChLoID = lauf;
       gefunden[3]=true;
     }  
-    if (strcmp(datenfeld[lauf].ID, "1552")==0)  //memorize the position of the BUP freq variable
+    if (strcmp(datenfeld[lauf].ID, "1552")==0)  //memorize the position of the flare low warning variable
     {
       FlLoID = lauf;
       gefunden[4]=true;
@@ -52,53 +55,52 @@ void CheckSwitchesCMDS()
 {
   CMDSMain=false;
   
-  for(byte sw=0;sw<anzSchalter;sw++)
+  for(byte sw=0;sw<numSwitches;sw++)
   {  
-    if (schalter[sw].intCommand==1)  //check MAIN switch
+    if (switches[sw].intCommand==1)  //check MAIN switch
     {
-      if ((schalter[sw].typ==1)||(schalter[sw].typ==2))  // digital reading
+      if ((switches[sw].typ==1)||(switches[sw].typ==2))  // digital reading
       {
-        if(schalter[sw].lastPINState==0) //switch is active (ON)
-           {CMDSMain=true;}
+        if(switches[sw].lastPINState==0) //switch is active (ON)
+           {CMDSMain=true;}        
       }
       else                    // analog reading
       {
-        if (schalter[sw].lastPINState>(1024/STATES))  //rotary is out of leftmost position (OFF)
-          {CMDSMain=true;} 
+        if (switches[sw].lastPINState>153)  //rotary is out of leftmost position (OFF)
+          {CMDSMain=true;}        
       }
     }
     
-    if (schalter[sw].intCommand==2)  //check flare switch
+    if (switches[sw].intCommand==2)  //check flare switch
     {
-      if(schalter[sw].lastPINState==0) //switch is active (ON)
+      if(switches[sw].lastPINState==0) //switch is active (ON)
         {FlareON=true;}
       else
         {FlareON=false;} 
     }  
     
-    if (schalter[sw].intCommand==3)  //check chaff switch
+    if (switches[sw].intCommand==3)  //check chaff switch
     {
-      if(schalter[sw].lastPINState==0) //switch is active (ON)
+      if(switches[sw].lastPINState==0) //switch is active (ON)
         {ChaffON=true;}
       else
         {ChaffON=false;} 
     } 
-  }
+  } 
 }
-
 
 ///check if a display is supposed to be illuminated
 bool checkPowerOn(byte disp)
 {
-  if (datenfeld[mainPwr].wert[0]=='F') return false; //turn off displays if a/c power is off
+  if (datenfeld[mainPwr].wert[0]=='F'){return false;} //turn off displays if a/c power is off
   
-  if (!CMDSMain) return false;                       //turn off both displays if CMDS Power is off
-  
+  if (!CMDSMain){return false;}                       //turn off both displays if CMDS Power is off
+
   if ((disp==FlareID)&&(FlareON==false)){return false;}  //turn off flare qty if flare switch is off
   if ((disp==FlLoID)&&(FlareON==false)){return false;}   //turn off flare Lo warning if flare switch is off
   if ((disp==ChaffID)&&(ChaffON==false)){return false;}  //turn off chaff qty if chaff switch is off
   if ((disp==ChLoID)&&(ChaffON==false)){return false;}   //turn off chaff Lo warning if chaff switch is off  
-  
+
   return true;
 }
 
@@ -108,7 +110,8 @@ void CMDSUpdate(byte p)
 {
   CheckSwitchesCMDS(); //check switch positions to determine display behaviour
   
-  if (!checkPowerOn(p))  // if no power is applied the display remains blank
+  bool power=checkPowerOn(p);
+  if (!power)  // if no power is applied the display remains blank
   {
     for (int lauf=0;lauf<DATENLAENGE-1;lauf++)
       {Wert[lauf]=' ';}
