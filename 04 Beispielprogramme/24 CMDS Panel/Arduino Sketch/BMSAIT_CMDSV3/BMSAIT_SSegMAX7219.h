@@ -1,4 +1,6 @@
 // settings and functions to display numbers on 7-segment-displays
+// V1.3.7 26.09.2021
+
 //target= device ID (if multiple displays are connected
 //ref2= not used
 //ref3= number of figures to display
@@ -12,10 +14,10 @@ LedControl Max7219_display[]={
 };
 const byte max7219anz = sizeof(Max7219_display)/sizeof(Max7219_display[0]); 
 
-#define MAX_CLK A1   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
-#define MAX_CS  A2    //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
-#define MAX_DIN A3  //PIN "Data In" for the SPI connection of the 7-Segment Tube 
-#define MAX_BRIGHTNESS 5
+#define MAX_CLK 2    //PIN "Clock" for the SPI connection of the 7-Segment Tube 
+#define MAX_CS  3    //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
+#define MAX_DIN 4    //PIN "Data In" for the SPI connection of the 7-Segment Tube 
+#define MAX_BRIGHTNESS 5 //0 (out) -  16 (max brightness)
   
 void SetupMax7219()
 {
@@ -44,6 +46,7 @@ void UpdateMAX7219(byte p)
 {
   bool dp=false;
   //mod
+  //Variable Wert will be initialized in CMDS module
   //char Wert[DATENLAENGE]="";
   //mod
   
