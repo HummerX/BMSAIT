@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.15  from 26.9.2023 (BMS 4.37)
+0;F4SM;bool;F4SMVar;Version of this file: 1.16  from 26.10.2023 (BMS 4.37u3)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -410,6 +410,13 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1900;AIRCRAFT;int ;lastdamage;1 to 8 depending on quadrant. 
 1910;AIRCRAFT;float ;damageforce;How big the hit was.
 1920;AIRCRAFT;int;whendamage;???
+1930;RADIO;int;radio2_preset;Radio 2 channel preset (if present).
+1940;RADIO;int;radio2_frequency;Radio 2 channel frequency (if present).
+1950;IFF;int;iffTransponderActiveCode1;mode 1
+1960;IFF;int;iffTransponderActiveCode2;mode 2
+1970;IFF;int;iffTransponderActiveCode3A;mode 3A
+1980;IFF;int;iffTransponderActiveCodeC;mode C
+1990;IFF;int;iffTransponderActiveCode4;"mode 4; assumes the correct codeword"
 2000;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio
 2001;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1
 2002;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2
