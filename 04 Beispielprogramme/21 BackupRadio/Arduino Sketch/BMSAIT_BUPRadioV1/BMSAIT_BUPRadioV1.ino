@@ -24,7 +24,7 @@
   
 //Function headers
   void ReadData();
-  void UpdateInput();
+  void UpdateInput(bool all);
   void UpdateOutput();
   void PullRequest(byte v);
   void ReadResponse();     
@@ -215,6 +215,7 @@ void setup()
     SetupBUPRadio();
   #endif                                //LEDs setup end
   //mod
+  
    #ifdef LED                            //LEDs setup begin
     SetupLED();
   #endif                                //LEDs setup end
@@ -307,8 +308,7 @@ void setup()
     SetupNewDevice();
   #endif                                //Example end
   
-  
- //precompile pull messages
+  //precompile pull messages
   char pos[2]={0,0};
   char nachricht[10]={0};
   for (byte var=0;var<VARIABLENANZAHL;var++)
@@ -333,7 +333,6 @@ void setup()
     strcpy(datenfeld[var].request,nachricht);
   }
 }
-
 
 /// Main loop
 void loop()              
@@ -495,6 +494,11 @@ void UpdateOutput()
           break;
       #endif
       
+      #ifdef SLx2016
+        case 32:   //7-Segment display TM1637
+          UpdateSLx2016(x);
+          break;
+      #endif   								 
       #ifdef ServoMotor
         case 40: //standard Servos (i.e. SG90)
           UpdateServo(x);
@@ -525,6 +529,12 @@ void UpdateOutput()
           break;
       #endif
       
+      #ifdef CompassX27
+        case 53: //compass driven by X-class stepper motor
+          UpdateCompassX27(x);
+          break;
+      #endif 
+	  
       #ifdef MotorPoti
         case 60: //MotorPoti
           UpdateMotorPoti(x);
@@ -549,6 +559,11 @@ void UpdateOutput()
           break;      
       #endif
       
+      #ifdef Lighting
+        case 80: //Backlighting
+          UpdateLighting(x);
+          break;      
+      #endif
       #ifdef NewDevice  //define this flag in the top of BMSAIT_UserConfig.h to activate this block ("#define newDevice")
         case 69: //assign this type to a variable in the data container to call a new method
           UpdateNewDevice(x);  //program a new method void Update_newDevice(int p){command1;command2;...}to enable your device 
@@ -593,28 +608,28 @@ void PullRequest(byte var)
     ReadResponse();
   }
     
-    SendMessage(datenfeld[var].request,2);
-    byte x=0;
-    while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
-    {
-      #ifdef PRIORITIZE_OUTPUT
-        UpdateOutput(); //throw in another update if outputs are priorized
-        x+=10;
-      #endif
-      #ifdef PRIORITIZE_INPUT
-        UpdateInput();   //throw in another update if inputs are priorized
-        x+=10;
-      #endif
-      delay(1);
-      FastUpdate();
-      x++;  
-    }
-    while(SERIALCOM.available()>1)  //read incoming data     
-    {
-      delay(1);
-      FastUpdate();
-      ReadResponse();
-    }
+  SendMessage(datenfeld[var].request,2);
+  byte x=0;
+  while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
+  {
+    #ifdef PRIORITIZE_OUTPUT
+      UpdateOutput(); //throw in another update if outputs are priorized
+      x+=10;
+    #endif
+    #ifdef PRIORITIZE_INPUT
+      UpdateInput();   //throw in another update if inputs are priorized
+      x+=10;
+    #endif
+    delay(1);
+    FastUpdate();
+    x++;  
+  }
+  while(SERIALCOM.available()>1)  //read incoming data     
+  {
+    delay(1);
+    FastUpdate();
+    ReadResponse();
+  }
 }
 
 
@@ -677,7 +692,7 @@ bool CheckForSysCommand(byte SysCmd)
   } 
   else if (SysCmd == READBACKON)
   {
-    //confirm readbackmode
+    //confirm debugmode
     readbackmode=true;
     SERIALCOM.flush();
     SendSysCommand("on");
@@ -766,7 +781,7 @@ void ReadResponse()
         }
         else
         {
-          if (debugmode){SendMessage("Fehler State 3",1);}
+          if (debugmode){SendMessage("Fehler State 2",1);}
           state=0; //unexpected value. discard data and start over.
         }  
       }
@@ -809,14 +824,6 @@ void ReadResponse()
                 {BUPRadioFreq[neuer_wert.varNr-100].wert[lauf]='\0';}
                 
               memcpy(BUPRadioFreq[neuer_wert.varNr-100].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
-              if (debugmode && (neuer_wert.varNr==120))
-              {
-                for (byte x=101;x<121;x++)
-                {
-                  //if (testmode) {DebugReadbackBUP(x-100);} //send current data back to BMSAIT App for debug purposes
-                  delay(2);
-                }
-              }
             }
             //modification for BUP Radio   
             state=0;

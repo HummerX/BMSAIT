@@ -1,4 +1,4 @@
-//options - uncommend options you want to use to determine the backup UHD display
+//options - uncomment options you want to use to determine the backup UHF display
 #define check_for_ac_power
 #define check_for_UHF_Main_Switch
 //#define check_for_UHF_Volume_On
@@ -72,7 +72,11 @@ void SetupBUPRadio()
       gefunden[2]=true;
     }          
   }
- if (!gefunden[0] || !gefunden[1] || !gefunden[2]) SendMessage("Fehler in Funktion SetupBUPRadio",1);
+ if (!gefunden[0] || !gefunden[1] || !gefunden[2]) 
+ {
+  delay(2000);
+  SendMessage("Fehler in Funktion SetupBUPRadio",1);
+ }
 }
 
 ///check if a display is supposed to be illuminated
