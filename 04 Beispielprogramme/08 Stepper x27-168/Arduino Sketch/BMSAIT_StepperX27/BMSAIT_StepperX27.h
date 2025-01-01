@@ -1,4 +1,4 @@
-//V2.1 12.3.22
+//V2.2 1.1.25
 // settings and functions to drive a stepper motor (i.e. x27-168)
 // standard X27.168 range is 315 degrees at 1/3 degree steps
 //target= reference link to the line of the stepperdata table of this module
@@ -13,7 +13,7 @@ typedef struct
 {
 byte pIN[4];        //PINs the motor is connected to
 uint16_t arc;       //max steps for the motor
-bool invert;         //mark if the motor has its 0 Position on the clockwise end
+bool invert;         //mark if the motor has its zero position on the clockwise end of the movement arc
 unsigned int last;  //current target
 } StepperdataX27;
 
@@ -24,6 +24,7 @@ StepperdataX27 stepperdataX27[] =
 {
   //  {PIN1 PIN2 PIN3 PIN4}    arc    invert   last
     { {  2,   3,   4,   5   }, 315*3 , false,    0   }  // example: RPM
+// ,{ {  x,   x,   x,   x   }, 315*3 , false,    0   }  //uncomment this to add a second motor. You need to change the x by the correct PINs
 };
 
 const int stepperzahlX27 = sizeof(stepperdataX27)/sizeof(stepperdataX27[0]);
@@ -31,6 +32,7 @@ const int stepperzahlX27 = sizeof(stepperdataX27)/sizeof(stepperdataX27[0]);
 SwitecX25 stepperX27[stepperzahlX27]=
 {
   SwitecX25(945,0,0,0,0)
+//,SwitecX25(945,0,0,0,0)  //uncomment this to add a second motor. no changes to the field are needed
 }; 
 
 
