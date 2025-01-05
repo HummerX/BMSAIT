@@ -68,7 +68,7 @@ void UpdateSBI(byte pos)
 {
   if ((millis()-lastInput)>10000) 
   {
-    if (!testmode)         //if not in testmode and no data was recieved within 10 seconds,the display will shut down
+    if (!debugmode)         //if not in testmode and no data was recieved within 10 seconds,the display will shut down
     {
       ClearDisplaySBI();    
       sb[0]=3;
