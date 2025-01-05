@@ -31,6 +31,7 @@
 //BASIC SETTINGS
   #define BAUDRATE 57600      // serial connection speed
   #define POLLTIME 200           // set time between PULL data requests
+  #define PULLTIMEOUT 30         // set time to wait for a requested data update; default: 30ms
   #define PRIORITIZE_OUTPUT    //uncomment this to put a stress on fast update of outputs (should be used for motors to allow smoother movements)
   //#define PRIORITIZE_INPUT     //uncomment this to put a stress on fast er poll of inputs (switches/Buttons) 
   const char ID[]= "BMSAIT_FFI"; //Set the ID for this arduino program. Use any string. The program will use this ID to check in with the BMSAIT windows application
