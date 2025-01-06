@@ -1,4 +1,4 @@
-  // V2.3  5.4.22
+  // V2.4  13.1.24
  // Display of the DED or the PFL on a 256x64 OLED display
  // inspired by the DEDuino coding by Uri_ba (https://pit.uriba.org/tag/deduino/)
  
@@ -7,7 +7,7 @@
 
 
 // Declare screen Object
-#if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+#if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA) || defined(ESP)
   //arduino board with enough memory will use the unbuffered mode
    U8G2_SSD1322_NHD_256X64_F_4W_SW_SPI displayDED(U8G2_R0, /* (gelb) clock=*/ 2, /* (violett) data=*/ 3, /*(blau) cs=*/ 4, /*(grün) dc=*/ 5, /*(orange) reset=*/ 6); 
    //U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI displayDED(U8G2_R0, /* CS=*/ 4, /* DC=*/ 2);
@@ -136,7 +136,7 @@ void ClearDED()
 ///draw DED data from SharedMem
 void RealDED()
 {
-    #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+    #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA) || defined(ESP)
       displayDED.clearBuffer();     //strong arduinos: command for full buffered mode
     #else
       displayDED.firstPage(); //weak arduinos: command for paged mode
@@ -147,7 +147,7 @@ void RealDED()
       {
         displayDED.drawStr(DED_H_CONST, line * DED_CHAR_H + DED_V_CONST, datenfeld[line+2].wert);
       }
-    #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+    #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA) || defined(ESP)
       displayDED.sendBuffer(); //strong arduinos: command for full buffered mode
     #else
       } while ( displayDED.nextPage() ); //weak arduinos: command for paged mode
@@ -159,7 +159,7 @@ void RealDED()
 ///draw a test picture 
 void TestDED()
 {
-  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)|| defined(ESP)
     displayDED.clearBuffer();     //strong arduinos: command for full buffered mode
   #else
     displayDED.firstPage(); //weak arduinos: command for paged mode
@@ -174,7 +174,7 @@ void TestDED()
       displayDED.drawLine(1,32,63,32);
       displayDED.drawLine(192,32,255,32);
   
-  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)|| defined(ESP)
     displayDED.sendBuffer(); //strong arduinos: command for full buffered mode
   #else
     } while ( displayDED.nextPage() ); //weak arduinos: command for paged mode
