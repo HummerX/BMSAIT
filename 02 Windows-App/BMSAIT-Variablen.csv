@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.16  from 26.10.2023 (BMS 4.37u3)
+0;F4SM;bool;F4SMVar;Version of this file: 1.17  from 23.01.2024 (BMS 4.37u3)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -9,6 +9,7 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 70;AIRCRAFT;float;turnRate;actual turn rate (no delay or dampening) in degrees/second
 80;AIRCRAFT;float;yaw;Ownship Yaw (Radians)
 90;ALTIMETER;float;aauz;AAU altimeter indicated altitude (new in BMS4)
+91;ALTIMETER;string;aauz_s;Digit display of altimeter
 100;ALTIMETER;float;cabinAlt;Ownship cabin altitude
 101;ALTIMETER;int;cabinAlt(s);Ownship cabin altitude (0..65535)
 110;ALTIMETER;float;caraAlow;Cara alow setting
