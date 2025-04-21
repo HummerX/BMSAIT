@@ -1,5 +1,5 @@
 // Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
-// Version: 1.3.13   30.3.22
+// Version: 1.3.15   18.4.25
 // Robin "Hummer" Bruns
 
 
@@ -14,8 +14,8 @@
   #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
-  #define TESTON  190         // activates testmode
-  #define READBACKON 191      // activates testmode with readback of data variables
+  #define TESTON  190         // activates readback of data variables
+  #define READBACKON 191      // activates testmode with readback of data variables 
   #define TESTOFF 200         // deactivates testmode
   #define VAR_BEGIN '<'       // char to mark the begin of the actual data
   #define VAR_ENDE '>'        // char to mark the end of the actual data
@@ -24,7 +24,7 @@
   
 //Function headers
   void ReadData();
-  void UpdateInput();
+  void UpdateInput(bool all);
   void UpdateOutput();
   void PullRequest(byte v);
   void ReadResponse();     
@@ -79,7 +79,7 @@
   
 //settings for PULL logic
   bool pull= false;           //flag that defines wether to use push or pull logic (true=pull ; false=push). Can be switched by commands of the F4SMExporter App
-  long lastPoll=0;            //timestamp of the last data request during pull logic
+  unsigned long lastPoll=0;            //timestamp of the last data request during pull logic
   byte last_request=99;        //marker for the last variable that was requested via pull logic in the last loop 
 //settings for PULL logic
 
@@ -89,6 +89,11 @@
   #include "BMSAIT_Switches.h" 
 #endif  
  
+ //magnetic held switches
+#ifdef MagSwitch                
+  #include "BMSAIT_MagSwitch.h" 
+#endif  
+
 //button matrix settings
 #ifdef ButtonMatrix               
   #include "BMSAIT_Buttonmatrix.h"
@@ -276,6 +281,10 @@ void setup()
    SetupSwitches();
   #endif                                //Input controller setup end
   
+  #ifdef MagSwitch                       //Input controller setup begin
+   SetupMagSwitch();
+  #endif                                //Input controller setup end  
+    
   #ifdef ButtonMatrix                   //Buttonmatrix setup begin
    SetupButtonMatrix();
   #endif                                //Buttonmatrix setup end
@@ -299,7 +308,7 @@ void setup()
  //precompile pull messages
   char pos[2]={0,0};
   char nachricht[10]={0};
-  for (byte var=0;var<VARIABLENANZAHL;var++)
+  for (byte var=0;var<variableCount;var++)
   {                                          
     itoa(var,pos,10);  //write data container position as character
     if (var<10) 
@@ -335,6 +344,7 @@ void loop()
   UpdateOutput(); //update outputs (LEDs, motors, displays)
   FastUpdate();
 }
+
 
 //********************
 //Functions
@@ -401,6 +411,10 @@ void FastUpdate()
 
 #ifdef MotorPoti
   MotorPoti_FastUpdate(); 
+#endif 
+
+#ifdef MagSwitch
+  MagSwitch_FastUpdate(); 
 #endif  
 }
 
@@ -411,7 +425,7 @@ void ReadData()
   {
     if (millis()-POLLTIME>lastPoll) //reduce the time between data request to prevent spamming (default POLLTIME 200 --> max of 5 attempts per second)
     {
-      for (byte v=0;v<VARIABLENANZAHL;v++)  //request update of each data variable
+      for (byte v=0;v<variableCount;v++)  //request update of each data variable
         {PullRequest(v);}
       lastPoll=millis();
     }
@@ -444,7 +458,10 @@ void UpdateOutput()
     UpdateDED();  
   #endif
   
- for (byte x=0;x<VARIABLENANZAHL;x++)     //loop through the data container. For each entry, the respective output will be updated
+  #ifdef MagSwitch  
+    UpdateMagSwitches();            
+  #endif 					
+ for (byte x=0;x<variableCount;x++)     //loop through the data container. For each entry, the respective output will be updated
   {
     switch (datenfeld[x].typ)
     {
@@ -482,11 +499,11 @@ void UpdateOutput()
       #endif
 
       #ifdef SLx2016
-        case 32:   //7-Segment display TM1637
+        case 32:   //matrix display SLx2016
           UpdateSLx2016(x);
           break;
       #endif
-
+      
       #ifdef ServoMotor
         case 40: //standard Servos (i.e. SG90)
           UpdateServo(x);
@@ -546,7 +563,7 @@ void UpdateOutput()
           UpdateFFI(x);
           break;      
       #endif
-      
+
       #ifdef Lighting
         case 80: //Backlighting
           UpdateLighting(x);
@@ -598,6 +615,7 @@ void PullRequest(byte var)
   }
     
     SendMessage(datenfeld[var].request,2);
+    
     byte x=0;
     while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
     {
@@ -632,85 +650,85 @@ void Reset()
 
 bool CheckForSysCommand(byte SysCmd)
 {
-  bool SysCmdFound=false;
-  if (SysCmd == HANDSHAKE)
+  switch (SysCmd)
   {
-    SERIALCOM.flush();
-    SendSysCommand(ID); //Send ID to idendify this board
-    SysCmdFound=true;
+    case HANDSHAKE:
+      {
+        SERIALCOM.flush();
+        SendSysCommand(ID); //Send ID to identify this board
+        break;
+      }
+    case STARTPULL:
+      {
+        //confirm start of PULL requests
+        pull=true;
+        SERIALCOM.flush();
+        SendSysCommand("on");
+        break;
+      }  
+    case ENDPULL:
+      {
+        //confirm termination of PULL requests
+        pull=false;
+        SERIALCOM.flush();
+        SendSysCommand("off");
+        break;
+      } 
+    case CALIBRATE:
+      {
+        //reset motor position to zero
+        SERIALCOM.flush();
+        SendSysCommand("ok");
+        ResetMotors(true);
+        break;
+      }    
+    case ZEROIZE:
+        {
+        //reset motor position to zero
+        SERIALCOM.flush();
+        SendSysCommand("ok");
+        ResetMotors(false);
+        break;
+      }        
+    case TESTON:
+      {
+        //confirm debugmode
+        debugmode=true;
+        SERIALCOM.flush();
+        SendSysCommand("on");
+        break;
+      } 
+    case READBACKON:
+      {
+        //confirm readbackmode
+        readbackmode=true;
+        SERIALCOM.flush();
+        SendSysCommand("on");
+        break;
+      }   
+    case TESTOFF:
+      {
+        //confirm end of debugmode
+        debugmode=false;
+        readbackmode=false;
+        SERIALCOM.flush();
+        SendSysCommand("off");
+        break;
+      }
+    case SWITCHPOSITION:
+      {
+        //send current switch positions
+        SERIALCOM.flush();
+        UpdateInput(true);
+        break;
+      }
+    default:
+      {
+        return false;
+      }
   }
-  else if (SysCmd == STARTPULL)
-  {
-    //confirm start of PULL requests
-    pull=true;
-    SERIALCOM.flush();
-    SendSysCommand("on");
-    SysCmdFound=true;
-  }  
-  else if (SysCmd == ENDPULL)
-  {
-    //confirm termination of PULL requests
-    pull=false;
-    SERIALCOM.flush();
-    SendSysCommand("off");
-    SysCmdFound=true;
-  } 
-  else if (SysCmd == CALIBRATE)
-  {
-    //reset motor position to zero
-    SERIALCOM.flush();
-    SendSysCommand("ok");
-    ResetMotors(true);
-    SysCmdFound=true;
-  }    
-  else if (SysCmd == ZEROIZE)
-  {
-    //reset motor position to zero
-    SERIALCOM.flush();
-    SendSysCommand("ok");
-    ResetMotors(false);
-    SysCmdFound=true;
-  }          
-  else if (SysCmd == TESTON)
-  {
-    //confirm debugmode
-    debugmode=true;
-    SERIALCOM.flush();
-    SendSysCommand("on");
-    SysCmdFound=true;
-  } 
-  else if (SysCmd == READBACKON)
-  {
-    //confirm debugmode
-    readbackmode=true;
-    SERIALCOM.flush();
-    SendSysCommand("on");
-    SysCmdFound=true;
-  }   
-  else if (SysCmd == TESTOFF)
-  {
-    //confirm end of debugmode
-    debugmode=false;
-    readbackmode=false;
-    SERIALCOM.flush();
-    SendSysCommand("off");
-    SysCmdFound=true;
-  }
-  else if (SysCmd == SWITCHPOSITION)
-  {
-    //send current switch positions
-    SERIALCOM.flush();
-    UpdateInput(true);
-    SysCmdFound=true;
-  }
-  
-  if (SysCmdFound==true)
-  {
-    Reset();
-    return true;
-  }
-  else
-  {return false;}
+  Reset();
+  return true;
 }
 
 /// Check incoming serial data for data. Expects structured messages --> CommandBit VariableID {VariableType}<Data>
@@ -737,7 +755,7 @@ void ReadResponse()
       inputByte_1=SERIALCOM.read();
       if (!CheckForSysCommand(inputByte_1))  //check if a system command was recieved. If not, continue to check if valid data was recieved
       {
-        if (((int)inputByte_1 < VARIABLENANZAHL) || ((int)inputByte_1 >100)) //check if ID is valid
+        if (((int)inputByte_1 < variableCount) || ((int)inputByte_1 >100)) //check if ID is valid
         {
           neuer_wert.varNr=(int)inputByte_1;
           state=2;
@@ -770,7 +788,7 @@ void ReadResponse()
         }
         else
         {
-          if (debugmode){SendMessage("Fehler State 3",1);}
+          if (debugmode){SendMessage("Fehler State 2",1);}
           state=0; //unexpected value. discard data and start over.
         }  
       }
@@ -805,6 +823,7 @@ void ReadResponse()
                 memcpy(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert, sizeof(neuer_wert.wert)); //write the new data into the data container
               }
               lastInput=millis(); //store last transmission time
+              if (readbackmode){DebugReadback(neuer_wert.varNr);}
             }  
             state=0;
           }
@@ -866,37 +885,24 @@ void SendSysCommand(const char text[])
 void SendMessage(const char message[], byte option)
 {
   SERIALCOM.print(VAR_BEGIN);
-  if (option==1)      //send a text message
+  switch (option)
   {
-    SERIALCOM.print('t');
-  }
-  else if (option==2) //send a data request
-  {
-    SERIALCOM.print('d');
-  }
-  else if (option==3) //send a command
-  {
-    SERIALCOM.print('k');
-  }
-  else if (option==4) //sends analog axis data value
-  {
-    SERIALCOM.print('a');
-  }
-  else if (option==5) //report empty input buffer
-  {
-    SERIALCOM.print('g');
-  }  
-    else if (option==6) //request DED/PFL Data
-  {
-    SERIALCOM.print('u');
-  }  
-  else if (option==7) //send an internal command for BMSAIT App
-  {
-    SERIALCOM.print('s');
-  }                        
-  else
-  {
-    //do nothing
+    case 1://send a text message
+      {SERIALCOM.print('t'); break;}
+    case 2: //send a data request
+      {SERIALCOM.print('d');break;}
+    case 3: //send a command
+      {SERIALCOM.print('k');break;}
+    case 4: //sends analog axis data value
+      {SERIALCOM.print('a');break;}
+    case 5: //report empty input buffer
+      {SERIALCOM.print('g');break;}  
+    case 6: //request DED/PFL Data
+      {SERIALCOM.print('u');break;}  
+    case 7: //send an internal command to BMSAIT App
+      {SERIALCOM.print('s');break;}                        
+    default:
+      {return;/*do nothing*/}
   }
   SERIALCOM.print(message) ;
   SERIALCOM.println(VAR_ENDE);
