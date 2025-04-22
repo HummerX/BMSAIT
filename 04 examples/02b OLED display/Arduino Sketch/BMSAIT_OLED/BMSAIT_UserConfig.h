@@ -16,6 +16,7 @@
   //#define StepperX27        //drive stepper motor X27.168
   //#define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
   //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
+  //#define AirCore           //drive multiple Air Core motors (via CS4192 controller chip)
   //#define MotorPoti         //motor-driven poti control
   #define OLED              //display data on an OLED display
   //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)

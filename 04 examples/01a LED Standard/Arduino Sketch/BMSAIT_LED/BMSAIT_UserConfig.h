@@ -15,6 +15,7 @@
   //#define StepperBYJ        //drive stepper motor 28BYJ-48
   //#define StepperX27        //drive stepper motor X27.168
   //#define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
+  //#define AirCore           //drive multiple Air Core motors (via CS4192 controller chip)
   //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
   //#define MotorPoti         //motor-driven poti control
   //#define OLED              //display data on an OLED display

@@ -907,4 +907,3 @@ void SendMessage(const char message[], byte option)
   SERIALCOM.print(message) ;
   SERIALCOM.println(VAR_ENDE);
 }
-
