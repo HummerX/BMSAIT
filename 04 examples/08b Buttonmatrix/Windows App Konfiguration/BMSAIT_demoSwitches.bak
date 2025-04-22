@@ -1,0 +1,9 @@
+<controller>;0;COM1;57600;DemoButtonMatrix;200;1
+<kommando>;<device>,0;1;2;UHF-OFF;<>;<>;<>;<JoyB>;1;2;
+<kommando>;<device>,0;2;3;UHF-MAIN;<>;<>;<>;<JoyB>;1;2;
+<kommando>;<device>,0;3;4;UHF-BOTH;<>;<>;<>;<JoyB>;1;2;
+<kommando>;<device>,0;4;79;ManPitchOverPress;<>;<>;<>;<KeyB>;0;0;
+<kommando>;<device>,0;5;79;ManPitchOverRelease;<>;<>;<>;<KeyB>;0;1;
+<kommando>;<device>,0;6;71;GearDown;<>;<>;<>;<KeyB>;0;2;
+<kommando>;<device>,0;7;71;GearUp;<>;<>;<shft>;<KeyB>;0;2;
+

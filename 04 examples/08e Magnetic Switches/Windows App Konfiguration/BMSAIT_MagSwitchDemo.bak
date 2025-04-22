@@ -1,0 +1,8 @@
+<controller>;0;COM29;57600;MagSwitch;200;1
+<methode>;0;1531;0;<@>;False;1
+<methode>;0;1247;1;<@>;False;1
+<methode>;0;1600;2;<@>;False;1
+<methode>;0;1594;3;<@>;False;1
+<kommando>;<device>,0;1;49;AP right up;<>;<alt>;<>;<KeyB>;0;2;
+<kommando>;<device>,0;2;50;AP right center;<>;<alt>;<>;<KeyB>;0;2;
+<kommando>;<device>,0;3;51;AP right down;<>;<alt>;<>;<KeyB>;0;2;
