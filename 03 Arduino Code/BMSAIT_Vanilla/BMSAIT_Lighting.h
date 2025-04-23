@@ -1,12 +1,12 @@
 // settings and functions to enable a software controlled backlighting
-// V0.1 30.03.2022
+// V0.2 30.03.2025
 
 // datenfeld.target defines the PIN to output power to a 5V backlighting circuit (max 40mA!)
 bool lightsOn=false;
 
 void SetupLighting()
 {
-  for (byte x;x<VARIABLENANZAHL;x++)
+  for (byte x=0;x<variableCount;x++)
   {
     if (datenfeld[x].typ==80)
       {pinMode(datenfeld[x].target, OUTPUT);}

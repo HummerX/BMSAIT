@@ -1,13 +1,12 @@
-// V1.3.7 26.09.2021
+// V1.2 24.04.2022
 // This module provides functions to read switches and send commands to the BMSAIT windows application
 // define any attached input controls (buttons, switches) and the command to be send back to Windows.
-
 
 typedef struct //data field structure for switches and buttons
 {
   byte pIN;                       //sets the PIN the switch is connected to
   char bezeichnung[6];            //short description (max. 5 characters)
-  byte typ;                       //sets the type of switch:  (1) button/momentary switch, (2) permanent switch or (3)rotary switch with analog read
+  byte typ;                       //sets the type of switch:  (1) button/momentary switch, (2) permanent switch, (3)rotary switch with analog read (4) Rotary encoder
   byte switchID;                  //used to differentiate between multiple rotary switches w/ analog read
   uint16_t lastPINState;          //memorizes last state 
   char signalOn[3];               //sets the command that will be send to the windows app when the switch gets activated
@@ -16,100 +15,76 @@ typedef struct //data field structure for switches and buttons
 } Switch;
   
   
+  
 typedef struct //data field structure to define commands for rotary switches with analog reading
 {
-  char command[3];        // command to be send (2 digits, i.e. "01")
-  bool ext;                // defines if a command is used within the arduino enviroment or to be send to the Windows app
-  uint16_t untergrenze;    // lowest value of the analog read that will initiate this command (0..1024)
-  uint16_t obergrenze;     // highest value of the analog read that will initiate this command (0..1024)
+  char command[3];      // command to be send (2 digits, i.e. "01")
+  bool ext;             // defines if a command is used within the arduino enviroment or to be send to the Windows app
+  uint16_t lbound;      // lowest value of the analog read that will initiate this command (0..1024)
+  uint16_t ubound;      // highest value of the analog read that will initiate this command (0..1024)
 } Rotary;
 
 
 //Switch definition. If you add a switch, add a line to the following list 
-Switch schalter[]=
+Switch switches[]=
 {
-//  <PIN>,<description>,<type>,<rotarySwitchID>,  0, <commandID when pressed>,<commandID when released>,<internal command>
-    { 2,     "MC",       1,         0,            0,           "01",                     "00",                   0}          //Example button (Master Caution pushbutton) on PIN 2
-   ,{ 3,     "OVRD",     2,         0,            0,           "02",                     "03",                   0}          //Example button (Man Pitch Override) on PIN 3    
-   ,{ 4,     "Gear",     2,         0,            0,           "04",                     "05",                   0}          //Example switch (Gear) on PIN 4
-   ,{ A0,    "UHFM",     3,         0,            0,           "00",                     "00",                   0}          //Example rotary switch (UHF Main) on PIN A0
+ // <PIN>,<description>,<type>,<rotarySwitchID>,  0, <commandID when pressed>,<commandID when released>,<internal command> 
+     {4,     "BUP",       2,           0,         0,          "01",                     "02",                  0}   // DigitalBUP - Backup / Off
+    ,{5,     "AFLAP",     2,           0,         0,          "03",                     "04",                  0}   // AltFlaps - Extend / Norm
+    ,{6,     "MTF-F",     2,           0,         0,          "05",                     "06",                  0}   // Manual TF Flyup - ENABLE/DISABLE
+    ,{7,     "LEFLP",     2,           0,         0,          "07",                     "08",                  0}   // LE Flaps - Lock/Auto
+    ,{8,     "FCLSR",     2,           0,         0,          "09",                     "00",                  0}   // FCLS - Reset
+    ,{9,     "BIT-T",     2,           0,         0,          "10",                     "00",                  0}   // BIT - Test
+    ,{A2,    "BIT-T",     1,           0,         0,          "11",                     "12",                  0}   // Fire&Overheat
+    ,{A3,    "BIT-T",     2,           0,         0,          "13",                     "14",                  0}   // Oxy Qty
+    ,{A4,    "BIT-T",     1,           0,         0,          "15",                     "16",                  0}   // Mal&Ind Lights
+    ,{A5,    "BIT-T",     2,           0,         0,          "17",                     "18",                  0}   // EPU/GEN
+    ,{A6,    "BIT-T",     3,           0,         0,          "00",                     "00",                  0}   // Probe Heat
+    ,{A7,    "BIT-T",     3,           1,         0,          "00",                     "00",                  0}   // Test Mode
 };
-const byte anzSchalter = sizeof(schalter)/sizeof(schalter[0]);    
+const byte numSwitches = sizeof(switches)/sizeof(switches[0]);        
     
+//define commands for analog readings of a rotary switch or poti. This is an example for a 10-position switch
+//{<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
 
-
-#define STATES 10  //max number of positions of the rotary switch(es)
-Rotary analogSchalter[][STATES]=
+#define STATES 4  //number of positions of the rotary switch(es)
+Rotary analogInput[][STATES]=
 {
  {
-  //example setting for a 3-position rotary switch
-  //  {<CommandID>,<externalCommand>,<low threshold>,<high threshold>}
-   {    "06",         true,               0,             334}     //send command 04 if analog read is between 0 and 334 (of 1024)
-  ,{    "07",         true,             335,             668}     //send command 05 if analog read is between 335 and 668 (of 1024)
-  ,{    "08",         true,             669,            1024}     //send command 06 if analog read is between 669 and 1024 (of 1024)
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
-  ,{    "00",        false,               0,               0}
- }
+   {"19",true,0,200}       
+  ,{"20",true,201,800}     
+  ,{"25",true,201,800}     // Probe Heat
+  ,{"21",true,801,1024}
   
-  //activate this to add an additional rotary switch (example for a 10-position switch)
-  /*
- ,{
-   {    "09",         true,               0,              64}     //send command 04 if analog read is between 0 and 64 (of 1024)
-  ,{    "10",         true,              65,             177}     //send command 05 if analog read is between 65 and 177 (of 1024)
-  ,{    "11",         true,             178,             291}     //send command 06 if analog read is between 178 and 291 (of 1024)
-  ,{    "12",         true,             292,             405}     //send command 07 if analog read is between 292 and 405 (of 1024)
-  ,{    "13",         true,             406,             518}     //send command 08 if analog read is between 406 and 518 (of 1024)
-  ,{    "14",         true,             519,             632}     //send command 09 if analog read is between 519 and 632 (of 1024)
-  ,{    "15",         true,             633,             746}     //send command 10 if analog read is between 633 and 746 (of 1024)
-  ,{    "16",         true,             747,             859}     //send command 11 if analog read is between 747 and 859 (of 1024)
-  ,{    "17",         true,             860,             973}     //send command 12 if analog read is between 860 and 973 (of 1024)
-  ,{    "18",         true,             974,            1024}     //send command 13 if analog read is between 974 and 1024 (of 1024)
  }
- */
- 
-  //activate this to add an additional rotary switch (example for a 5-position switch)
-  /*    
-  ,{
-     {"19",true,0,177}      //send command 14 if analog read is between 0 and 64 (of 1024)
-    ,{"20",true,178,405}    //send command 15 if analog read is between 178 and 291 (of 1024)
-    ,{"21",true,406,632}    //send command 16 if analog read is between 406 and 518 (of 1024)
-    ,{"22",true,633,859}    //send command 17 if analog read is between 633 and 746 (of 1024)
-    ,{"23",true,860,1024}   //send command 18 if analog read is between 860 and 973 (of 1024)
-    ,{"00",false,0,0}
-  	,{"00",false,0,0}
-	  ,{"00",false,0,0}
-	  ,{"00",false,0,0}
-	  ,{"00",false,0,0}
-	};  
-  */
+ ,
+ {
+   {"22",true,0,200}       
+  ,{"23",true,201,800}     // Test Mode
+  ,{"24",true,801,1024}    
+  ,{"00",false,1025,1025}  
+ }
 };
 
 void SetupSwitches()
 {
-  for (byte index = 0; index < anzSchalter; index++)
+  for (byte index = 0; index < numSwitches; index++)
   {
-    if ((schalter[index].typ==1) || (schalter[index].typ==2))
+    if ((switches[index].typ==1) || (switches[index].typ==2))
     {
     //setup for digital reading of PIN x
-    pinMode(schalter[index].pIN, INPUT_PULLUP);
-    schalter[index].lastPINState=digitalRead(schalter[index].pIN);
+    pinMode(switches[index].pIN, INPUT_PULLUP);
+    switches[index].lastPINState=digitalRead(switches[index].pIN);
     }
-    else if (schalter[index].typ==3)
+    else if (switches[index].typ==3)
     {
     //setup for analog reading of PIN x
-    pinMode(schalter[index].pIN, INPUT_PULLUP);
-    schalter[index].lastPINState=analogRead(schalter[index].pIN);  
+    pinMode(switches[index].pIN, INPUT_PULLUP);
+    switches[index].lastPINState=analogRead(switches[index].pIN);  
     }
-    else if (schalter[index].typ==4)
+    else if (switches[index].typ==4)
     {
     //setup rotary encoders
-    
-    
     }    
     else
     {}
@@ -119,51 +94,55 @@ void SetupSwitches()
 void CheckSwitches(bool all)
 {
     //Check all buttons/switches for changes and send signals to Windows
-    for (byte index = 0; index < anzSchalter; index++)
+    for (byte index = 0; index < numSwitches; index++)
     {
-        if ((schalter[index].typ == 1) || (schalter[index].typ == 2))  //Digitaler Taster, Kippschalter, Drehschalter
+        if ((switches[index].typ == 1) || (switches[index].typ == 2))  //Digitaler Taster, Kippschalter, Drehschalter
         {
-            int currentPINState = digitalRead(schalter[index].pIN);
-            if ((currentPINState != schalter[index].lastPINState) || all)
+            int currentPINState = digitalRead(switches[index].pIN);
+            if ((currentPINState != switches[index].lastPINState) || all)
             {
                 delay(5);
-                schalter[index].lastPINState = currentPINState;
+                switches[index].lastPINState = currentPINState;
                 if (currentPINState == 0)
                 {
-                    if (!(schalter[index].signalOn[0] == '0') || !(schalter[index].signalOn[1] == '0'))
+                    if (!(switches[index].signalOn[0] == '0') || !(switches[index].signalOn[1] == '0'))
                     {
-                        SendMessage(schalter[index].signalOn, 3);
+                        SendMessage(switches[index].signalOn, 3);
                         if (debugmode)
                         {
                             char buf1[6];
                             byte offset = 0;
-                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
-                            itoa(schalter[index].pIN, buf1, 10);
+                            if (switches[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(switches[index].pIN, buf1, 10);
                             buf1[1 + offset] = ',';
                             buf1[2 + offset] = 'O';
                             buf1[3 + offset] = 'n';
                             buf1[4 + offset] = ' ';
                             SendMessage(buf1, 1);
                         }
-                        if ((schalter[index].intCommand==253) && !all)
+
+                        if ((switches[index].intCommand==253) && !all)
                           {SendMessage("1", 7);} //send internal command to BMSAIT to initiate switch sync
-                        if ((schalter[index].intCommand==254) && !all)
+                        if ((switches[index].intCommand==254) && !all)
                           {SendMessage("2", 7);} //send internal command to BMSAIT to fast calibrate motors
-                        if ((schalter[index].intCommand==255) && !all)
+                        if ((switches[index].intCommand==255) && !all)
                           {SendMessage("3", 7);} //send internal command to BMSAIT for full motor calibration
+                        if ((switches[index].intCommand == 253) && !all)
+                          {SendMessage("4", 7);} //send internal command to BMSAIT to turn off panel lighting sync
+
                     }
                 }
                 else
                 {
-                    if (!(schalter[index].signalOff[0] == '0') || !(schalter[index].signalOff[1] == '0'))
+                    if (!(switches[index].signalOff[0] == '0') || !(switches[index].signalOff[1] == '0'))
                     {
-                        SendMessage(schalter[index].signalOff, 3);
+                        SendMessage(switches[index].signalOff, 3);
                         if (debugmode)
                         {
                             char buf1[6];
                             byte offset = 0;
-                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
-                            itoa(schalter[index].pIN, buf1, 10);
+                            if (switches[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(switches[index].pIN, buf1, 10);
                             buf1[1 + offset] = ',';
                             buf1[2 + offset] = 'O';
                             buf1[3 + offset] = 'f';
@@ -174,26 +153,26 @@ void CheckSwitches(bool all)
                 }
             }
         }
-        else if (schalter[index].typ == 3)  //analoger Drehschalter
+        else if (switches[index].typ == 3)  //analog rotary switch
         {
-            uint16_t currentPINState = analogRead(schalter[index].pIN);
+            uint16_t currentPINState = analogRead(switches[index].pIN);
 
-            if (((currentPINState > schalter[index].lastPINState + 50) || ((schalter[index].lastPINState > 50) && (currentPINState < schalter[index].lastPINState - 50))) || all)     //rotary switch got moved
+            if (((currentPINState > switches[index].lastPINState + 50) || ((switches[index].lastPINState > 50) && (currentPINState < switches[index].lastPINState - 50))) || all)     //rotary switch got moved
             {
                 delay(20);
-                currentPINState = analogRead(schalter[index].pIN);
-                schalter[index].lastPINState = currentPINState;
+                currentPINState = analogRead(switches[index].pIN);
+                switches[index].lastPINState = currentPINState;
                 for (byte lauf = 0; lauf < STATES; lauf++)
                 {
-                    if ((currentPINState >= analogSchalter[schalter[index].switchID][lauf].untergrenze) && (currentPINState <= analogSchalter[schalter[index].switchID][lauf].obergrenze))
+                    if ((currentPINState >= analogInput[switches[index].switchID][lauf].lbound) && (currentPINState <= analogInput[switches[index].switchID][lauf].ubound))
                     {
-                        SendMessage(analogSchalter[schalter[index].switchID][lauf].command, 3);
+                        SendMessage(analogInput[switches[index].switchID][lauf].command, 3);
                         if (debugmode)
                         {
                             char buf1[4];
                             byte offset = 0;
-                            if (schalter[index].pIN < 10)offset = 0; else offset = 1;
-                            itoa(schalter[index].pIN, buf1, 10);
+                            if (switches[index].pIN < 10)offset = 0; else offset = 1;
+                            itoa(switches[index].pIN, buf1, 10);
                             buf1[1 + offset] = ',';
                             buf1[2 + offset] = '\0';
                             char buf2[5];

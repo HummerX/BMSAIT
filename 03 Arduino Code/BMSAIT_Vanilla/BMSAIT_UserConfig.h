@@ -14,12 +14,14 @@
   //#define ServoPWM          //drive multiple servo motors via pwm shield
   //#define StepperBYJ        //drive stepper motor 28BYJ-48
   //#define StepperX27        //drive stepper motor X27.168
-  //#define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
   //#define StepperVID        //drive multiple stepper motors X25.168 with a VID66-06 controller
+  //#define CompassX27        //drive a compass with a Xxx.xxx -class stepper motor
+  //#define AirCore           //drive multiple Air Core motors (via CS4192 controller chip)
   //#define MotorPoti         //motor-driven poti control
   //#define OLED              //display data on an OLED display
   //#define SpeedBrake        //Enable display of the SpeedBrake indicator on an 128x64 OLED display (DEDunino)
   //#define FuelFlowIndicator //Enable display of the FuelFlow indicator on an 128x64 OLED display (DEDunino)
+  //#define OLED_Compass      //Enable display of the wet compass on an 128x32 OLED display 
   //#define DED_PFL           //Enable display of DED or PFL on an 254x64 OLED display (DEDunino)
   //#define Switches          //use the arduino to read switch positions and send keyboard commands
   //#define MagSwitch         //enable magnetic held switches														   
@@ -28,8 +30,8 @@
   //#define AnalogAxis        //use the arduino to read analog resistors and sync this with a gamecontroller axis
   //#define Lighting          //software controlled backlighting
   //#define NewDevice         //placeholder. Use this line to activate your own code to drive other, specific hardware
-
-
+  //#define BUPRadio          //activate special procedures to drive the Backup Radio Panel
+  //#define CMDS              //activate special procedures to drive the CMDS Panel
 
 //BASIC SETTINGS
   #define BAUDRATE 57600         // serial connection speed

@@ -17,7 +17,7 @@ const byte max7219anz = sizeof(Max7219_display)/sizeof(Max7219_display[0]);
 #define MAX_CLK 8   //PIN "Clock" for the SPI connection of the 7-Segment Tube 
 #define MAX_CS 9    //PIN "Cable Select" for the SPI connection of the 7-Segment Tube
 #define MAX_DIN 10  //PIN "Data In" for the SPI connection of the 7-Segment Tube 
-#define MAX_BRIGHTNESS 5
+#define MAX_BRIGHTNESS 5 //0 (out) -  16 (max brightness)
   
 void SetupMax7219()
 {

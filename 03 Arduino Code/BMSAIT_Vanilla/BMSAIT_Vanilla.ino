@@ -67,8 +67,8 @@
   byte inputByte_1;           //container for incoming serial message
   byte state =0;              //marker to memorize the current position in a message string
   byte Uebertragung_pos=0;    //counts how many chars have already been read from an incoming data stram. Used to prevent an overflow of data variables. 
-  bool debugmode=false;        //debugmode on/off
-  bool readbackmode=false;        //Readbackmode on/off
+  bool debugmode=false;       //debugmode on/off
+  bool readbackmode=false;    //Readbackmode on/off
   unsigned long lastInput =0; //last successful transmission
   
   #ifdef DUE_NATIVE
@@ -79,8 +79,8 @@
   
 //settings for PULL logic
   bool pull= false;           //flag that defines wether to use push or pull logic (true=pull ; false=push). Can be switched by commands of the F4SMExporter App
-  unsigned long lastPoll=0;            //timestamp of the last data request during pull logic
-  byte last_request=99;        //marker for the last variable that was requested via pull logic in the last loop 
+  unsigned long lastPoll=0;   //timestamp of the last data request during pull logic
+  byte last_request=99;       //marker for the last variable that was requested via pull logic in the last loop 
 //settings for PULL logic
 
 
@@ -88,7 +88,15 @@
 #ifdef Switches                
   #include "BMSAIT_Switches.h" 
 #endif  
- 
+
+#ifdef BUPRadio              
+  #include "BMSAIT_BUPRadio.h"
+#endif
+
+#ifdef CMDS
+  #include "BMSAIT_CMDS.h"
+#endif	 
+
  //magnetic held switches
 #ifdef MagSwitch                
   #include "BMSAIT_MagSwitch.h" 
@@ -169,6 +177,11 @@
   #include "BMSAIT_CompassX27.h"
 #endif  
 
+//Air Core motor w/ controllerboard settings
+#ifdef AirCore                   
+  #include "BMSAIT_AirCore.h"
+#endif  
+
 //motor poti settings
 #ifdef MotorPoti 
   #include "BMSAIT_MotorPoti.h"
@@ -185,6 +198,10 @@
 #ifdef FuelFlowIndicator
   #include "BMSAIT_FF.h"
 #endif
+
+#ifdef OLED_Compass
+  #include "BMSAIT_OLED_Compass.h"
+#endif			
 
 #ifdef DED_PFL                             
   #include "BMSAIT_DED_PFL.h"
@@ -208,7 +225,18 @@
 void setup()
 {
   SERIALCOM.begin(BAUDRATE);
-                                      
+  #ifdef LEONARDO //workaround for issue with serial communication of Leonardo boards
+    while (!Serial);
+  #endif   
+  
+  #ifdef BUPRadio                       //Backup radio setup begin
+    SetupBUPRadio();
+  #endif  								//Backup radio setup end	
+
+  #ifdef CMDS                           //CMDS setup begin
+    SetupCMDS();
+  #endif   
+  
   #ifdef LED                            //LEDs setup begin
     SetupLED();
   #endif                                //LEDs setup end
@@ -252,11 +280,15 @@ void setup()
   #ifdef StepperVID                     //stepper on controller board setup begin
    SetupStepperVID();
   #endif                                //stepper setup end
-
+  
   #ifdef CompassX27                     //Compass setup start
    SetupCompassX27();
   #endif                                //Compass setup end
-
+  
+  #ifdef AirCore                        //Air Core motor setup start
+   SetupAirCore();
+  #endif                                //Air Core motor setup end
+  
   #ifdef MotorPoti                      //MotorPoti setup begin
     SetupMotorPoti();
   #endif                                //MotorPoti setup end
@@ -273,6 +305,10 @@ void setup()
    SetupFFI();
   #endif                                //FFI setup end
   
+  #ifdef OLED_Compass                   //Wet Compass setup begin
+   SetupOLEDCompass();
+  #endif                                //Wet Compass setup end
+
   #ifdef DED_PFL                        //DED setup begin
     SetupDED();
   #endif                                //DED setup end
@@ -377,6 +413,10 @@ void ResetMotors(bool full)
   CompassX27_Zeroize(full);
 #endif 
 
+#ifdef AirCore
+  AirCore_Zeroize(full);   
+#endif
+
 #ifdef MotorPoti
   MotorPoti_Zeroize(full); 
 #endif
@@ -408,6 +448,10 @@ void FastUpdate()
 #ifdef CompassX27
   CompassX27_FastUpdate();
 #endif      
+
+#ifdef AirCore
+  AirCore_FastUpdate();   
+#endif
 
 #ifdef MotorPoti
   MotorPoti_FastUpdate(); 
@@ -460,7 +504,8 @@ void UpdateOutput()
   
   #ifdef MagSwitch  
     UpdateMagSwitches();            
-  #endif 					
+  #endif 		
+
  for (byte x=0;x<variableCount;x++)     //loop through the data container. For each entry, the respective output will be updated
   {
     switch (datenfeld[x].typ)
@@ -497,7 +542,6 @@ void UpdateOutput()
           UpdateTM1637(x);
           break;
       #endif
-
       #ifdef SLx2016
         case 32:   //matrix display SLx2016
           UpdateSLx2016(x);
@@ -539,8 +583,14 @@ void UpdateOutput()
           UpdateCompassX27(x);
           break;
       #endif
-      
-      #ifdef MotorPoti
+      	  
+      #ifdef AirCore
+        case 54: //Air Core motors
+          UpdateAirCore(x);
+          break;
+      #endif
+	  
+	    #ifdef MotorPoti
         case 60: //MotorPoti
           UpdateMotorPoti(x);
           break;      
@@ -564,7 +614,12 @@ void UpdateOutput()
           break;      
       #endif
 
-      #ifdef Lighting
+	    #ifdef OLED_Compass
+         case 73: //FFI OLED
+          UpdateOLEDCompass(x);
+          break;       
+      #endif
+	    #ifdef Lighting
         case 80: //Backlighting
           UpdateLighting(x);
           break;      
@@ -603,7 +658,6 @@ void UpdateInput(bool all)
   #endif
 }
 
-
 ///Send a message to the BMSAIT App to request an update for a data variable
 void PullRequest(byte var)
 {
@@ -613,30 +667,28 @@ void PullRequest(byte var)
     FastUpdate();
     ReadResponse();
   }
-    
-    SendMessage(datenfeld[var].request,2);
-    
-    byte x=0;
-    while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
-    {
-      #ifdef PRIORITIZE_OUTPUT
-        UpdateOutput(); //throw in another update if outputs are priorized
-        x+=10;
-      #endif
-      #ifdef PRIORITIZE_INPUT
-        UpdateInput();   //throw in another update if inputs are priorized
-        x+=10;
-      #endif
-      delay(1);
-      FastUpdate();
-      x++;  
-    }
-    while(SERIALCOM.available()>1)  //read incoming data     
-    {
-      delay(1);
-      FastUpdate();
-      ReadResponse();
-    }
+  SendMessage(datenfeld[var].request,2);
+  byte x=0;
+  while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
+  {
+	#ifdef PRIORITIZE_OUTPUT
+	  UpdateOutput(); //throw in another update if outputs are priorized
+	  x+=10;
+	#endif
+	#ifdef PRIORITIZE_INPUT
+	  UpdateInput();   //throw in another update if inputs are priorized
+	  x+=10;
+	#endif
+	delay(1);
+	FastUpdate();
+	x++;  
+  }
+  while(SERIALCOM.available()>1)  //read incoming data     
+  {
+    delay(1);
+	FastUpdate();
+	ReadResponse();
+  }
 }
 
 
@@ -650,7 +702,7 @@ void Reset()
 
 bool CheckForSysCommand(byte SysCmd)
 {
-  switch (SysCmd)
+  switch (SysCmd)	
   {
     case HANDSHAKE:
       {
@@ -884,8 +936,8 @@ void SendSysCommand(const char text[])
 ///Send a message to the BMSAIT App
 void SendMessage(const char message[], byte option)
 {
-  SERIALCOM.print(VAR_BEGIN);
-  switch (option)
+  SERIALCOM.print(VAR_BEGIN);			 
+  switch (option)  
   {
     case 1://send a text message
       {SERIALCOM.print('t'); break;}

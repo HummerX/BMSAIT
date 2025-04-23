@@ -8,7 +8,7 @@
 
 /// Declare screen Object
   // make sure to find the correct constructor here
-  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA)
+  #if defined(DUE) || defined(DUE_NATIVE) || defined(MEGA) || defined(ESP)
     //arduino board with enough memory will use the unbuffered mode
     U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI displaySBI(U8G2_R0, 2/*clock (D0) */, 3/*data (D1) */, 6/*cs*/,5/*dc*/, 4/*reset*/);
   #else

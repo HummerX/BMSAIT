@@ -5,6 +5,7 @@
 // datenfeld.ref2 sets LED brightness (0..255) -->works on pwm PINs only!
 // datenfeld.ref2 sets a timemark for fast blink (2 switches per second)
 // datenfeld.ref3 sets a timemark for slow blink (1 switch per second)
+
 #ifdef ESP  
   #include <analogWrite.h>
 #endif
@@ -16,7 +17,7 @@ unsigned long LEDTimer;
 void SetupLED()
 {
    //all LED PINs are set to output
-  for(byte a = 0; a < VARIABLENANZAHL; a++)
+  for(byte a = 0; a < variableCount; a++)
   {
     if (datenfeld[a].typ==10)
     {
@@ -29,13 +30,13 @@ void SetupLED()
       digitalWrite(datenfeld[a].target,HIGH);
     } 
   }
-  LEDTimer=millis();;
+  LEDTimer=millis();
 }
 
 void UpdateBlink()
 {
   LEDTimer=millis();
-  for(byte a = 0; a < VARIABLENANZAHL; a++)
+  for(byte a = 0; a < variableCount; a++)
   {
     if ((datenfeld[a].typ==10) || (datenfeld[a].typ==11))
     {

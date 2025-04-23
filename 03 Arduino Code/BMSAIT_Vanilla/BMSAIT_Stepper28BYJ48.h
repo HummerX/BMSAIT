@@ -34,9 +34,9 @@ for (byte stepperID=0;stepperID<stepperzahlBYJ;stepperID++)
     stepperBYJ[stepperID].setSpeed(200);
     stepperBYJ[stepperID].moveTo(0);
     #ifdef Switches
-    for (byte switchID=0;switchID<anzSchalter;switchID++)
+    for (byte switchID=0;switchID<numSwitches;switchID++)
     {
-     if (schalter[switchID].intCommand==51+stepperID){stepperdataBYJ[stepperID].calSwitch=switchID;}
+     if (switches[switchID].intCommand==51+stepperID){stepperdataBYJ[stepperID].calSwitch=switchID;}
     }
     #endif
   } 
@@ -52,7 +52,7 @@ void StepperBYJ_Zeroize(bool full)
       stepperBYJ[stepperID].move(stepperdataBYJ[stepperID].arc);
       long termination=millis()+4000;
       
-      while((digitalRead(schalter[stepperdataBYJ[stepperID].calSwitch].pIN)==1)&&(millis()<termination));
+      while((digitalRead(switches[stepperdataBYJ[stepperID].calSwitch].pIN)==1)&&(millis()<termination));
       {
         stepperBYJ[stepperID].run();
       }
@@ -82,11 +82,11 @@ void StepperBYJ_Zeroize(bool full)
 
 void ManualCalibrationStepperBYJ(byte StepperID)
 {
-  if ((stepperdataBYJ[StepperID].calSwitch!=99) && (digitalRead(schalter[stepperdataBYJ[StepperID].calSwitch].pIN)==0))
+  if ((stepperdataBYJ[StepperID].calSwitch!=99) && (digitalRead(switches[stepperdataBYJ[StepperID].calSwitch].pIN)==0))
   {
     int endPoint = stepperdataBYJ[StepperID].arc;
     SendSysCommand("Starte");
-    while (digitalRead(schalter[stepperdataBYJ[StepperID].calSwitch].pIN)==0)
+    while (digitalRead(switches[stepperdataBYJ[StepperID].calSwitch].pIN)==0)
     { 
       if (stepperBYJ[StepperID].distanceToGo() == 0)
       {
