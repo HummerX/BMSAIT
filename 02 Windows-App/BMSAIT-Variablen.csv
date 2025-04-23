@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.17  from 23.01.2024 (BMS 4.37u3)
+0;F4SM;bool;F4SMVar;Version of this file: 1.18  from 27.01.2024 (BMS 4.37u3)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -226,6 +226,8 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1360;TRIM;float;trimPitch;Value of trim in pitch axis, -0.5 to +0.5
 1370;TRIM;float;trimRoll;Value of trim in roll axis, -0.5 to +0.5
 1380;TRIM;float;trimYaw;Value of trim in yaw axis, -0.5 to +0.5
+1390;AIRCRAFT;float;magDeviationSystem;current mag deviation of the system
+1400;AIRCRAFT;float;magDeviationReal;current mag deviation of the system
 1450;ALTIMETER;uint;altBits;Various altimeter bits, see AltBits enum for details
 1451;ALTIMETER;bool;calType;True if calibration in inches of Mercury (Hg), false if in hectoPascal (hPa)
 1452;ALTIMETER;bool;pneuFlag;True if PNEU flag is visible
@@ -385,8 +387,12 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 1658;CMDS/RWR;bool;ECM5_Active;
 1659;CMDS/RWR;bool;ECM5_Transmit;
 1660;CMDS/RWR;bool;ECM5_Fail;
-1670;AIRCRAFT;float;magDeviationSystem;current mag deviation of the system
-1680;AIRCRAFT;float;magDeviationReal;current mag deviation of the system
+1661;CMDS/RWR;bool;ECM6_7_8_Standby;Not implemented in BMS
+1662;CMDS/RWR;bool;ECM6_7_8_Active;Not implemented in BMS
+1663;CMDS/RWR;bool;ECM6_7_8_Transmit;Not implemented in BMS
+1664;CMDS/RWR;bool;ECM6_7_8_Fail;Not implemented in BMS
+1670;AIRCRAFT;float;DoNotUse;magDeviationSystem moved to 1390
+1680;AIRCRAFT;float;DoNotUse;magDeviationReal moved to 1400
 1690;LIGHTS;byte;Flood Console;current floodconsole brightness setting, see FloodConsole enum for details
 1700;AIRCRAFT;byte;aaMissileFired;How many AA missiles fired.
 1710;AIRCRAFT;byte;agMissileFired;How many maverick/rockets fired
