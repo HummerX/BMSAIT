@@ -1,5 +1,5 @@
 ID;Gruppe;Typ;Bezeichnung;Beschreibung
-0;F4SM;bool;F4SMVar;Version of this file: 1.18  from 27.01.2024 (BMS 4.37u3)
+0;F4SM;bool;F4SMVar;Version of this file: 1.19  from 2.07.2025 (BMS 4.38)
 10;AIRCRAFT;float;alpha;Ownship AOA (Degrees)
 20;AIRCRAFT;float;beta;Ownship Beta (Degrees)
 30;AIRCRAFT;float;gamma;Ownship Gamma (Radians)
@@ -445,6 +445,9 @@ ID;Gruppe;Typ;Bezeichnung;Beschreibung
 2018;RADIO;string;bupUhfFreqCh18;Manuel UHF Freqs for BUP Radio Channel18
 2019;RADIO;string;bupUhfFreqCh19;Manuel UHF Freqs for BUP Radio Channel19
 2020;RADIO;string;bupUhfFreqCh20;Manuel UHF Freqs for BUP Radio Channel20
+3000;UNKNOWN;int;desired_RTT_FPS;The configured RTT export FPS value, g_nRTTExport_FPS
+3010;HSI/ADI/TACAN;int;tacan_ils_frequency;Tacan ILS (110.30 = 11030). Valid interval [108.10, 111.95]
+3020;HSI/ADI/TACAN;float;sideSlipdeg;ADI side Slip 
 5000;DCSCommon;string;DCSBIOSVer;Version of DCSBIOS
 5010;DCS_GFS;int;SpeedbrakeLeft;Position of left speedbrake
 5020;DCS_GFS;int;SpeedbrakeRight;Position of right speedbrake
