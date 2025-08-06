@@ -121,7 +121,7 @@ void SwitecX27::center(unsigned int pos)
 // characteristics of the motor.  Ultimately it 
 // steps the motor once (up or down) and computes
 // the delay until the next step.  Because it gets
-// called once per step per motor, the calcuations
+// called once per step per motor, the calculations
 // here need to be as light-weight as possible, so
 // we are avoiding floating-point arithmetic.
 //
