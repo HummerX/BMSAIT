@@ -654,7 +654,7 @@ void PullRequest(byte var)
         x+=10;
       #endif
       #ifdef PRIORITIZE_INPUT
-        UpdateInput();   //throw in another update if inputs are priorized
+        UpdateInput();   //throw in another update if inputs are prioritized
         x+=10;
       #endif
       delay(1);
