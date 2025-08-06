@@ -643,7 +643,7 @@ void PullRequest(byte var)
 void Reset()
 {
   while (SERIALCOM.available()){SERIALCOM.read();}
-  SendMessage("",5); // reqest new data
+  SendMessage("",5); // request new data
   state=0;
 }
 
