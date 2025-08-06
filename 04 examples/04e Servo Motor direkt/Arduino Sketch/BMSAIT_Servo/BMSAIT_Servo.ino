@@ -850,7 +850,7 @@ void ReadResponse()
   }
 }
 
-//readback of recieved data for verification
+//readback of received data for verification
 void DebugReadback(byte posID)
 {
   char antwort[DATENLAENGE+3]="";
