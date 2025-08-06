@@ -672,7 +672,7 @@ void PullRequest(byte var)
   while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
   {
 	#ifdef PRIORITIZE_OUTPUT
-	  UpdateOutput(); //throw in another update if outputs are priorized
+	  UpdateOutput(); //throw in another update if outputs are prioritized
 	  x+=10;
 	#endif
 	#ifdef PRIORITIZE_INPUT
