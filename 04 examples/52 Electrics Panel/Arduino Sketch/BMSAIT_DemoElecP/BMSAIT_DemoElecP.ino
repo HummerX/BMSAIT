@@ -1,4 +1,4 @@
-// Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
+// Arduino sketch to send/receive data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
 // Version: 1.3.15   18.4.25
 // Robin "Hummer" Bruns
 
