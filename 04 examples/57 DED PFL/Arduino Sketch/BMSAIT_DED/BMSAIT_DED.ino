@@ -787,7 +787,7 @@ void ReadResponse()
     if ((state==1) && SERIALCOM.available())
     {
       inputByte_1=SERIALCOM.read();
-      if (!CheckForSysCommand(inputByte_1))  //check if a system command was recieved. If not, continue to check if valid data was recieved
+      if (!CheckForSysCommand(inputByte_1))  //check if a system command was received. If not, continue to check if valid data was received
       {
         if (((int)inputByte_1 < variableCount) || ((int)inputByte_1 >100)) //check if ID is valid
         {
