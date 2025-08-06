@@ -459,7 +459,7 @@ void ReadData()
     while(SERIALCOM.available())
     { 
       #ifdef PRIORITIZE_OUTPUT
-      UpdateOutput();   //throw in another update if outputs are priorized 
+      UpdateOutput();   //throw in another update if outputs are prioritized 
       #endif
       #ifdef PRIORITIZE_INPUT
       UpdateInput(false);   //throw in another update if inputs are priorized 
