@@ -42,7 +42,7 @@
     char ID[5];                     //only required for PULL-operation. The ID for this data from "BMSAIT-Variablen.csv". this will tell the windows app what kind of data you are requesting
     char format;                    //only required for PULL-operation. Data type according to  "BMSAIT-Variablen.csv" (y=byte, i=integer, f=float, s=string, b=bool, 1=Byte Array, 2=Int Array, 3=string Array, 4=float Array) 
     byte typ;                       //indicates the type of device that will be used to output his data (10: LED, 20: LCD, 30: 7-Segment MAX7219, 40: Servomotor)
-    byte target;                    //this byte links the variable to a specific device (i.e. PIN for LED output, the adress for motors on a pwm shield or to differentiate between multiple devices within one module)
+    byte target;                    //this byte links the variable to a specific device (i.e. PIN for LED output, the address for motors on a pwm shield or to differentiate between multiple devices within one module)
     byte ref2;                      //the use of reference byte depends on the output type. Ref2 can set the line on LCD displays
     byte ref3;                      //the use of reference byte depends on the output type. Ref3 can set the length if a data value to display on LCD or 7-segment displays
     byte ref4;                      //the use of reference byte depends on the output type. Ref4 can set the position of data on LCD / 7Segment displays. if set, the data will be offset by this number of characters
