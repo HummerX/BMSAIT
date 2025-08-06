@@ -488,7 +488,7 @@ void ReadData()
     }   
     if (millis()-POLLTIME>lastPoll) //reduce the number of attempts to get new data (default POLLTIME 200 --> max of 5 attempts per second)
     {
-      SendMessage("",5); // reqest new data
+      SendMessage("",5); // request new data
       lastPoll=millis();
     }       
   }
