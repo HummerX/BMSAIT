@@ -846,7 +846,7 @@ void ReadResponse()
             int laenge=sizeof(neuer_wert.wert);            
             if (neuer_wert.varNr<100)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
-              if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
+              if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the received data is different from the stored data
               {
                 for (int lauf=DATENLAENGE-1;lauf>laenge;lauf--)
                   {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
