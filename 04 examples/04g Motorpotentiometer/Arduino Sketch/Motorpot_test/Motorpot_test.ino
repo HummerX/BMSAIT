@@ -375,7 +375,7 @@ void loop()
 {
   long curr_time=millis();
   
-  if (!error) //only continue if no error occured
+  if (!error) //only continue if no error occurred
   {  
     //check for debug message (set new trim pos)
     ReadMessage(); 
