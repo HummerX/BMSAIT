@@ -14,7 +14,7 @@
   #define MESSAGEBEGIN 255    // this byte marks the beginning of a new message from the Windows app
   #define HANDSHAKE 128       // this byte marks an identification request from the Windows app
   #define SWITCHPOSITION 150  // this byte marks a request to send current switch positions
-  #define CALIBRATE 160       // this byte marks a request to reset motors to inital position
+  #define CALIBRATE 160       // this byte marks a request to reset motors to initial position
   #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
