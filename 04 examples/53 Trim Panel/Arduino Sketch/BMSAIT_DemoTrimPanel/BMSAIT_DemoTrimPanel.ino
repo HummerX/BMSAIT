@@ -1,4 +1,4 @@
-// Arduino sketch to send/recieve data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
+// Arduino sketch to send/receive data from the Falcon BMS Shared Memory via the BMS-Arduino Interface Tool and control devices in home cockpits
 // Version: 1.3.15   18.4.25
 // Robin "Hummer" Bruns
 
@@ -10,7 +10,7 @@
   #define MESSAGEBEGIN 255    // this byte marks the beginning of a new message from the Windows app
   #define HANDSHAKE 128       // this byte marks an identification request from the Windows app
   #define SWITCHPOSITION 150  // this byte marks a request to send current switch positions
-  #define CALIBRATE 160       // this byte marks a request to reset motors to inital position
+  #define CALIBRATE 160       // this byte marks a request to reset motors to initial position
   #define ZEROIZE   161       // this byte marks a request to fast zeroize motors 
   #define STARTPULL 170       // this byte marks a request to start the PULL logic on the arduino
   #define ENDPULL 180         // this byte marks a request to end the PULL logic on the arduino
@@ -42,7 +42,7 @@
     char ID[5];                     //only required for PULL-operation. The ID for this data from "BMSAIT-Variablen.csv". this will tell the windows app what kind of data you are requesting
     char format;                    //only required for PULL-operation. Data type according to  "BMSAIT-Variablen.csv" (y=byte, i=integer, f=float, s=string, b=bool, 1=Byte Array, 2=Int Array, 3=string Array, 4=float Array) 
     byte typ;                       //indicates the type of device that will be used to output his data (10: LED, 20: LCD, 30: 7-Segment MAX7219, 40: Servomotor)
-    byte target;                    //this byte links the variable to a specific device (i.e. PIN for LED output, the adress for motors on a pwm shield or to differentiate between multiple devices within one module)
+    byte target;                    //this byte links the variable to a specific device (i.e. PIN for LED output, the address for motors on a pwm shield or to differentiate between multiple devices within one module)
     byte ref2;                      //the use of reference byte depends on the output type. Ref2 can set the line on LCD displays
     byte ref3;                      //the use of reference byte depends on the output type. Ref3 can set the length if a data value to display on LCD or 7-segment displays
     byte ref4;                      //the use of reference byte depends on the output type. Ref4 can set the position of data on LCD / 7Segment displays. if set, the data will be offset by this number of characters
@@ -460,16 +460,16 @@ void ReadData()
     while(SERIALCOM.available())
     { 
       #ifdef PRIORITIZE_OUTPUT
-      UpdateOutput();   //throw in another update if outputs are priorized 
+      UpdateOutput();   //throw in another update if outputs are prioritized 
       #endif
       #ifdef PRIORITIZE_INPUT
-      UpdateInput(false);   //throw in another update if inputs are priorized 
+      UpdateInput(false);   //throw in another update if inputs are prioritized 
       #endif
       ReadResponse();   //check for new data from the windows app
     }   
     if (millis()-POLLTIME>lastPoll) //reduce the number of attempts to get new data (default POLLTIME 200 --> max of 5 attempts per second)
     {
-      SendMessage("",5); // reqest new data
+      SendMessage("",5); // request new data
       lastPoll=millis();
     }       
   }
@@ -651,11 +651,11 @@ void PullRequest(byte var)
     while ((SERIALCOM.available()<3) && (x<PULLTIMEOUT)) //wait for answer, but no longer than 30ms
     {
       #ifdef PRIORITIZE_OUTPUT
-        UpdateOutput(); //throw in another update if outputs are priorized
+        UpdateOutput(); //throw in another update if outputs are prioritized
         x+=10;
       #endif
       #ifdef PRIORITIZE_INPUT
-        UpdateInput();   //throw in another update if inputs are priorized
+        UpdateInput();   //throw in another update if inputs are prioritized
         x+=10;
       #endif
       delay(1);
@@ -674,7 +674,7 @@ void PullRequest(byte var)
 void Reset()
 {
   while (SERIALCOM.available()){SERIALCOM.read();}
-  SendMessage("",5); // reqest new data
+  SendMessage("",5); // request new data
   state=0;
 }
 
@@ -856,7 +856,7 @@ void ReadResponse()
     if ((state==1) && SERIALCOM.available())
     {
       inputByte_1=SERIALCOM.read();
-      if (!CheckForSysCommand(inputByte_1))  //check if a system command was recieved. If not, continue to check if valid data was recieved
+      if (!CheckForSysCommand(inputByte_1))  //check if a system command was received. If not, continue to check if valid data was received
       {
         if (((int)inputByte_1 < variableCount) || ((int)inputByte_1 >100)) //check if ID is valid
         {
@@ -919,7 +919,7 @@ void ReadResponse()
             int laenge=sizeof(neuer_wert.wert);            
             if (neuer_wert.varNr<100)     //only compute the data if a valid data position is found (everything above 99 is invalid)
             {
-              if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the recieved data is different from the stored data
+              if (strcmp(datenfeld[neuer_wert.varNr].wert, neuer_wert.wert)!=0)  //check if the received data is different from the stored data
               {
                 for (int lauf=DATENLAENGE-1;lauf>laenge;lauf--)
                   {datenfeld[neuer_wert.varNr].wert[lauf]='\0';}
@@ -953,7 +953,7 @@ void ReadResponse()
   }
 }
 
-//readback of recieved data for verification
+//readback of received data for verification
 void DebugReadback(byte posID)
 {
   char antwort[DATENLAENGE+3]="";
