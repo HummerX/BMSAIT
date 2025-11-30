@@ -1,0 +1,471 @@
+ID;group;type;name;description;use with
+0;F4SM;bool;F4SMVar;Version of this file: 1.2  from 18.10.2025 (BMS 4.38);info only
+10;AIRCRAFT;float;alpha;Ownship AOA (Degrees);LCD, servo to drive AOA gauge
+20;AIRCRAFT;float;beta;Ownship Beta (Degrees);
+30;AIRCRAFT;float;gamma;Ownship Gamma (Radians);
+40;AIRCRAFT;float;gs;Ownship Normal Gs;
+50;AIRCRAFT;float;pitch;Ownship Pitch (Radians);
+60;AIRCRAFT;float;roll;Ownship Roll (Radians);
+70;AIRCRAFT;float;turnRate;actual turn rate (no delay or dampening) in degrees/second;
+80;AIRCRAFT;float;yaw;Ownship Yaw (Radians);
+90;ALTIMETER;float;aauz;AAU altimeter indicated altitude (new in BMS4);
+91;ALTIMETER;string;aauz_s;Digit display of altimeter;OLED, LCD, MAX7219, TM1637
+92;ALTIMETER;int;aauz_TT(s);Altimeter TenThousand Gauge (0..65535);StepperX27, StepperVID
+93;ALTIMETER;int;aauz_T(s);Altimeter Thousand Gauge (0..65535);StepperX27, StepperVID
+100;ALTIMETER;float;cabinAlt;Ownship cabin altitude;OLED, LCD, MAX7219, TM1637
+101;ALTIMETER;int;cabinAlt(s);Ownship cabin altitude (0..65535);StepperX27, StepperVID
+110;ALTIMETER;float;caraAlow;Cara alow setting;
+120;ALTIMETER;float;RALT;"Radar altitude (only valid/ reliable if MiscBit ""RALT_Valid"" is set)";
+130;ALTIMETER;string;AltCalReading;Altimeter setting (e.g. 1013/2992);OLED, LCD, MAX7219, TM1637
+150;CMDS/RWR;float;ChaffCount;Number of Chaff left;MAX7219, TM1637, LCD
+160;CMDS/RWR;float;FlareCount;Number of Flare left;MAX7219, TM1637, LCD
+170;CMDS/RWR;byte[];RwrInfo;New RWR Info;
+180;CMDS/RWR;int;cmdsMode;Ownship CMDS mode state, see CmdsModes enum for details;CMDS
+190;AIRCRAFT;float;lefPos;Ownship LEF position;
+200;AIRCRAFT;float;speedBrake;Ownship speed brake position 0 = closed, 1 = 60 Degrees open;OLED SBI
+201;AIRCRAFT;int;speedBrake(g);Ownship speed brake position 0 = closed, 65535= 60 Degrees open;X27 SBI
+210;AIRCRAFT;float;tefPos;Ownship TEF position;
+220;AIRCRAFT;float;vtolPos;Ownship VTOL exhaust angle;
+230;DED/PFL;string[];DEDLines;All 5 rows with 25 chars each;
+231;DED/PFL;string;DEDLine1;Line 1 of the DED display;DED/PFL
+232;DED/PFL;string;DEDLine2;Line 2 of the DED display;DED/PFL
+233;DED/PFL;string;DEDLine3;Line 3 of the DED display;DED/PFL
+234;DED/PFL;string;DEDLine4;Line 4 of the DED display;DED/PFL
+235;DED/PFL;string;DEDLine5;Line 5 of the DED display;DED/PFL
+236;DED/PFL;string;DEDLine1f;First half of the Line 1 of the DED display;LCD, OLED
+237;DED/PFL;string;DEDLine2f;First half of the Line 2 of the DED display;LCD, OLED
+238;DED/PFL;string;DEDLine3f;First half of the Line 3 of the DED display;LCD, OLED
+239;DED/PFL;string;DEDLine4f;First half of the Line 4 of the DED display;LCD, OLED
+240;DED/PFL;string;DEDLine5f;First half of the Line 5 of the DED display;LCD, OLED
+241;DED/PFL;string;DEDLine1s;Second half of the Line 1 of the DED display;LCD, OLED
+242;DED/PFL;string;DEDLine2s;Second half of the Line 2 of the DED display;LCD, OLED
+243;DED/PFL;string;DEDLine3s;Second half of the Line 3 of the DED display;LCD, OLED
+244;DED/PFL;string;DEDLine4s;Second half of the Line 4 of the DED display;LCD, OLED
+245;DED/PFL;string;DEDLine5s;Second half of the Line 5 of the DED display;LCD, OLED
+246;DED/PFL;string[];Invert;Marks inverted parts of the DED display;DED/PFL (BMSAIT Win App uses this automatically)
+250;ENGINE;float;epuFuel;Ownship EPU fuel (Percent 0-100);LCD, OLED, Max7219, TM1637
+251;ENGINE;int;epuFuel(g);EPU gauge indicator (0..65535);StepperX27, StepperVID
+260;ENGINE;float;ftit;Ownship Forward Turbine Inlet Temp (Degrees C);LCD, OLED, Max7219, TM1637
+261;ENGINE;int;ftit(g);FTIT gauge indicator  (0..65535);StepperX27, StepperVID
+270;ENGINE;float;ftit2;Ownship Forward Turbine Inlet Temp2 (Degrees C);LCD, OLED, Max7219, TM1637
+271;ENGINE;int;ftit2;FTIT2 gauge indicator  (0..65535);StepperX27, StepperVID
+280;ENGINE;float;hydPressureA;Ownship Hydraulic Pressure A;LCD, OLED, Max7219, TM1637
+281;ENGINE;int;hydPressureA(g);HydPres A gauge indicator (0..65535);StepperX27, StepperVID
+290;ENGINE;float;hydPressureB;Ownship Hydraulic Pressure B;LCD, OLED, Max7219, TM1637
+291;ENGINE;int;hydPressureB(g);HydPres B gauge indicator (0..65535);StepperX27, StepperVID
+300;ENGINE;float;nozzlePos;Ownship engine nozzle percent open (0-100);LCD, OLED, Max7219, TM1637
+301;ENGINE;int;nozzePos(g);Nozzle gauge indicator (0..65535);StepperX27, StepperVID
+310;ENGINE;float;nozzlePos2;Ownship engine nozzle2 percent open (0-100);LCD, OLED, Max7219, TM1637
+311;ENGINE;int;nozzePos(g);Nozzle2 gauge indicator (0..65535);StepperX27, StepperVID
+320;ENGINE;float;oilPressure;Ownship Oil Pressure (Percent 0-100);LCD, OLED, Max7219, TM1637
+321;ENGINE;int;oilPressure(g);OilPress gaugle indicator(0..65535);StepperX27, StepperVID
+330;ENGINE;float;oilPressure2;Ownship Oil Pressure2 (Percent 0-100);LCD, OLED, Max7219, TM1637
+331;ENGINE;int;oilPressure2(g);OilPress2 gaugle indicator (0..65535);StepperX27, StepperVID
+340;ENGINE;float;rpm;Ownship engine rpm (Percent 0-103);LCD, OLED, Max7219, TM1637
+341;ENGINE;int;rpm(g);RPM gauge indicator (0..65535);StepperX27, StepperVID
+350;ENGINE;float;rpm2;Ownship engine rpm2 (Percent 0-103);LCD, OLED, Max7219, TM1637
+351;ENGINE;int;rpm2(g);RPM2 gauge indicator (0..65535);StepperX27, StepperVID
+360;ENVIROMENT;float;windOffset;Wind delta to FPM (Radians);
+370;ENVIROMENT;float;bullseyeX;Bullseye X in sim coordinates (same as ownship, i.e. North (Ft));
+380;ENVIROMENT;float;bullseyeY;Bullseye Y in sim coordinates (same as ownship, i.e. East (Ft));
+390;F4SM;int;BMSBuildNumber;E.g. build 20050;info only
+400;F4SM;int;BMSVersionMajor;E.g.  4.;info only
+410;F4SM;int;BMSVersionMinor;E.g. 34.;info only
+420;F4SM;int;BMSVersionMicro;E.g. 1;info only
+430;F4SM;int;VersionNum;Version of Mem area;info only
+440;F4SM;int;VersionNum2;Version of Mem area;info only
+450;F4SM;string;DrawingAreaSize;The overall size of the DrawingData/FalconSharedMemoryAreaDrawing area;
+460;F4SM;string;StringAreaSize;The overall size of the StringData/FalconSharedMemoryAreaString shared memory area;
+470;F4SM;string;StringAreaTime;Last time the StringData/FalconSharedMemoryAreaString shared memory area has been changed - you only need to re-read the string shared mem if this changes;
+480;FUEL;float;aft;Fuel quantity in aft tank in lbs;LCD, OLED, Max7219, TM1637
+481;FUEL;int;aft(g);Fuel quantity in aft tank in lbs (Gauge position);StepperX27, StepperVID
+490;FUEL;float;bingoFuel;Bingo fuel level;LCD, OLED, Max7219, TM1637
+500;FUEL;float;externalFuel;Ownship external fuel (Lbs);LCD, OLED, Max7219, TM1637
+510;FUEL;float;fuelFlow;Ownship fuel flow (Lbs/Hour);Max7219, TM1637
+511;FUEL;string;fuelFlow(s);Fuelflow as string value;LCD, OLED
+520;FUEL;float;fuelFlow2;Ownship fuel flow2 (Lbs/Hour);Max7219, TM1637
+521;GFUEL;string;fuelFlow2(s);Fuelflow2 as string value;LCD, OLED
+530;FUEL;float;fwd;Fuel quantity in forward tank in lbs;LCD, OLED, Max7219, TM1637
+531;FUEL;int;fwd(g);Fuel quantity in forward tank in lbs (Gauge position);StepperX27, StepperVID
+540;FUEL;float;internalFuel;Ownship internal fuel (Lbs);LCD, OLED, Max7219, TM1637
+550;FUEL;float;total;Total fuel in lbs;
+551;FUEL;string;total(s);Total Fuel (as 5 digit string);LCD, OLED
+560;GEAR;float;bumpIntensity;"Intensity of a ""bump"" while taxiing/rolling, 0..1";
+570;GEAR;float;gearPos;Ownship Gear position 0 = up, 1 = down;
+580;GEAR;float;LeftGearPos;Position of the left landinggear;StepperX27, StepperVID, Servo, LCD, OLED
+590;GEAR;float;NoseGearPos;Position of the nose landinggear;StepperX27, StepperVID, Servo, LCD, OLED
+600;GEAR;float;RightGearPos;Position of the right landinggear;StepperX27, StepperVID, Servo, LCD, OLED
+610;HeadPosition;float;headPitch;Head pitch offset from design eye (radians) NB: these do not work when TrackIR device is enabled;
+620;HeadPosition;float;headRoll;Head roll offset from design eye (radians) NB: these do not work when TrackIR device is enabled;
+630;HeadPosition;float;headYaw;Head yaw offset from design eye (radians) NB: these do not work when TrackIR device is enabled;
+640;HeadPosition;float;headX;Head X offset from design eye (feet);
+650;HeadPosition;float;headY;Head Y offset from design eye (feet);
+660;HeadPosition;float;headZ;Head Z offset from design eye (feet);
+670;HSI/ADI/TACAN;float;kias;Ownship Indicated Airspeed (Knots);LCD, OLED
+671;HSI/ADI/TACAN;int;kias (g);Ownship Indicated Airspeed (needle postion 0..65355);StepperX27, StepperVID
+680;HSI/ADI/TACAN;float;mach;Ownship Mach number;LCD, OLED
+690;HSI/ADI/TACAN;float;vt;Ownship True Airspeed (Ft/Sec);LCD, OLED
+700;HSI/ADI/TACAN;byte;navMode;HSI nav mode (new in BMS4);LCD, OLED
+710;HSI/ADI/TACAN;float;airbaseX;HSI_VAL_AIRBASE_X;LCD, OLED
+720;HSI/ADI/TACAN;float;airbaseY;HSI_VAL_AIRBASE_Y;LCD, OLED
+730;HSI/ADI/TACAN;float;bearingToBeacon;HSI_VAL_BEARING_TO_BEACON;LCD, OLED
+740;HSI/ADI/TACAN;float;courseDeviation;HSI_VAL_CRS_DEVIATION;LCD, OLED
+750;HSI/ADI/TACAN;float;currentHeading;HSI_VAL_CURRENT_HEADING;OLEDCompass
+751;HSI/ADI/TACAN;int;currentHeading(s);Current Heading in a 0..65535 value format;CompassX27
+760;HSI/ADI/TACAN;float;desiredCourse;HSI_VAL_DESIRED_CRS;LCD, OLED
+770;HSI/ADI/TACAN;float;desiredHeading;HSI_VAL_DESIRED_HEADING;LCD, OLED
+780;HSI/ADI/TACAN;float;deviationLimit;HSI_VAL_DEV_LIMIT;LCD, OLED
+790;HSI/ADI/TACAN;float;distanceToBeacon;HSI_VAL_DISTANCE_TO_BEACON;LCD, OLED
+800;HSI/ADI/TACAN;float;halfDeviationLimit;HSI_VAL_HALF_DEV_LIMIT;LCD, OLED
+810;HSI/ADI/TACAN;float;localizerCourse;HSI_VAL_LOCALIZER_CRS;LCD, OLED
+820;HSI/ADI/TACAN;float;totalValues;HSI_VAL_TOTAL_VALUES;LCD, OLED
+830;HSI/ADI/TACAN;int;courseState;HSI_STA_CRS_STATE;LCD, OLED
+840;HSI/ADI/TACAN;int;headingState;HSI_STA_HDG_STATE;LCD, OLED
+850;HSI/ADI/TACAN;int;totalStates;HSI_STA_TOTAL_STATES;LCD, OLED
+860;UNKNOWN;ushort[];RTT_area;For each area: left/top/right/bottom;
+870;UNKNOWN;ushort[];RTT_size;RTT overall width and height;
+880;LIGHTS;byte;instrLight;Current instrument backlight brightness setting, see InstrLight enum for details;Lighting
+890;IFF;string;iffBackupMode;IFF panel backup Mode1 all 4 digits;LCD, OLED
+891;IFF;byte;iffBackupMode1Digit1;IFF panel backup Mode1 digit 1;Max7219, TM1637, LCD, OLED
+892;IFF;byte;iffBackupMode1Digit2;IFF panel backup Mode1 digit 2;Max7219, TM1637, LCD, OLED
+893;IFF;byte;iffBackupMode3ADigit1;IFF panel backup Mode3A digit 1;Max7219, TM1637, LCD, OLED
+894;IFF;byte;iffBackupMode3ADigit2;IFF panel backup Mode3A digit 2;Max7219, TM1637, LCD, OLED
+900;HSI/ADI/TACAN;float;adiIlsVerPos;Position of vertical ILS bar;StepperX27, StepperVID, Servo, LCD, OLED
+910;HSI/ADI/TACAN;float;adiIlsHorPos;Position of horizontal ILS bar;StepperX27, StepperVID, Servo, LCD, OLED
+920;SYSTEMS;uint;miscBits;See MiscBits enum for details;
+921;SYSTEMS;bool;ralt_Valid;Indicates whether the RALT reading is valid/reliable;
+922;TEST/FLCS;bool;Flcs_Flcc_A;FLCS A LED;LED, LEDMatrix
+923;TEST/FLCS;bool;Flcs_Flcc_B;FLCS B LED;LED, LEDMatrix
+924;TEST/FLCS;bool;Flcs_Flcc_C;FLCS C LED;LED, LEDMatrix
+925;TEST/FLCS;bool;Flcs_Flcc_D;FLCS D LED;LED, LEDMatrix
+926;SYSTEMS;bool;SolenoidStatus;0 not powered or failed or WOW  , 1 is working OK;
+980;MULTIPLAYER;byte;pilotsOnline;Number of pilots in an MP session;LCD, OLED
+990;MULTIPLAYER;byte[];pilotsStatus;Status of the MP pilots, see enum FlyStates;LCD, OLED
+1000;MULTIPLAYER;string[];pilotsCallsign;List of pilots callsign connected to an MP session;LCD, OLED
+1010;MULTIPLAYER;int;vehicleACD;Ownship ACD index number, i.e. which aircraft type are we flying.;
+1020;NAVIGATION;float;x;Ownship North (Ft);LCD, OLED
+1030;NAVIGATION;float;y;Ownship East (Ft);LCD, OLED
+1040;NAVIGATION;float;z;Ownship Down (Ft);LCD, OLED
+1050;NAVIGATION;float;xDot;Ownship North Rate (ft/sec);LCD, OLED
+1060;NAVIGATION;float;yDot;Ownship East Rate (ft/sec);LCD, OLED
+1070;NAVIGATION;float; zDot;Ownship Down Rate (ft/sec);LCD, OLED
+1080;NAVIGATION;float;latitude;Ownship latitude in degrees (as known by avionics);LCD, OLED
+1090;NAVIGATION;float;longitude;Ownship longitude in degrees (as known by avionics);LCD, OLED
+1100;DED/PFL;string[];PFLLines;25 usable chars;
+1101;DED/PFL;string;PFLLine1;Line 1 of PFL display;DED/PFL
+1102;DED/PFL;string;PFLLine2;Line 2 of PFL display;DED/PFL
+1103;DED/PFL;string;PFLLine3;Line 3 of PFL display;DED/PFL
+1104;DED/PFL;string;PFLLine4;Line 4 of PFL display;DED/PFL
+1105;DED/PFL;string;PFLLine5;Line 5 of PFL display;DED/PFL
+1106;DED/PFL;string;PFLLine1f;First half of Line 1 of PFL;LCD
+1107;DED/PFL;string;PFLLine2f;First half of Line 2 of PFL;LCD
+1108;DED/PFL;string;PFLLine3f;First half of Line 3 of PFL;LCD
+1109;DED/PFL;string;PFLLine4f;First half of Line 4 of PFL;LCD
+1110;DED/PFL;string;PFLLine5f;First half of Line 5 of PFL;LCD
+1111;DED/PFL;string;PFLLine1s;Second half of Line 1 of PFL;LCD
+1112;DED/PFL;string;PFLLine2s;Second half of Line 2 of PFL;LCD
+1113;DED/PFL;string;PFLLine3s;Second half of Line 3 of PFL;LCD
+1114;DED/PFL;string;PFLLine4s;Second half of Line 4 of PFL;LCD
+1115;DED/PFL;string;PFLLine5s;Second half of Line 5 of PFL;LCD
+1116;DED/PFL;string[];PFLInvert;25 usable chars;
+1120;RADIO;string;bupUhfFreq;BUP UHF channel frequency;Max7219, TM1637, LCD, OLED
+1130;RADIO;string;bupUhfPreset;BUP UHF channel preset;Max7219, TM1637, LCD, OLED
+1140;IVC;RadioClientControl;ivc_RadioClientControlData;???;
+1150;IVC;RadioClientStatus;ivc_RadioClientStatus;???;
+1151;IVC;bool;ivc_AllClear ;No status indications present;
+1152;IVC;bool;ivc_ClientActive;Voice client program running;
+1153;IVC;bool;ivc_Connected;Connection established with voice server;
+1154;IVC;bool;ivc_ConnectionFail;Client failed to connect to voice server;
+1155;IVC;bool;ivc_HostUnknown;Bad ip address supplied for voice server;
+1156;IVC;bool;ivc_BadPassword;Password rejected by voice server;
+1157;IVC;bool;ivc_NoMicrophone;No input device detected by voice client;
+1158;IVC;bool;ivc_NoSpeakers;No output device detected by voice client;
+1160;CMDS/RWR;float[];bearing;???;
+1170;CMDS/RWR;float[];lethality;???;
+1180;CMDS/RWR;int;rwrObjectCount;???;
+1190;CMDS/RWR;int[];rwrSymbol;???;
+1200;CMDS/RWR;uint[];missileActivity;???;
+1210;CMDS/RWR;uint[];missileLaunch;???;
+1220;CMDS/RWR;uint[];newDetection;???;
+1230;CMDS/RWR;uint[];selected;???;
+1240;SYSTEMS;uint;powerBits;Ownship power bus / generator states, see PowerBits enum for details;
+1241;SYSTEMS;bool;busPowerBattery;True if at least the battery bus is powered;Power states for various modules
+1242;SYSTEMS;bool;busPowerEmergency;True if at least the emergency bus is powered;Power states for various modules
+1243;SYSTEMS;bool;busPowerEssential;True if at least the essential bus is powered;Power states for various modules
+1244;SYSTEMS;bool;busPowerNonEssential;True if at least the non-essential bus is powered;Power states for various modules
+1245;SYSTEMS;bool;mainGenerator;True if the main generator is online;Power states for various modules
+1246;SYSTEMS;bool;standbyGenerator;True if the standby generator is online;Power states for various modules
+1247;SYSTEMS;bool;jetFuelStarter;True if JFS is running, can be used for magswitch;Power states for various modules
+1248;SYSTEMS;bool;avionicsPower;True if UFC switch is turned on;Power states for various modules
+1250;SYSTEMS;int;currentTime;Current time in seconds (max 60 * 60 * 24);Max7219, TM1637, LCD, OLED
+1260;SYSTEMS;int;mainPower;???;
+1270;CAUTION;uint;bettyBits;See BettyBits enum for details;
+1271;CAUTION;bool;betty_Allwords;Betty is bitching;
+1272;CAUTION;bool;betty_Pullup ;Betty is bitching;
+1273;CAUTION;bool;betty_Altitude;Betty is bitching;
+1274;CAUTION;bool;betty_Warning;Betty is bitching;
+1275;CAUTION;bool;betty_Jammer;Betty is bitching;
+1276;CAUTION;bool;betty_Counter;Betty is bitching;
+1277;CAUTION;bool;betty_ChaffFlare;Betty is bitching;
+1278;CAUTION;bool;betty_ChaffFlare_Low;Betty is bitching;
+1279;CAUTION;bool;betty_ChaffFlare_Out;Betty is bitching;
+1280;CAUTION;bool;betty_Lock;Betty is bitching;
+1281;CAUTION;bool;betty_Caution;Betty is bitching;
+1282;CAUTION;bool;betty_Bingo;Betty is bitching;
+1283;CAUTION;bool;betty_Data;Betty is bitching;
+1284;CAUTION;bool;betty_IFF;Betty is bitching;
+1285;CAUTION;bool;betty_Lowspeed;Betty is bitching;
+1286;CAUTION;bool;betty_Beeps;Betty is bitching;
+1287;CAUTION;bool;betty_AOA;Betty is bitching;
+1288;CAUTION;bool;betty_MaxG;Betty is bitching;
+1290;TACAN;bool;auxTacanIsAA;True if TACAN is set to AA;LED, LEDMatrix
+1300;TACAN;bool;auxTacanIsX;True if TaCAN is set to X;LED, LEDMatrix
+1310;TACAN;bool;ufcTacanIsAA;True if TACAN is set to AA;LED, LEDMatrix
+1320;TACAN;bool;ufcTacanIsX;True if TACAN is set to X;LED, LEDMatrix
+1330;TACAN;byte[];tacanInfo;TACAN info (new in BMS4);
+1340;TACAN;int;auxTChan;Backup TACAN Channel;Max7219, TM1637, LCD, OLED
+1350;TACAN;int;ufcTChan;UFC Tacan Channel;Max7219, TM1637, LCD, OLED
+1360;TRIM;float;trimPitch;Value of trim in pitch axis, -0.5 to +0.5;MotorPoti
+1370;TRIM;float;trimRoll;Value of trim in roll axis, -0.5 to +0.5;MotorPoti
+1380;TRIM;float;trimYaw;Value of trim in yaw axis, -0.5 to +0.5;MotorPoti
+1390;AIRCRAFT;float;magDeviationSystem;current mag deviation of the system;Max7219, TM1637, LCD, OLED
+1400;AIRCRAFT;float;magDeviationReal;current mag deviation of the system;Max7219, TM1637, LCD, OLED
+1450;ALTIMETER;uint;altBits;Various altimeter bits, see AltBits enum for details;
+1451;ALTIMETER;bool;calType;True if calibration in inches of Mercury (Hg), false if in hectoPascal (hPa);LED, LEDMatrix
+1452;ALTIMETER;bool;pneuFlag;True if PNEU flag is visible;LED, LEDMatrix
+1460;HSI/ADI/TACAN;uint;hsiBits;HSI flags;
+1461;HSI/ADI/TACAN;bool;toTrue;HSI_FLAG_TO_TRUE;LED, LEDMatrix
+1462;HSI/ADI/TACAN;bool;ilsWarning  ;HSI_FLAG_ILS_WARN;LED, LEDMatrix
+1463;HSI/ADI/TACAN;bool;courseWarning;HSI_FLAG_CRS_WARN;LED, LEDMatrix
+1464;HSI/ADI/TACAN;bool;init ;HSI_FLAG_INIT;LED, LEDMatrix
+1465;HSI/ADI/TACAN;bool;totalFlags ;"HSI_FLAG_TOTAL_FLAGS; never set";LED, LEDMatrix
+1466;HSI/ADI/TACAN;bool;adi_OFF ;ADI OFF Flag;LED, LEDMatrix
+1467;HSI/ADI/TACAN;bool;adi_AUX ;ADI AUX Flag;LED, LEDMatrix
+1468;HSI/ADI/TACAN;bool;adi_GS ;ADI GS FLAG;LED, LEDMatrix
+1469;HSI/ADI/TACAN;bool;adi_LOC ;ADI LOC FLAG;LED, LEDMatrix
+1470;HSI/ADI/TACAN;bool;hsi_OFF ;HSI OFF Flag;LED, LEDMatrix
+1471;HSI/ADI/TACAN;bool;bup_adi_OFF ;Backup ADI Off Flag;LED, LEDMatrix
+1472;HSI/ADI/TACAN;bool;vvi;VVI OFF Flag;LED, LEDMatrix
+1473;HSI/ADI/TACAN;bool;aoa;AOA OFF Flag;LED, LEDMatrix
+1474;HSI/ADI/TACAN;bool;avtr;AVTR Light;LED, LEDMatrix
+1475;HSI/ADI/TACAN;byte;outerMarker ;MARKER beacon light for outer marker;LED, LEDMatrix
+1476;HSI/ADI/TACAN;byte;middleMarker ;MARKER beacon light for middle marker;LED, LEDMatrix
+1477;HSI/ADI/TACAN;bool;fromTrue ;HSI_FLAG_TO_TRUE;LED, LEDMatrix
+1478;HSI/ADI/TACAN;bool;flying ;True if player is attached to an aircraft (i.e. not in UI state). ;Power states for various modules
+1480;LIGHTS;uint;blinkBits;Cockpit indicator lights blink status, see BlinkBits enum for details. Value is 1 if lamp is blinking;
+1481;HSI/ADI/TACAN;bool;blink_OuterMarker;Slow flashing for outer marker. Value is 1 if lamp is blinking;LED, LEDMatrix
+1482;HSI/ADI/TACAN;bool;blink_MiddleMarker;Fast flashing for middle marker. Value is 1 if lamp is blinking;LED, LEDMatrix
+1483;SYSTEMS;bool;blink_PROBEHEAT ;Probeheat system is tested. Value is 1 if lamp is blinking;LED, LEDMatrix
+1484;CMDS/RWR;bool;blink_AuxSrch ;Search function in NOT activated and a search radar is painting ownship. Value is 1 if lamp is blinking;LED, LEDMatrix
+1485;CMDS/RWR;bool;blink_Launch ;Missile is fired at ownship. Value is 1 if lamp is blinking;LED, LEDMatrix
+1486;CMDS/RWR;bool;blink_PriMode ;priority mode is enabled but more than 5 threat emitters are detected. Value is 1 if lamp is blinking;LED, LEDMatrix
+1487;CMDS/RWR;bool;blink_Unk ;Unknown is not active but EWS detects unknown radar. Value is 1 if lamp is blinking;LED, LEDMatrix
+1488;SYSTEMS;bool;blink_Elec_Fault ;non-resetting fault.  Value is 1 if lamp is blinking;LED, LEDMatrix
+1489;CAUTION;bool;blink_OXY_BROW ;monitor fault during Obogs.  Value is 1 if lamp is blinking;LED, LEDMatrix
+1490;ENGINE;bool;blink_EPUOn ;abnormal EPU operation.  Value is 1 if lamp is blinking;LED, LEDMatrix
+1491;ENGINE;bool;blink_JFSOn_Slow ;Non-critical failure.  Value is 1 if lamp is blinking slow;LED, LEDMatrix
+1492;ENGINE;bool;blink_JFSOn_Fast ;Critical failure.  Value is 1 if lamp is blinking fast;LED, LEDMatrix
+1493;CMDS/RWR;bool;blink_ECM_Oper;defined in EcmOperStates - system warming up;LED, LEDMatrix
+1500;LIGHTS;uint;lightBits;Cockpit Indicator Lights, one bit per bulb. See enum;
+1501;CAUTION;bool;masterCaution ;Left eyebrow;LED, LEDMatrix
+1502;CAUTION;bool;tf;Left eyebrow;LED, LEDMatrix
+1503;CAUTION;byte;oxy_BROW ;Repurposed for eyebrow OXY LOW (was OBS, unused);LED, LEDMatrix
+1504;CAUTION;bool;equip_HOT ;"Caution light; repurposed for cooling fault (was: not used)";LED, LEDMatrix
+1505;LIGHTS;bool;onGround ;True if on ground: this is not a lamp bit!;LED, LEDMatrix
+1506;CAUTION;bool;eng_FIRE ;"Right eyebrow; upper half of split face lamp";LED, LEDMatrix
+1507;CAUTION;bool;config;Stores config, caution panel;LED, LEDMatrix
+1508;CAUTION;bool;hyd;"Right eyebrow; see also OIL (this lamp is not split face)";LED, LEDMatrix
+1509;TEST/FLCS;bool;flcs_ABCD ;"TEST panel FLCS channel lamps; repurposed, was OIL (see HYD; that lamp is not split face)";LED, LEDMatrix
+1510;CAUTION;bool;flcs;"Right eyebrow; was called DUAL which matches block 25, 30/32 and older 40/42";LED, LEDMatrix
+1511;CAUTION;bool;can;Right eyebrow;LED, LEDMatrix
+1512;CAUTION;bool;t_l_CFG ;Right eyebrow;LED, LEDMatrix
+1513;INDEXER;bool;aoaAbove ;AOA Indexer top;LED, LEDMatrix
+1514;INDEXER;bool;aoaOn ;AOA Indexer center;LED, LEDMatrix
+1515;INDEXER;bool;aoaBelow ;AOA Indexer bottom;LED, LEDMatrix
+1516;INDEXER;bool;refuelRDY ;Refuel/NWS top;LED, LEDMatrix
+1517;INDEXER;bool;refuelAR ;Refuel/NWS center;LED, LEDMatrix
+1518;INDEXER;bool;refuelDSC ;Refuel/NWS bottom;LED, LEDMatrix
+1519;CAUTION;bool;fltControlSys ;Caution lights;LED, LEDMatrix
+1520;CAUTION;bool;leFlaps ;Caution lights;LED, LEDMatrix
+1521;CAUTION;bool;engineFault ;Caution lights;LED, LEDMatrix
+1522;CAUTION;bool;overheat ;Caution lights;LED, LEDMatrix
+1523;CAUTION;bool;fuelLow ;Caution lights;LED, LEDMatrix
+1524;CAUTION;bool;avionics ;Caution lights;LED, LEDMatrix
+1525;CAUTION;bool;radarAlt ;Caution lights;LED, LEDMatrix
+1526;CAUTION;bool;iff;Caution lights;LED, LEDMatrix
+1527;CAUTION;bool;ecm;Caution lights;LED, LEDMatrix
+1528;CAUTION;bool;hook ;Caution lights;LED, LEDMatrix
+1529;CAUTION;bool;nwsFail ;Caution lights;LED, LEDMatrix
+1530;CAUTION;bool;cabinPress ;Caution lights;LED, LEDMatrix
+1531;SYSTEMS;bool;autoPilotOn ;TRUE if is AP on.  NB: This is not a lamp bit!;LED, LEDMatrix
+1532;SYSTEMS;bool;tfr_STBY ;"MISC panel; lower half of split face TFR lamp";LED, LEDMatrix
+1540;LIGHTS;uint;lightBits2;Cockpit Indicator Lights, one bit per bulb. See enum;
+1541;CMDS/RWR;bool;handOff ;Threat Warning Prime;LED, LEDMatrix
+1542;CMDS/RWR;byte;launch ;Threat Warning Prime;LED, LEDMatrix
+1543;CMDS/RWR;byte;priMode ;Threat Warning Prime;LED, LEDMatrix
+1544;CMDS/RWR;bool;naval ;Threat Warning Prime;LED, LEDMatrix
+1545;CMDS/RWR;byte;unk ;Threat Warning Prime;LED, LEDMatrix
+1546;CMDS/RWR;bool;tgtSep ;Threat Warning Prime;LED, LEDMatrix
+1547;CMDS/RWR;bool;go ;EWS on and operating normally;LED, LEDMatrix
+1548;CMDS/RWR;bool;noGo ;EWS on but malfunction present;LED, LEDMatrix
+1549;CMDS/RWR;bool;degr ;EWS Status message: AUTO DEGR;LED, LEDMatrix
+1550;CMDS/RWR;bool;rdy ;EWS Status message: DISPENSE RDY;LED, LEDMatrix
+1551;CMDS/RWR;bool;chaffLo ;EWS Bingo chaff quantity reached;LED, LEDMatrix
+1552;CMDS/RWR;bool;flareLo ;EWS Bingo flare quantity reached;LED, LEDMatrix
+1553;CMDS/RWR;byte;auxSrch ;Aux Threat Warning;LED, LEDMatrix
+1554;CMDS/RWR;bool;auxAct ;Aux Threat Warning;LED, LEDMatrix
+1555;CMDS/RWR;bool;auxLow ;Aux Threat Warning;LED, LEDMatrix
+1556;CMDS/RWR;bool;auxPwr ;Aux Threat Warning;LED, LEDMatrix
+1557;CMDS/RWR;bool;ecmPwr ;ECM;LED, LEDMatrix
+1558;CMDS/RWR;bool;ecmFail ;ECM;LED, LEDMatrix
+1559;CAUTION;bool;fwdFuelLow ;Caution lights;LED, LEDMatrix
+1560;CAUTION;bool;aftFuelLow ;Caution lights;LED, LEDMatrix
+1561;ENGINE;byte;epuOn ;"EPU panel; run light";LED, LEDMatrix
+1562;ENGINE;byte;jfsOn ;"Eng Jet Start panel; run light";LED, LEDMatrix
+1563;CAUTION;bool;sec ;Caution panel;LED, LEDMatrix
+1564;CAUTION;bool;oxy_Low;Caution panel;LED, LEDMatrix
+1565;CAUTION;byte;probeHeat;Caution panel;LED, LEDMatrix
+1566;CAUTION;bool;seat_Arm;Caution panel;LED, LEDMatrix
+1567;CAUTION;bool;buc;Caution panel;LED, LEDMatrix
+1568;CAUTION;bool;fuel_Oil_Hot ;Caution panel;LED, LEDMatrix
+1569;CAUTION;bool;anti_Skid;Caution panel;LED, LEDMatrix
+1570;CAUTION;bool;tfr_Engaged;"MISC panel; upper half of split face TFR lamp";LED, LEDMatrix
+1571;GEAR;bool;gearHandle ;Lamp in gear handle lights on fault or gear in motion;LED, LEDMatrix
+1572;CAUTION;bool;engine;Lower half of right eyebrow ENG FIRE/ENGINE lamp;LED, LEDMatrix
+1580;LIGHTS;uint;lightBits3;Cockpit Indicator Lights, one bit per bulb. See enum;
+1581;ELECTRICS;bool;flcsPmg ;Elec Panel;LED, LEDMatrix
+1582;ELECTRICS;bool;mainGen ;Elec Panel;LED, LEDMatrix
+1583;ELECTRICS;bool;stbyGen ;Elec Panel;LED, LEDMatrix
+1584;ELECTRICS;bool;epuGen ;Elec Panel;LED, LEDMatrix
+1585;ELECTRICS;bool;epuPmg ;Elec Panel;LED, LEDMatrix
+1586;ELECTRICS;bool;toFlcs ;Elec Panel;LED, LEDMatrix
+1587;ELECTRICS;bool;flcsRly ;Elec Panel;LED, LEDMatrix
+1588;ELECTRICS;bool;batFail ;Elec Panel;LED, LEDMatrix
+1589;ENGINE;bool;hydrazine ;EPU Panel ;LED, LEDMatrix
+1590;ENGINE;bool;air ;EPU Panel ;LED, LEDMatrix
+1591;CAUTION;bool;elec_Fault ;Caution panel;LED, LEDMatrix
+1592;CAUTION;bool;lef_Fault ;Caution panel;LED, LEDMatrix
+1593;GEAR;bool;onGround ;Weight-on-wheels;LED, LEDMatrix
+1594;TEST/FLCS;bool;flcsBitRun ;FLT CONTROL panel RUN light (used to be Multi-engine fire light);LED, LEDMatrix
+1595;TEST/FLCS;bool;flcsBitFail ;"FLT CONTROL panel FAIL light (used to be Lock light Cue; non-F-16)";LED, LEDMatrix
+1596;CAUTION;bool;dbuWarn ;"Right eyebrow DBU ON cell; was Shoot light cue; non-F16";LED, LEDMatrix
+1597;GEAR;bool;noseGearDown ;"Landing gear panel; on means down and locked";LED, LEDMatrix
+1598;GEAR;bool;leftGearDown ;"Landing gear panel; on means down and locked";LED, LEDMatrix
+1599;GEAR;bool;rightGearDown ;"Landing gear panel; on means down and locked";LED, LEDMatrix
+1600;GEAR;bool;parkBrakeOn ;"Parking brake engaged; NOTE: not a lamp bit";LED, LEDMatrix
+1601;ELECTRICS;bool;power_Off ;Set if there is no electrical power.  NB: not a lamp bit;LED, LEDMatrix
+1602;CAUTION;bool;cadc ;Caution panel;LED, LEDMatrix
+1603;AIRCRAFT;bool;sSpeedBrake ;True if speed brake is in anything other than stowed position;LED, LEDMatrix
+1604;TEST/FLCS;bool;sysTest ;Threat Warning Prime - additional bits;LED, LEDMatrix
+1605;CAUTION;bool;mcAnnounced ;"Master Caution WILL come up in 3sec; turns off when MC light is on";LED, LEDMatrix
+1606;AIRCRAFT;bool;mlgWow ;MLGWOW is only for AFM , it means WOW switches on MLG are triggered ;LED, LEDMatrix
+1607;AIRCRAFT;bool;nlgWow ;NLGWOW is only for AFM , it means WOW switches on MLG are triggered ;LED, LEDMatrix
+1608;CAUTION;bool;atf_Not_Engaged;Autopilot status TFR;LED, LEDMatrix
+1609;CAUTION;bool;Inlet_Icing;Caution Panel ;LED, LEDMatrix
+1610;CAUTION;bool;Nuclear;Not implemented in BMS;LED, LEDMatrix
+1611;CAUTION;bool;EEC;Not implemented in BMS;LED, LEDMatrix
+1612;CAUTION;bool;---;Unused spaces  of the Caution Panel. Not implemented in BMS;LED, LEDMatrix
+1619;CAUTION;bool;AllCPLightsOn;true if all caution panel lights are on;LED, LEDMatrix
+1620;CMDS/RWR;byte;EcmOperStates;see enum EcmOperStates for details;
+1630;CMDS/RWR;byte[];JammingStates;see enum JammingStates for details;
+1640;CMDS/RWR;int[];ecmBits;see EcmBits enum for details - Note: these are currently not combinable bits, but mutually exclusive states!;
+1641;CMDS/RWR;bool;ECM1_Standby;;LED, LEDMatrix
+1642;CMDS/RWR;bool;ECM1_Active;;LED, LEDMatrix
+1643;CMDS/RWR;bool;ECM1_Transmit;;LED, LEDMatrix
+1644;CMDS/RWR;bool;ECM1_Fail;;LED, LEDMatrix
+1645;CMDS/RWR;bool;ECM2_Standby;;LED, LEDMatrix
+1646;CMDS/RWR;bool;ECM2_Active;;LED, LEDMatrix
+1647;CMDS/RWR;bool;ECM2_Transmit;;LED, LEDMatrix
+1648;CMDS/RWR;bool;ECM2_Fail;;LED, LEDMatrix
+1649;CMDS/RWR;bool;ECM3_Standby;;LED, LEDMatrix
+1650;CMDS/RWR;bool;ECM3_Active;;LED, LEDMatrix
+1651;CMDS/RWR;bool;ECM3_Transmit;;LED, LEDMatrix
+1652;CMDS/RWR;bool;ECM3_Fail;;LED, LEDMatrix
+1653;CMDS/RWR;bool;ECM4_Standby;;LED, LEDMatrix
+1654;CMDS/RWR;bool;ECM4_Active;;LED, LEDMatrix
+1655;CMDS/RWR;bool;ECM4_Transmit;;LED, LEDMatrix
+1656;CMDS/RWR;bool;ECM4_Fail;;LED, LEDMatrix
+1657;CMDS/RWR;bool;ECM5_Standby;;LED, LEDMatrix
+1658;CMDS/RWR;bool;ECM5_Active;;LED, LEDMatrix
+1659;CMDS/RWR;bool;ECM5_Transmit;;LED, LEDMatrix
+1660;CMDS/RWR;bool;ECM5_Fail;;LED, LEDMatrix
+1661;CMDS/RWR;bool;ECM6_7_8_Standby;Not implemented in BMS;LED, LEDMatrix
+1662;CMDS/RWR;bool;ECM6_7_8_Active;Not implemented in BMS;LED, LEDMatrix
+1663;CMDS/RWR;bool;ECM6_7_8_Transmit;Not implemented in BMS;LED, LEDMatrix
+1664;CMDS/RWR;bool;ECM6_7_8_Fail;Not implemented in BMS;LED, LEDMatrix
+1670;AIRCRAFT;float;DoNotUse;magDeviationSystem moved to 1390;
+1680;AIRCRAFT;float;DoNotUse;magDeviationReal moved to 1400;
+1690;LIGHTS;byte;Flood Console;current floodconsole brightness setting, see FloodConsole enum for details;Lighting
+1700;AIRCRAFT;byte;aaMissileFired;How many AA missiles fired.;Max7219, TM1637, LCD, OLED
+1710;AIRCRAFT;byte;agMissileFired;How many maverick/rockets fired;Max7219, TM1637, LCD, OLED
+1720;AIRCRAFT;byte;bombDropped;How many bombs dropped;Max7219, TM1637, LCD, OLED
+1730;AIRCRAFT;byte;flareDropped;How many flares dropped;Max7219, TM1637, LCD, OLED
+1740;AIRCRAFT;byte;chaffDropped;How many chaff dropped;Max7219, TM1637, LCD, OLED
+1750;AIRCRAFT;byte;bulletsFired;How many bullets shot;Max7219, TM1637, LCD, OLED
+1760;AIRCRAFT;int;collisionCounter;Collisions;
+1770;AIRCRAFT;bool;isFiringGun;True if gun is firing;LED, LEDMatrix
+1780;AIRCRAFT;bool;isEndFlight;True if player is ending the flight from 3D;LED, LEDMatrix
+1790;AIRCRAFT;bool;isEjecting;True if player has ejected;LED, LEDMatrix
+1800;AIRCRAFT;bool;in3D;True if player is in3D;LED, LEDMatrix
+1810;AIRCRAFT;bool;isPaused;True if Sim is paused;LED, LEDMatrix
+1820;AIRCRAFT;bool;isFrozen;True if Sim is frozen;LED, LEDMatrix
+1830;AIRCRAFT;bool;isOverG;True if G limits are being exceeded;LED, LEDMatrix
+1840;AIRCRAFT;bool;isOnGround;True if player a/c is on the ground;LED, LEDMatrix
+1850;AIRCRAFT;bool;isExitGame;True if player exits the game (2D);
+1860;AIRCRAFT;float ;gForce;Current G force;Max7219, TM1637, LCD, OLED, StepperX27, StepperVID
+1870;AIRCRAFT;float ;eyex;Where the eye is in relationship to the plane;
+1880;AIRCRAFT;float ;eyey;Where the eye is in relationship to the plane;
+1890;AIRCRAFT;float ;eyez;Where the eye is in relationship to the plane;
+1900;AIRCRAFT;int ;lastdamage;1 to 8 depending on quadrant. ;
+1910;AIRCRAFT;float ;damageforce;How big the hit was.;
+1920;AIRCRAFT;int;whendamage;???;
+1930;RADIO;int;radio2_preset;Radio 2 channel preset (if present).;Max7219, TM1637, LCD, OLED
+1940;RADIO;int;radio2_frequency;Radio 2 channel frequency (if present).;Max7219, TM1637, LCD, OLED
+1950;IFF;int;iffTransponderActiveCode1;mode 1;Max7219, TM1637, LCD, OLED
+1960;IFF;int;iffTransponderActiveCode2;mode 2;Max7219, TM1637, LCD, OLED
+1970;IFF;int;iffTransponderActiveCode3A;mode 3A;Max7219, TM1637, LCD, OLED
+1980;IFF;int;iffTransponderActiveCodeC;mode C;Max7219, TM1637, LCD, OLED
+1990;IFF;int;iffTransponderActiveCode4;"mode 4; assumes the correct codeword";Max7219, TM1637, LCD, OLED
+2000;RADIO;string[];bupUhfFreq;Manuel UHF Freqs for BUP Radio;
+2001;RADIO;string;bupUhfFreqCh1;Manuel UHF Freqs for BUP Radio Channel1;BUPRadio
+2002;RADIO;string;bupUhfFreqCh2;Manuel UHF Freqs for BUP Radio Channel2;BUPRadio
+2003;RADIO;string;bupUhfFreqCh3;Manuel UHF Freqs for BUP Radio Channel3;BUPRadio
+2004;RADIO;string;bupUhfFreqCh4;Manuel UHF Freqs for BUP Radio Channel4;BUPRadio
+2005;RADIO;string;bupUhfFreqCh5;Manuel UHF Freqs for BUP Radio Channel5;BUPRadio
+2006;RADIO;string;bupUhfFreqCh6;Manuel UHF Freqs for BUP Radio Channel6;BUPRadio
+2007;RADIO;string;bupUhfFreqCh7;Manuel UHF Freqs for BUP Radio Channel7;BUPRadio
+2008;RADIO;string;bupUhfFreqCh8;Manuel UHF Freqs for BUP Radio Channel8;BUPRadio
+2009;RADIO;string;bupUhfFreqCh9;Manuel UHF Freqs for BUP Radio Channel9;BUPRadio
+2010;RADIO;string;bupUhfFreqCh10;Manuel UHF Freqs for BUP Radio Channel10;BUPRadio
+2011;RADIO;string;bupUhfFreqCh11;Manuel UHF Freqs for BUP Radio Channel11;BUPRadio
+2012;RADIO;string;bupUhfFreqCh12;Manuel UHF Freqs for BUP Radio Channel12;BUPRadio
+2013;RADIO;string;bupUhfFreqCh13;Manuel UHF Freqs for BUP Radio Channel13;BUPRadio
+2014;RADIO;string;bupUhfFreqCh14;Manuel UHF Freqs for BUP Radio Channel14;BUPRadio
+2015;RADIO;string;bupUhfFreqCh15;Manuel UHF Freqs for BUP Radio Channel15;BUPRadio
+2016;RADIO;string;bupUhfFreqCh16;Manuel UHF Freqs for BUP Radio Channel16;BUPRadio
+2017;RADIO;string;bupUhfFreqCh17;Manuel UHF Freqs for BUP Radio Channel17;BUPRadio
+2018;RADIO;string;bupUhfFreqCh18;Manuel UHF Freqs for BUP Radio Channel18;BUPRadio
+2019;RADIO;string;bupUhfFreqCh19;Manuel UHF Freqs for BUP Radio Channel19;BUPRadio
+2020;RADIO;string;bupUhfFreqCh20;Manuel UHF Freqs for BUP Radio Channel20;BUPRadio
+3000;UNKNOWN;int;desired_RTT_FPS;The configured RTT export FPS value, g_nRTTExport_FPS;LCD
+3010;HSI/ADI/TACAN;int;tacan_ils_frequency;Tacan ILS (110.30 = 11030). Valid interval [108.10, 111.95];Max7219, TM1637, LCD, OLED
+3020;HSI/ADI/TACAN;float;sideSlipdeg;ADI side Slip ;LCD
+5000;DCSCommon;string;DCSBIOSVer;Version of DCSBIOS;LCD
+5010;DCS_GFS;int;SpeedbrakeLeft;Position of left speedbrake;LCD, OLED, StepperX27, StepperVID, Servo, ServoPWM
+5020;DCS_GFS;int;SpeedbrakeRight;Position of right speedbrake;LCD, OLED, StepperX27, StepperVID, Servo, ServoPWM
+5030;DCS_GFS;bool;Flaps_Warn;Flaps overspeed warning light;LED, LEDMatrix
+5031;DCS_GFS;bool;Flaps_Half;Flaps Half indicator light;LED, LEDMatrix
+5032;DCS_GFS;bool;Flaps_Full;Flaps Full indicator light;LED, LEDMatrix
+5043;DCS_Indexer;bool;Lock;Lock indexer light;LED, LEDMatrix
+5044;DCS_Indexer;bool;Shoot;Shoot indexer light;LED, LEDMatrix
+5060;DCS_Indexer;bool;Shoot_Strobe;Shoot indexer light is blinking;LED, LEDMatrix
+5061;DCS_Indexer;bool;AA_Mode;F18 AA Mode indicator light;LED, LEDMatrix
+5062;DCS_Indexer;bool;AG_Mode;F18 AG Mode indicator light;LED, LEDMatrix
+5063;DCS_Caution;bool;DISCH;F18 Fire extiguisher discharge indicator light;LED, LEDMatrix
+5064;DCS_Caution;bool;MC_Ready;F18 Fire extiguisher ready indicator light;LED, LEDMatrix
+5065;DCS_Caution;bool;Eng_Fire_Right;Right engine fire warning light (Left is on ID 1506);LED, LEDMatrix
+5066;DCS_Caution;bool;APU_Fire;APU fire warning light;LED, LEDMatrix
+5067;DCS_Caution;bool;Spin;Spin warning light;LED, LEDMatrix
+;DCS_Caution;bool;APU;APU warning light;LED, LEDMatrix
+;DCS_Caution;bool;Gen_L;Generator left failure warning light;LED, LEDMatrix
+;DCS_Caution;bool;Gen_R;Generator right failure warning light;LED, LEDMatrix
