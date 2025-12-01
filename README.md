@@ -1,7 +1,7 @@
 # BMSAIT-Project
 Falcon BMS to Arduino Interface Tool
 
-BMSAIT ist an interface tool for cockpit builders.
+BMSAIT is an interface tool for cockpit builders.
 It allows to relay output data from the shared memory of Falcon BMS to output devices like LED, LCD, Servo motors and many others.
 BMSAIT also allows to register input commands from digital and analog sources like switches, encoders and potentiometers to simulate keyboard and 
 joystick commands that will be send to Falcon BMS.</p>
@@ -14,3 +14,6 @@ The folder "02 Windows App" contains the needed files to run the windows applica
 The folder "03 Arduino Code" contains a basic, unedited set of arduino code to be used for individual customizations</p>
 The folder "04 Beispielprogramme" contains pre-edited arduino sketches, matching configurations for the windows app and a documentation about how to run the examples.</p>
 
+tutorial videos:
+BMSAIT setup/basic settings:         https://www.youtube.com/watch?v=HeJZFDz4m_k
+BMSAIT introduction/tutial by Mihi:  https://www.youtube.com/watch?v=6cLPfiHxl_U
